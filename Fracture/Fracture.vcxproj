@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -117,14 +118,29 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\ThirdParty\Cinder\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\ThirdParty\Cinder\include;..\ThirdParty\PhysX/Include;..\ThirdParty\PhysX/Include/foundation;..\ThirdParty\PhysX/Include/pxtask;..\ThirdParty\PhysX/Include/geometry;..\ThirdParty\PhysX/Include/extensions;..\ThirdParty\PhysX/source/fastxml/include;..\ThirdParty\PhysX/source/foundation/include;..\ThirdParty\PhysX/Include/pvd;..\ThirdParty\Voro++\include\3D;..\ThirdParty\Voro++\include\2D;..\ThirdParty\Solid_Boolean\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\hgl\Desktop\FractureDemo\Fracture\ThirdParty\Cinder\lib\msw\x64\Debug\v143;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cinderDEBUG.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\ThirdParty\Cinder\lib\msw\x64\Debug\v143;..\ThirdParty\PhysX/lib/;..\ThirdParty\Voro++\lib\Debug;..\ThirdParty\Solid_Boolean\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cinderDEBUG.lib;LowLevelClothDEBUG.lib;LowLevelDEBUG.lib;
+LowLevelDynamicsDEBUG.lib
+;LowLevelParticlesDEBUG.lib;
+PhysX3CharacterKinematicDEBUG_x64.lib;
+PhysX3CommonDEBUG_x64.lib;
+PhysX3CookingDEBUG_x64.lib;PhysX3DEBUG_x64.lib;
+PhysX3ExtensionsDEBUG.lib
+;PhysX3VehicleDEBUG.lib
+;PsFastXmlDEBUG_x64.lib
+;
+PxFoundationDEBUG_x64.lib;
+PxPvdSDKDEBUG_x64.lib;
+PxTaskDEBUG_x64.lib;
+SceneQueryDEBUG.lib;
+SimulationControllerDEBUG.lib
+;LowLevelAABBDEBUG.lib;voro++.lib;Solid_Boolean.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,11 +161,50 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Application.cpp" />
+    <ClCompile Include="..\src\FActor.cpp" />
+    <ClCompile Include="..\src\FAttack.cpp" />
+    <ClCompile Include="..\src\FDamage.cpp" />
+    <ClCompile Include="..\src\FDamageManager.cpp" />
+    <ClCompile Include="..\src\FMeshBoolean.cpp" />
+    <ClCompile Include="..\src\FPerlinNoise.cpp" />
+    <ClCompile Include="..\src\FRenderMesh.cpp" />
+    <ClCompile Include="..\src\FScene.cpp" />
+    <ClCompile Include="..\src\FSiteGenerator.cpp" />
+    <ClCompile Include="..\src\FVoronoi2D.cpp" />
+    <ClCompile Include="..\src\FVoronoi3D.cpp" />
+    <ClCompile Include="..\src\FWireMesh.cpp" />
+    <ClCompile Include="..\src\MeshBoolean.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\FActor.h" />
+    <ClInclude Include="..\src\FAttack.h" />
+    <ClInclude Include="..\src\FDamage.h" />
+    <ClInclude Include="..\src\FDamageManager.h" />
+    <ClInclude Include="..\src\FMeshBoolean.h" />
+    <ClInclude Include="..\src\FPerlinNoise.h" />
+    <ClInclude Include="..\src\Fracture.h" />
+    <ClInclude Include="..\src\FRenderMesh.h" />
+    <ClInclude Include="..\src\FScene.h" />
+    <ClInclude Include="..\src\FSiteGenerator.h" />
+    <ClInclude Include="..\src\FVoronoi2D.h" />
+    <ClInclude Include="..\src\FVoronoi3D.h" />
+    <ClInclude Include="..\src\FWireMesh.h" />
+    <ClInclude Include="..\src\MeshBoolean.h" />
     <ClInclude Include="..\src\Resources.h" />
+    <ClInclude Include="..\src\Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets'))" />
+  </Target>
 </Project>

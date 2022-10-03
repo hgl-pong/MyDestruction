@@ -107,7 +107,7 @@ struct LightData {
 	vec3						target;
 };
 
-class ShadowMappingApp : public App {
+class Application : public App {
   public:
 	void setup() override;
 	void update() override;
@@ -142,7 +142,7 @@ class ShadowMappingApp : public App {
 	float						mPolygonOffsetFactor, mPolygonOffsetUnits;
 };
 
-void ShadowMappingApp::setup()
+void Application::setup()
 {
 	Rand::randomize();
 	
@@ -207,7 +207,7 @@ void ShadowMappingApp::setup()
 	mCamUi = CameraUi( &mCamera, getWindow() );
 }
 
-void ShadowMappingApp::update()
+void Application::update()
 {
 	ImGui::Begin( "Settings" );
 	ImGui::Text( "Framerate: %f", mFrameRate );
@@ -247,7 +247,7 @@ void ShadowMappingApp::update()
 	mFrameRate = getAverageFps();
 }
 
-void ShadowMappingApp::drawScene( float spinAngle, const gl::GlslProgRef& shadowGlsl )
+void Application::drawScene( float spinAngle, const gl::GlslProgRef& shadowGlsl )
 {
 	{
 		gl::ScopedColor red( Color( 0.98f, 0.22f, 0.10f ));
@@ -265,7 +265,7 @@ void ShadowMappingApp::drawScene( float spinAngle, const gl::GlslProgRef& shadow
 	}
 	
 	{
-		gl::ScopedColor white( Color( 0.90f, 0.97f, 0.97f ) );
+		gl::ScopedColor white( Color( 0.10f, 0.17f, 0.97f ) );
 		for ( const auto& transform : mTransforms ) {
 			gl::ScopedModelMatrix push;
 			gl::scale( vec3(0.25) );
@@ -278,7 +278,7 @@ void ShadowMappingApp::drawScene( float spinAngle, const gl::GlslProgRef& shadow
 	}
 }
 
-void ShadowMappingApp::draw()
+void Application::draw()
 {
 	gl::clear( Color( 0.07f, 0.05f, 0.1f ) );
 	
@@ -293,6 +293,7 @@ void ShadowMappingApp::draw()
 	gl::setMatrices( mLight.camera );
 	gl::viewport( mShadowMap->getSize() );
 	{
+		
 		gl::ScopedFramebuffer bindFbo( mShadowMap->getFbo() );
 		gl::clear();
 		drawScene( spinAngle );
@@ -317,14 +318,13 @@ void ShadowMappingApp::draw()
 		
 		drawScene( spinAngle, mShadowShader );
 	}
-	
 	gl::disable( GL_POLYGON_OFFSET_FILL );
 	
 	// Render light direction vector
 	gl::drawVector( mLight.viewpoint, 4.5f * normalize( mLight.viewpoint ) );
 }
 
-void ShadowMappingApp::keyDown( KeyEvent event )
+void Application::keyDown( KeyEvent event )
 {
 	if( event.getChar() == 'f' ) {
 		app::setFullScreen( !app::isFullScreen() );
@@ -339,4 +339,4 @@ void prepareSettings( App::Settings *settings )
 #endif
 }
 
-CINDER_APP( ShadowMappingApp, RendererGl( RendererGl::Options().msaa( 16 ) ), prepareSettings )
+CINDER_APP( Application, RendererGl( RendererGl::Options().msaa( 16 ) ), prepareSettings )
