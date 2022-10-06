@@ -1,0 +1,11 @@
+# Created with Anim8or 1.00
+# Object "B":
+
+newmtl Flat_Rock___Base
+Ka 0.224 0.224 0.224
+Kd 0.49 0.49 0.49
+Ks 0.694 0.694 0.694
+Ns 738.6
+map_Kd RocksFlatLong_Base-Diffuse.png
+map_Ks RocksFlatLong_Base-Specular.png
+

@@ -11,7 +11,7 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 // PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2021 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -42,26 +42,19 @@
 #include "common/PxTypeInfo.h"
 #include "common/PxStringTable.h"
 
-//
-// Important: if you adjust the comment about binary compatible versions below, don't forget to adjust the compatibility list in
-// sBinaryCompatibleVersionsbinary as well
-//
 /**
-PX_BINARY_SERIAL_VERSION is used to specify the binary data format compatibility additionally to the physics sdk version. 
-The binary format version is defined as "PX_PHYSICS_VERSION_MAJOR.PX_PHYSICS_VERSION_MINOR.PX_PHYSICS_VERSION_BUGFIX-PX_BINARY_SERIAL_VERSION".
-The following binary format versions are compatible with the current physics version:
-  (no compatible versions)
-
-The PX_BINARY_SERIAL_VERSION for a given PhysX release is typically 0. If incompatible modifications are made to a customer specific branch the
-number should be increased.
+PX_BINARY_SERIAL_VERSION is used to version the PhysX binary data and meta data. The global unique identifier of the PhysX SDK needs to match 
+the one in the data and meta data, otherwise they are considered incompatible. A 32 character wide GUID can be generated with https://www.guidgenerator.com/ for example. 
 */
-#define PX_BINARY_SERIAL_VERSION 0
+#define PX_BINARY_SERIAL_VERSION "77E92B17A4084033A0FDB51332D5A6BB"
 
 
 #if !PX_DOXYGEN
 namespace physx
 {
 #endif
+
+	class PxBinaryConverter;
 
 /**
 \brief Utility functions for serialization
@@ -134,7 +127,6 @@ public:
 	 - shapes require their material(s) and mesh (triangle mesh, convex mesh or height field), if any
 	 - articulations require their links and joints
 	 - aggregates require their actors
-	 - cloth actors require their cloth fabric
 
 	If followJoints is specified another rule is added:
 	 - actors require their joints
@@ -239,6 +231,21 @@ public:
 	@see PxCollection, PxOutputStream, PxSerialization::complete, PxSerialization::createCollectionFromBinary, PxSerializationRegistry
 	*/
 	static	bool			serializeCollectionToBinary(PxOutputStream& outputStream, PxCollection& collection, PxSerializationRegistry& sr, const PxCollection* externalRefs = NULL, bool exportNames = false );
+
+	/**
+	\brief Serializes a collection to a binary stream.
+
+	Convenience function that serializes a collection to a stream while rebasing memory addresses and handles
+	to achieve a deterministic output, independent of the PhysX runtime environment the objects have been created in. 
+
+	The same functionality can be achieved by manually
+	- creating a binary data stream with PxSerialization::serializeCollectionToBinary
+	- producing the binary meta data of the current runtime platform with PxSerialization::dumpBinaryMetaData
+	- converting the binary data stream with the PxBinaryConverter, using the binary meta for both source and destination
+
+	@see PxSerialization::serializeCollectionToBinary, PxSerialization::dumpBinaryMetaData, PxBinaryConverter
+	*/
+	static bool				serializeCollectionToBinaryDeterministic(PxOutputStream& outputStream, PxCollection& collection, PxSerializationRegistry& sr, const PxCollection* externalRefs = NULL, bool exportNames = false);
 
 	/** 
 	\brief Dumps the binary meta-data to a stream.

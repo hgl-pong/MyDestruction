@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Fracture", "Fracture\Fracture.vcxproj", "{491AF9BE-109C-4AB0-981F-0B6DA4C5EF45}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImGui", "ThirdParty\ImGui\ImGui.vcxproj", "{2B0863F6-DFF1-48D5-8016-8EEE63859162}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{491AF9BE-109C-4AB0-981F-0B6DA4C5EF45}.Release|x64.Build.0 = Release|x64
 		{491AF9BE-109C-4AB0-981F-0B6DA4C5EF45}.Release|x86.ActiveCfg = Release|Win32
 		{491AF9BE-109C-4AB0-981F-0B6DA4C5EF45}.Release|x86.Build.0 = Release|Win32
+		{2B0863F6-DFF1-48D5-8016-8EEE63859162}.Debug|x64.ActiveCfg = Debug|x64
+		{2B0863F6-DFF1-48D5-8016-8EEE63859162}.Debug|x64.Build.0 = Debug|x64
+		{2B0863F6-DFF1-48D5-8016-8EEE63859162}.Debug|x86.ActiveCfg = Debug|x64
+		{2B0863F6-DFF1-48D5-8016-8EEE63859162}.Debug|x86.Build.0 = Debug|x64
+		{2B0863F6-DFF1-48D5-8016-8EEE63859162}.Release|x64.ActiveCfg = Release|x64
+		{2B0863F6-DFF1-48D5-8016-8EEE63859162}.Release|x64.Build.0 = Release|x64
+		{2B0863F6-DFF1-48D5-8016-8EEE63859162}.Release|x86.ActiveCfg = Release|x64
+		{2B0863F6-DFF1-48D5-8016-8EEE63859162}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

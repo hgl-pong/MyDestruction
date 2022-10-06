@@ -1,6 +1,8 @@
 #ifndef FACTOR_H
 #define FACTOR_H
 #include "PxPhysicsAPI.h"
+#include "Common/MeshData.h"
+#include <string>
 using namespace physx;
 struct FChunk {
 	float m_Volume;
@@ -9,6 +11,10 @@ struct FChunk {
 	float m_Life;
 	bool m_IsSleeping;
 };
+
+class FRenderMesh;
+class FWireMesh;
+class FScene;
 class FActor
 {
 public:
@@ -24,13 +30,19 @@ public:
 	bool RemoveAllActors();
 	bool Update();
 	
-	bool OnEnterScene();
-	bool OnLeaveScene();
+	bool OnEnterScene(FScene* scene);
+	bool OnLeaveScene(FScene* scene);
 	
 	bool SetRenderWireFrame();
 
+private:
+	FRenderMesh* m_pRenderMesh;
+	FWireMesh* m_pWireMesh;
 
+	Graphics::MeshData* m_pMeshData;
+	PxMaterial* m_pMaterial;
 
+	char* name;
 };
 #endif // FACTOR_H
 

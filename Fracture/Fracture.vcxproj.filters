@@ -13,11 +13,23 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\Renderer">
+      <UniqueIdentifier>{77cd9875-f667-4b8c-8507-f6ca0a9d1451}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\UI">
+      <UniqueIdentifier>{b94875bc-db72-4f95-8ac8-8dd27bca8ee4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Logger">
+      <UniqueIdentifier>{abd40907-8f68-4efb-b477-719fc4c0082c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Importer">
+      <UniqueIdentifier>{1b1976b1-0516-4af1-8652-c5f27f52fe9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Common">
+      <UniqueIdentifier>{576f377a-b1f0-4a0b-9100-088b80a3fcff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Application.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\FActor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -56,6 +68,93 @@
     </ClCompile>
     <ClCompile Include="..\src\FPerlinNoise.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FPhysics.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\UI.cpp">
+      <Filter>头文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\Renderer.cpp">
+      <Filter>头文件\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\BoudingBoxEffect.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\Camera.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\CameraController.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\CascadedShadowManager.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\Collision.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\CpuTimer.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\DDSTextureLoader.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\DXTrace.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\EffectHelper.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\ForwardEffect.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\Geometry.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\GpuTimer.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\MaterialManager.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\RenderStates.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\ShadowEffect.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\SkyBox.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\SkyboxToneMapEffect.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\stb_image.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\Texture.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\Texture2D.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\WICTextureLoader.cpp">
+      <Filter>头文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common\Application.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Logger\Logger.cpp">
+      <Filter>头文件\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Importer\TextureImporter.cpp">
+      <Filter>头文件\Importer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Importer\MeshImporter.cpp">
+      <Filter>头文件\Importer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +204,117 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Fracture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FGraphics.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FPhysics.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\UI.h">
+      <Filter>头文件\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\Renderer.h">
+      <Filter>头文件\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Base.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Buffer.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Camera.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\CameraController.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\CascadedShadowManager.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Collision.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\CpuTimer.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\DDSTextureLoader.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\DXTrace.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\EffectHelper.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Effects.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Geometry.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\GpuTimer.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\IEffect.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Material.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\MaterialManager.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\MeshData.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Property.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\RenderStates.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\SkyBox.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\stb_image.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Texture.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Texture2D.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Transform.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Vertex.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\WICTextureLoader.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\WinMin.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\XUtil.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common\Application.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Logger\Logger.h">
+      <Filter>头文件\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Importer\MeshImporter.h">
+      <Filter>头文件\Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Importer\TextureImporter.h">
+      <Filter>头文件\Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Effects.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

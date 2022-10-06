@@ -1,5 +1,9 @@
 #ifndef FSCENE_H
 #define FSCENE_H
+#include "PxPhysicsAPI.h"
+#include <set>
+using namespace physx;
+class FActor;
 class FScene
 {
 public:
@@ -15,8 +19,13 @@ public:
 	bool RemoveAllActors();
 	bool Update();
 
-	bool Simulate(bool simulate);
-
+	bool SetSimulateState(bool simulate);
+	bool GetSimulateState();
+private:
+	PxScene* m_pScene;
+	PxMaterial* m_pMaterial;
+	bool m_Simulating;
+	std::set<FActor*> m_Actors;
 };
 #endif // FSCENE_H
 

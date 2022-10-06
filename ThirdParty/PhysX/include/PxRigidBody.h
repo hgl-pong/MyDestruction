@@ -11,7 +11,7 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 // PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2021 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -131,7 +131,50 @@ struct PxRigidBodyFlag
 		/**
 		\brief Permit CCD to limit maxContactImpulse. This is useful for use-cases like a destruction system but can cause visual artefacts so is not enabled by default.
 		*/
-		eENABLE_CCD_MAX_CONTACT_IMPULSE		= (1 << 6)
+		eENABLE_CCD_MAX_CONTACT_IMPULSE = (1 << 6),
+
+		/**
+		\brief Carries over forces/accelerations between frames, rather than clearning them
+		*/
+		eRETAIN_ACCELERATIONS = (1<<7),
+
+		/**
+		\brief Forces kinematic-kinematic pairs notifications for this actor.
+
+		This flag overrides the global scene-level PxPairFilteringMode setting for kinematic actors.
+		This is equivalent to having PxPairFilteringMode::eKEEP for pairs involving this actor.
+
+		A particular use case is when you have a large amount of kinematic actors, but you are only
+		interested in interactions between a few of them. In this case it is best to use set
+		PxSceneDesc.kineKineFilteringMode = PxPairFilteringMode::eKILL, and then raise the
+		eFORCE_KINE_KINE_NOTIFICATIONS flag on the small set of kinematic actors that need
+		notifications.
+
+		\note This has no effect if PxRigidBodyFlag::eKINEMATIC is not set.
+
+		\warning Changing this flag at runtime will not have an effect until you remove and re-add the actor to the scene.
+
+		@see PxPairFilteringMode PxSceneDesc.kineKineFilteringMode
+		*/
+		eFORCE_KINE_KINE_NOTIFICATIONS = (1<<8),
+
+		/**
+		\brief Forces static-kinematic pairs notifications for this actor.
+
+		Similar to eFORCE_KINE_KINE_NOTIFICATIONS, but for static-kinematic interactions.
+
+		\note This has no effect if PxRigidBodyFlag::eKINEMATIC is not set.
+
+		\warning Changing this flag at runtime will not have an effect until you remove and re-add the actor to the scene.
+
+		@see PxPairFilteringMode PxSceneDesc.staticKineFilteringMode
+		*/
+		eFORCE_STATIC_KINE_NOTIFICATIONS = (1<<9),
+
+		/**
+		\brief Reserved for internal usage
+		*/
+		eRESERVED = (1<<15)
 	};
 };
 
@@ -140,8 +183,8 @@ struct PxRigidBodyFlag
 
 @see PxRigidBodyFlag
 */
-typedef PxFlags<PxRigidBodyFlag::Enum,PxU8> PxRigidBodyFlags;
-PX_FLAGS_OPERATORS(PxRigidBodyFlag::Enum,PxU8)
+typedef PxFlags<PxRigidBodyFlag::Enum,PxU16> PxRigidBodyFlags;
+PX_FLAGS_OPERATORS(PxRigidBodyFlag::Enum,PxU16)
 
 /**
 \brief PxRigidBody is a base class shared between dynamic rigid body objects.
@@ -275,6 +318,56 @@ public:
 	*/
 	virtual		PxVec3			getMassSpaceInvInertiaTensor()			const = 0;
 
+	/************************************************************************************************/
+	/** @name Damping
+	*/
+
+	/**
+	\brief Sets the linear damping coefficient.
+
+	Zero represents no damping. The damping coefficient must be nonnegative.
+
+	<b>Default:</b> 0.0
+
+	\param[in] linDamp Linear damping coefficient. <b>Range:</b> [0, PX_MAX_F32)
+
+	@see getLinearDamping() setAngularDamping()
+	*/
+	virtual		void				setLinearDamping(PxReal linDamp) = 0;
+
+	/**
+	\brief Retrieves the linear damping coefficient.
+
+	\return The linear damping coefficient associated with this actor.
+
+	@see setLinearDamping() getAngularDamping()
+	*/
+	virtual		PxReal				getLinearDamping() const = 0;
+
+	/**
+	\brief Sets the angular damping coefficient.
+
+	Zero represents no damping.
+
+	The angular damping coefficient must be nonnegative.
+
+	<b>Default:</b> 0.05
+
+	\param[in] angDamp Angular damping coefficient. <b>Range:</b> [0, PX_MAX_F32)
+
+	@see getAngularDamping() setLinearDamping()
+	*/
+	virtual		void				setAngularDamping(PxReal angDamp) = 0;
+
+	/**
+	\brief Retrieves the angular damping coefficient.
+
+	\return The angular damping coefficient associated with this actor.
+
+	@see setAngularDamping() getLinearDamping()
+	*/
+	virtual		PxReal				getAngularDamping() const = 0;
+
 
 /************************************************************************************************/
 /** @name Velocity
@@ -344,7 +437,63 @@ public:
 	*/
 	virtual		void			setAngularVelocity(const PxVec3& angVel, bool autowake = true ) = 0;
 
-	
+	/**
+	\brief Lets you set the maximum angular velocity permitted for this actor.
+
+	For various internal computations, very quickly rotating actors introduce error
+	into the simulation, which leads to undesired results.
+
+	With this function, you can set the  maximum angular velocity permitted for this rigid body.
+	Higher angular velocities are clamped to this value.
+
+	Note: The angular velocity is clamped to the set value <i>before</i> the solver, which means that
+	the limit may still be momentarily exceeded.
+
+	<b>Default:</b> 100.0
+
+	\param[in] maxAngVel Max allowable angular velocity for actor. <b>Range:</b> [0, PX_MAX_F32)
+
+	@see getMaxAngularVelocity()
+	*/
+	virtual		void				setMaxAngularVelocity(PxReal maxAngVel) = 0;
+
+	/**
+	\brief Retrieves the maximum angular velocity permitted for this actor.
+
+	\return The maximum allowed angular velocity for this actor.
+
+	@see setMaxAngularVelocity
+	*/
+	virtual		PxReal				getMaxAngularVelocity()	const = 0;
+
+
+	/**
+	\brief Lets you set the maximum linear velocity permitted for this actor.
+
+	With this function, you can set the  maximum linear velocity permitted for this rigid body.
+	Higher angular velocities are clamped to this value.
+
+	Note: The angular velocity is clamped to the set value <i>before</i> the solver, which means that
+	the limit may still be momentarily exceeded.
+
+	<b>Default:</b> PX_MAX_F32
+
+	\param[in] maxLinVel Max allowable linear velocity for actor. <b>Range:</b> [0, PX_MAX_F32)
+
+	@see getMaxAngularVelocity()
+	*/
+	virtual		void				setMaxLinearVelocity(PxReal maxLinVel) = 0;
+
+	/**
+	\brief Retrieves the maximum angular velocity permitted for this actor.
+
+	\return The maximum allowed angular velocity for this actor.
+
+	@see setMaxLinearVelocity
+	*/
+	virtual		PxReal				getMaxLinearVelocity()	const = 0;
+
+
 /************************************************************************************************/
 /** @name Forces
 */
@@ -453,6 +602,20 @@ public:
 	*/
 	virtual		void			clearTorque(PxForceMode::Enum mode = PxForceMode::eFORCE) = 0;
 
+
+	/**
+	\brief Sets the impulsive force and torque defined in the global coordinate frame to the actor.
+
+	::PxForceMode determines if the cleared torque is to be conventional or impulsive.
+
+	\note The force modes PxForceMode::eIMPULSE and PxForceMode::eVELOCITY_CHANGE can not be applied to articulation links.
+
+	\note It is invalid to use this method if the actor has not been added to a scene already or if PxActorFlag::eDISABLE_SIMULATION is set.
+
+	@see PxForceMode addTorque
+	*/
+	virtual		void			setForceAndTorque(const PxVec3& force, const PxVec3& torque, PxForceMode::Enum mode = PxForceMode::eFORCE) = 0;
+
 	/**
 	\brief Raises or clears a particular rigid body flag.
 	
@@ -537,8 +700,6 @@ public:
 	bodies will be the minimum	of the two limit values. For a collision between a static and a dynamic body, the impulse is limited
 	by the value for the dynamic body.
 
-	This value is not used in CCD unless PxRigidBodyFlag::eENABLE_CCD_MAX_CONTACT_IMPULSE is raised on the body.
-
 	\param[in] maxImpulse the maximum contact impulse. <b>Range:</b> [0, PX_MAX_F32] <b>Default:</b> PX_MAX_F32
 
 	@see getMaxContactImpulse
@@ -553,6 +714,13 @@ public:
 	@see setMaxContactImpulse
 	*/
 	virtual PxReal getMaxContactImpulse() const = 0;
+
+	/**
+	\brief Returns the island node index that only for internal use only
+
+	\return The island node index that only for internal use only
+	*/
+	virtual PxU32 getInternalIslandNodeIndex() const = 0;
 
 
 protected:

@@ -11,7 +11,7 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 // PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2021 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -89,8 +89,10 @@ public:
 		PxShape* shape = PxGetPhysics().createShape(geometry, materials, materialCount, true, shapeFlags);
 		if(shape)
 		{
-			actor.attachShape(*shape);	// attach can fail, if e.g. we try and attach a trimesh simulation shape to a dynamic actor
+			bool status = actor.attachShape(*shape);	// attach can fail, if e.g. we try and attach a trimesh simulation shape to a dynamic actor
 			shape->release();		// if attach fails, we hold the only counted reference, and so this cleans up properly
+			if(!status)
+				shape = NULL;
 		}
 		return shape;
 	}
@@ -130,6 +132,18 @@ public:
 		PxMaterial* materialPtr = const_cast<PxMaterial*>(&material);
 		return createExclusiveShape(actor, geometry, &materialPtr, 1, shapeFlags);
 	}
+
+
+	/**
+	\brief Gets a list of bounds based on shapes in rigid actor. This list can be used to cook/create
+	bounding volume hierarchy though PxCooking API.
+
+	\param[in] actor The actor from which the bounds list is retrieved.
+	\param[out] numBounds Number of bounds in returned list.
+
+	@see PxShape PxBVHStructure PxCooking::createBVHStructure PxCooking::cookBVHStructure
+	*/
+	static PxBounds3*					getRigidActorShapeLocalBoundsList(const PxRigidActor& actor, PxU32& numBounds);
 
 };
 

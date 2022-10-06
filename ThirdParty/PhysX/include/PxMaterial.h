@@ -11,7 +11,7 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 // PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2021 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -77,7 +77,20 @@ struct PxMaterialFlag
 
 		Note: This flag only has an effect if the PxMaterialFlag::eDISABLE_FRICTION bit is 0.
 		*/
-		eDISABLE_STRONG_FRICTION = 1 << 1
+		eDISABLE_STRONG_FRICTION = 1 << 1,
+
+		/**
+		This flag only has an effect if PxFrictionType::ePATCH friction model is used.
+
+		When using the patch friction model, up to 2 friction anchors are generated per patch. As the number of friction anchors
+		can be smaller than the number of contacts, the normal force is accumulated over all contacts and used to compute friction
+		for all anchors. Where there are more than 2 anchors, this can produce frictional behavior that is too strong (approximately 2x as strong
+		as analytical models suggest). 
+
+		This flag causes the normal force to be distributed between the friction anchors such that the total amount of friction applied does not 
+		exceed the analyical results.
+		*/
+		eIMPROVED_PATCH_FRICTION = 1 << 2
 	};
 };
 
@@ -227,24 +240,31 @@ public:
 	
 	See the list of flags #PxMaterialFlag
 
+	<b>Default:</b> no flags are set
+
 	<b>Sleeping:</b> Does <b>NOT</b> wake any actors which may be affected.
 
-	\param[in] flag The PxMaterial flag to raise(set) or clear.
+	\param[in]	flag	The PxMaterial flag to raise(set) or clear.
+	\param[in]	b		New state of the flag
 
-	@see getFlags() PxMaterialFlag
+	@see getFlags() setFlags() PxMaterialFlag
 	*/
-	virtual		void			setFlag(PxMaterialFlag::Enum flag, bool) = 0;
-
+	virtual		void			setFlag(PxMaterialFlag::Enum flag, bool b) = 0;
 
 	/**
 	\brief sets all the material flags.
 	
 	See the list of flags #PxMaterialFlag
 
+	<b>Default:</b> no flags are set
+
 	<b>Sleeping:</b> Does <b>NOT</b> wake any actors which may be affected.
 
+	\param[in]	flags	All PxMaterial flags
+
+	@see getFlags() setFlag() PxMaterialFlag
 	*/
-	virtual		void 			setFlags( PxMaterialFlags inFlags ) = 0;
+	virtual		void 			setFlags(PxMaterialFlags flags) = 0;
 
 	/**
 	\brief Retrieves the flags. See #PxMaterialFlag.
@@ -259,6 +279,8 @@ public:
 	\brief Sets the friction combine mode.
 	
 	See the enum ::PxCombineMode .
+
+	<b>Default:</b> PxCombineMode::eAVERAGE
 
 	<b>Sleeping:</b> Does <b>NOT</b> wake any actors which may be affected.
 
@@ -283,6 +305,8 @@ public:
 	\brief Sets the restitution combine mode.
 	
 	See the enum ::PxCombineMode .
+
+	<b>Default:</b> PxCombineMode::eAVERAGE
 
 	<b>Sleeping:</b> Does <b>NOT</b> wake any actors which may be affected.
 

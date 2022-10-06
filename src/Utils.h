@@ -2,7 +2,7 @@
 #define UTILS_H
 
 #define FASSERT(X)\
-if(X)\
+if(!X)\
 {\
   goto Exit0;\
 }
@@ -18,6 +18,20 @@ if(X)\
 if(X)\
 {\
   delete []X;\
+	X = nullptr; \
+}
+
+#define PHYSX_RELEASE(X)\
+if(X)\
+{\
+  X->release();\
+	X = nullptr; \
+}
+
+#define FRELEASE(X)\
+if(X)\
+{\
+  X->Release();\
 	X = nullptr; \
 }
 

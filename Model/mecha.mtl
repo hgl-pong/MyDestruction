@@ -1,0 +1,8 @@
+newmtl 01 - Default
+	map_Kd 
+	Kd 0.149020 0.149020 0.149020
+
+newmtl neverMat123XABCnever
+	map_Kd 
+	Kd 0.149020 0.149020 0.149020
+
