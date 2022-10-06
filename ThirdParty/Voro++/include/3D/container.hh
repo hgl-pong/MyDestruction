@@ -23,6 +23,13 @@
 
 namespace voro {
 
+	static void guess_optimal(int siteCount, double dx, double dy, double dz, int& nx, int& ny, int& nz) {
+		double ilscale = pow(siteCount / (optimal_particles * dx * dy * dz), 1 / 3.0);
+		nx = int(dx * ilscale + 1);
+		ny = int(dy * ilscale + 1);
+		nz = int(dz * ilscale + 1);
+	}
+
 /** \brief Pure virtual class from which wall objects are derived.
  *
  * This is a pure virtual class for a generic wall object. A wall object
@@ -306,6 +313,10 @@ class container : public container_base, public radius_mono {
 			import(fp);
 			fclose(fp);
 		}
+		voro_compute<container> make_compute() const
+		{
+			return voro_compute<container>((container&)*this, xperiodic ? 2 * nx + 1 : nx, yperiodic ? 2 * ny + 1 : ny, zperiodic ? 2 * nz + 1 : nz);
+		}
 		/** Imports a list of particles from an open file stream into
 		 * the container. Entries of four numbers (Particle ID, x
 		 * position, y position, z position) are searched for. In
@@ -462,6 +473,11 @@ class container : public container_base, public radius_mono {
 		template<class v_cell,class c_loop>
 		inline bool compute_cell(v_cell &c,c_loop &vl) {
 			return vc.compute_cell(c,vl.ijk,vl.q,vl.i,vl.j,vl.k);
+		}
+
+		template<class v_cell, class c_loop>
+		inline bool compute_cell(v_cell& c, c_loop& vl, voro_compute<container>& vc) {
+			return vc.compute_cell(c, vl.ijk, vl.q, vl.i, vl.j, vl.k);
 		}
 		/** Computes the Voronoi cell for given particle.
 		 * \param[out] c a Voronoi cell class in which to store the

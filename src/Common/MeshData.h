@@ -17,6 +17,7 @@
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
 #include "Transform.h"
+#include "Material.h"
 using namespace DirectX;
 namespace Graphics {
     struct VertexPNT

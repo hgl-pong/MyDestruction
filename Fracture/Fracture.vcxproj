@@ -114,17 +114,17 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;USE_LOGGER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;USE_LOGGER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\ThirdParty\PhysX/Include;..\ThirdParty\PhysX/Include/foundation;..\ThirdParty\PhysX/Include/pxtask;..\ThirdParty\PhysX/Include/geometry;..\ThirdParty\PhysX/Include/extensions;..\ThirdParty\PhysX/source/fastxml/include;..\ThirdParty\PhysX/source/foundation/include;..\ThirdParty\PhysX/Include/pvd;..\ThirdParty\Voro++\include\3D;..\ThirdParty\Voro++\include\2D;..\ThirdParty\Solid_Boolean\include;..\ThirdParty\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ThirdParty\PhysX/Include;..\ThirdParty\PhysX/Include/foundation;..\ThirdParty\PhysX/Include/pxtask;..\ThirdParty\PhysX/Include/geometry;..\ThirdParty\PhysX/Include/extensions;..\ThirdParty\PhysX/source/fastxml/include;..\ThirdParty\PhysX/source/foundation/include;..\ThirdParty\PhysX/Include/pvd;..\ThirdParty\Voro++\include\3D;..\ThirdParty\Solid_Boolean\include;..\ThirdParty\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\ThirdParty\PhysX/lib/debug/;..\ThirdParty\Voro++\lib\Debug;..\ThirdParty\Solid_Boolean\lib\Debug;..\ThirdParty\ImGui\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>voro++.lib;Solid_Boolean.lib;PhysXCooking_64.lib;PhysXCommon_64.lib;PhysXCharacterKinematic_static_64.lib;PhysX_64.lib;LowLevelDynamics_static_64.lib;LowLevelAABB_static_64.lib;LowLevel_static_64.lib;PhysXVehicle_static_64.lib;PhysXTask_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;SimulationController_static_64.lib;SceneQuery_static_64.lib;ImGuid.lib;dxguid.lib;d3d11.lib;dxgi.lib;winmm.lib;d3dcompiler.lib;d2d1.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Voro++3D.lib;Solid_Boolean.lib;PhysXCooking_64.lib;PhysXCommon_64.lib;PhysXCharacterKinematic_static_64.lib;PhysX_64.lib;LowLevelDynamics_static_64.lib;LowLevelAABB_static_64.lib;LowLevel_static_64.lib;PhysXVehicle_static_64.lib;PhysXTask_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;SimulationController_static_64.lib;SceneQuery_static_64.lib;ImGuid.lib;dxguid.lib;d3d11.lib;dxgi.lib;winmm.lib;d3dcompiler.lib;d2d1.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -245,6 +245,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\ImGui\ImGui.vcxproj">
       <Project>{2b0863f6-dff1-48d5-8016-8eee63859162}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\Voro++\include\3D\voro++.vcxproj">
+      <Project>{e95662bb-4f22-34ee-bed9-06613752364b}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

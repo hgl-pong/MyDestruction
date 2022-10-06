@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <set>
 
+class FWireMesh;
 namespace Graphics {
     class Renderer :public Base {
     public:
@@ -41,8 +42,13 @@ namespace Graphics {
         void DrawMeshQueue(IEffect* effect);
 		bool AddRenderMesh(MeshData* data);
 		bool RemoveRenderMesh(MeshData* data);
+		bool AddVoroMesh(MeshData* data);
+		bool RemoveVoroMesh(MeshData* data);
         bool AddRenderBoundingBox(size_t mesh_id, BoundingBox* box);
         bool RemoveRenderBoundingBox(size_t mesh_id);
+
+		Graphics::MeshData* CreateVoroMeshData(FWireMesh*mesh);
+
 
         /**
          * 设置视窗宽度
@@ -74,14 +80,15 @@ namespace Graphics {
         void OnResize();                  // 在窗口大小变动的时候调用
         float AspectRatio()const;
 
-        void LoadSceneBuffer();
+        void LoadSceneBuffer(); 
+        Graphics::MeshData* createBoundingBoxMesh(BoundingBox* box);
     private:
 
         bool InitResource();
 		bool DrawMesh(MeshData* mesh, IEffect* effect);
-
+        bool DrawVoroMesh(MeshData* mesh);
         bool DrawBoundingBox(MeshData& mesh);
-        Graphics::MeshData* createBoundingBoxMesh(BoundingBox* box);
+
 
         void RenderShadowForAllCascades();
         void RenderForward();
@@ -152,7 +159,8 @@ namespace Graphics {
         std::unique_ptr<BoudingBoxEffect> m_pBoundingBoxEffect;			// 天空盒特效
         ComPtr<ID3D11ShaderResourceView> m_pTextureCubeSRV;				// 天空盒纹理
 
-        std::set<Graphics::MeshData*>m_RenderMesh;
+		std::set<Graphics::MeshData*>m_RenderMesh;
+		std::set<Graphics::MeshData*>m_VoroMesh;
 
         int m_ClientWidth;                                           // 视口宽度
         int m_ClientHeight;                                          // 视口高度

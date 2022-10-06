@@ -118,13 +118,13 @@ namespace Graphics {
 	{
 		deviceContext->IASetInputLayout(pImpl->m_pVertexColorLayout.Get());
 		pImpl->m_pCurrEffectPass = pImpl->m_pEffectHelper->GetEffectPass("Cube");
-		//pImpl->m_pCurrEffectPass->SetDepthStencilState(RenderStates::DSSGreaterEqual.Get(), 0);
+		pImpl->m_pCurrEffectPass->SetDepthStencilState(RenderStates::DSSGreaterEqual.Get(), 0);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	}
 
 	void XM_CALLCONV BoudingBoxEffect::SetWorldMatrix(DirectX::FXMMATRIX W)
 	{
-		XMStoreFloat4x4(&pImpl->m_View, W);
+		XMStoreFloat4x4(&pImpl->m_World, W);
 	}
 
 	void XM_CALLCONV BoudingBoxEffect::SetViewMatrix(DirectX::FXMMATRIX V)
@@ -145,10 +145,10 @@ namespace Graphics {
 			meshData.m_pColors.Get(),
 		};
 		input.strides = { 12, 16 };
-		input.offsets = { 0, 0 };
+		input.offsets = { 0,0 };
 
 		input.pIndexBuffer = meshData.m_pIndices.Get();
-
+		input.indexCount = meshData.m_IndexCount;
 		return input;
 	}
 
@@ -157,6 +157,7 @@ namespace Graphics {
 	{
 
 		XMMATRIX WVP = XMLoadFloat4x4(&pImpl->m_World) * XMLoadFloat4x4(&pImpl->m_View) * XMLoadFloat4x4(&pImpl->m_Proj);
+		WVP = XMMatrixTranspose(WVP);
 		pImpl->m_pEffectHelper->GetConstantBufferVariable("g_MViewProj")->SetFloatMatrix(4, 4, (const FLOAT*)&WVP);
 
 		pImpl->m_pCurrEffectPass->Apply(deviceContext);

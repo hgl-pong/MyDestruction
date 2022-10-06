@@ -21,7 +21,7 @@ public:
 	FActor();
 	~FActor();
 
-	bool Init();
+	bool Init(char * name);
 	bool Release();
 	bool ReInit();
 
@@ -44,7 +44,7 @@ private:
 
 	PxMaterial* m_pMaterial;
 
-	char* name;
+	char* m_Name;
 };
 #endif // FACTOR_H
 

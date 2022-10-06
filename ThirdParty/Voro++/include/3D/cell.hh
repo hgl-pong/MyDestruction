@@ -14,7 +14,7 @@
 
 #include "config.hh"
 #include "common.hh"
-
+#include "vec.h"
 namespace voro {
 
 /** \brief A class representing a single Voronoi cell.
@@ -400,6 +400,7 @@ class voronoicell : public voronoicell_base {
 			init_tetrahedron_base(x0,y0,z0,x1,y1,z1,x2,y2,z2,x3,y3,z3);
 		}
 		void init_l_shape();
+		void extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices);
 	private:
 		inline void n_allocate(int i,int m) {};
 		inline void n_add_memory_vertices(int i) {};

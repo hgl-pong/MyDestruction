@@ -9,11 +9,6 @@ FScene::FScene():
 
 }
 
-FScene::FScene()
-{
-
-}
-
 FScene::~FScene()
 {
 	Release();

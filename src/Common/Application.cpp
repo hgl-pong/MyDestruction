@@ -5,7 +5,7 @@
 #include "../Utils.h"
 #include "../FPhysics.h"
 #include "../FScene.h"
-
+#include "../FActor.h"
 #pragma warning(disable: 6031)
 using namespace DirectX;
 extern "C"
@@ -163,6 +163,11 @@ bool Application::Init()
     Logger::Debug(m_pRenderer->name,"初始化Renderer成功！");
 
     Logger::Debug("Application","加载完成!");
+
+    FActor* actor=new FActor();
+    char name[] = "box";
+    actor->Init(name);
+    actor->OnEnterScene(m_pScene);
 
     return true;
 }

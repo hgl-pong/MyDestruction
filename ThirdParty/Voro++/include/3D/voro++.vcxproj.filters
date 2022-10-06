@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\hgl\Desktop\algorithm\voro\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F7F54F6B-D300-35E2-AB3F-91E580A33769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{4cc2bbf7-ee6a-4310-8251-3764ee43a6a8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="c_loops.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="cell.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="common.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="config.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="container.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="container_prd.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="pre_container.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="rad_option.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="unitcell.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="v_base.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="v_compute.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="vec.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="voro++.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="wall.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="worklist.hh">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="c_loops.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cell.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_line.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="container.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="container_prd.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pre_container.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unitcell.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="v_base.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="v_compute.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="voro++.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wall.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

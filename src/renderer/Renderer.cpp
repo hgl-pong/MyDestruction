@@ -7,6 +7,8 @@
 #include <wrl/client.h>
 #include <DirectXColors.h>
 #include <DirectXMath.h>
+
+#include "../FWireMesh.h"
 using namespace DirectX;
 namespace
 {
@@ -156,6 +158,19 @@ namespace Graphics {
 		return true;
 	}
 
+	bool Renderer::AddVoroMesh(MeshData* data)
+	{
+		return m_VoroMesh.emplace(data).second;
+	}
+
+	bool Renderer::RemoveVoroMesh(MeshData* data)
+	{
+		auto it = m_VoroMesh.find(data);
+		if (it != m_VoroMesh.end())
+			m_VoroMesh.erase(data);
+		return true;
+	}
+
 	bool Renderer::AddRenderBoundingBox(size_t mesh_id, BoundingBox* box)
 	{
 		return true;
@@ -164,6 +179,32 @@ namespace Graphics {
 	bool Renderer::RemoveRenderBoundingBox(size_t mesh_id)
 	{
 		return true;
+	}
+
+	Graphics::MeshData* Renderer::CreateVoroMeshData(FWireMesh* mesh)
+	{
+		Graphics::MeshData* meshData = new Graphics::MeshData();
+
+		CD3D11_BUFFER_DESC bufferDesc(0, D3D11_BIND_VERTEX_BUFFER);
+		D3D11_SUBRESOURCE_DATA initData{ nullptr, 0, 0 };
+		bufferDesc.ByteWidth = sizeof(XMFLOAT3)* mesh->vertices.size();
+		initData.pSysMem = mesh->vertices.data();
+		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pVertices.GetAddressOf()));
+
+		bufferDesc.ByteWidth = sizeof(XMFLOAT4) * mesh->colors.size();
+		initData.pSysMem = mesh->colors.data();
+		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pColors.GetAddressOf()));
+
+		// 设置索引缓冲区描述
+		bufferDesc = CD3D11_BUFFER_DESC(sizeof(uint32_t) * mesh->indices.size(), D3D11_BIND_INDEX_BUFFER);
+
+		// 新建索引缓冲区
+		initData.pSysMem = mesh->vertices.data();
+		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pIndices.GetAddressOf()));
+
+		meshData->m_VertexCount = mesh->vertices.size();
+		meshData->m_IndexCount = mesh->indices.size();
+		return meshData;
 	}
 
 	void Renderer::SwapChainPresent() {
@@ -455,6 +496,23 @@ namespace Graphics {
 		
 		return true;
 	}
+
+	bool Renderer::DrawVoroMesh(MeshData* mesh)
+	{
+		m_pBoundingBoxEffect->SetWorldMatrix(mesh->m_Transform.GetLocalToWorldMatrixXM());
+
+		MeshDataInput input = m_pBoundingBoxEffect->GetInputData(*mesh);
+		// 输入装配阶段的顶点缓冲区设置
+		m_pBoundingBoxEffect->Apply(m_pd3dImmediateContext.Get());
+		m_pd3dImmediateContext->IASetIndexBuffer(input.pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		m_pd3dImmediateContext->IASetVertexBuffers(0, 2,
+			input.pVertexBuffers.data(), input.strides.data(), input.offsets.data());
+
+		// 绘制立方体
+		m_pd3dImmediateContext->DrawIndexed(input.indexCount, 0, 0);
+		return true;
+	}
+
 	void Renderer::OnResize()
 	{
 		assert(m_pd3dImmediateContext);
@@ -638,34 +696,31 @@ namespace Graphics {
 
 
 	void Renderer::RenderBoundingBoxes() {
-		//app->m_GpuTimer_BoundingBox.Start();
-		//{
-		//	//m_pd3dImmediateContext->ClearRenderTargetView(m_pLitBuffer->GetRenderTarget(), DirectX::Colors::Black);
-		//	//m_pd3dImmediateContext->ClearDepthStencilView(m_pDepthBuffer->GetDepthStencil(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
-		//	D3D11_VIEWPORT Viewport = app->m_pViewerCamera->GetViewPort();
-		//	m_pd3dImmediateContext->RSSetViewports(1, &Viewport);
+			app->m_GpuTimer_BoundingBox.Start();
+			{
+				// m_pd3dImmediateContext->ClearRenderTargetView(m_pLitBuffer->GetRenderTarget(), DirectX::Colors::Black);
+				// m_pd3dImmediateContext->ClearDepthStencilView(m_pDepthBuffer->GetDepthStencil(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
+				D3D11_VIEWPORT Viewport = app->m_pViewerCamera->GetViewPort();
+				m_pd3dImmediateContext->RSSetViewports(1, &Viewport);
+				m_pBoundingBoxEffect->SetRenderDefault(m_pd3dImmediateContext.Get());
+				ID3D11RenderTargetView* pRTVs[] = { m_pLitBuffer->GetRenderTarget() };
+				m_pd3dImmediateContext->OMSetRenderTargets(1, pRTVs, m_pDepthBuffer->GetDepthStencil());
+				// m_pd3dImmediateContext->OMSetRenderTargets(1, pRTVs, nullptr);
+				for (auto mesh : m_VoroMesh) {
+					DrawVoroMesh(mesh);	
+					//DrawBoundingBox(*mesh);
+				}
 
-
-		//	ID3D11RenderTargetView* pRTVs[] = { m_pLitBuffer->GetRenderTarget() };
-		//	m_pd3dImmediateContext->OMSetRenderTargets(1, pRTVs, m_pDepthBuffer->GetDepthStencil());
-
-		//	m_pBoundingBoxEffect->SetRenderDefault(m_pd3dImmediateContext.Get());
-		//	m_pBoundingBoxEffect->SetWorldMatrix((app->m_pUIDrawer->hitMesh)->mesh_transform->GetLocalToWorldMatrixXM());
-
-
-		//	for (auto it = m_pRenderBoundingBoxesQueue.begin(); it != m_pRenderBoundingBoxesQueue.end(); it++)
-		//		DrawBoundingBox(*it->second);
-
-		//	// 清除状态
-		//	m_pd3dImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
-		//	m_pBoundingBoxEffect->Apply(m_pd3dImmediateContext.Get());
-
-
-		//}
-		//app->m_GpuTimer_BoundingBox.Stop();
+				// 清除状态
+				m_pd3dImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
+			}
+			app->m_GpuTimer_BoundingBox.Stop();
 	}
 
 	bool Renderer::DrawBoundingBox(MeshData& mesh) {
+		//m_pBoundingBoxEffect->SetRenderDefault(m_pd3dImmediateContext.Get());
+		m_pBoundingBoxEffect->SetWorldMatrix(mesh.m_Transform.GetLocalToWorldMatrixXM());
+
 		MeshDataInput input = m_pBoundingBoxEffect->GetInputData(mesh);
 		// 输入装配阶段的顶点缓冲区设置
 		m_pBoundingBoxEffect->Apply(m_pd3dImmediateContext.Get());
@@ -675,58 +730,55 @@ namespace Graphics {
 
 		// 绘制立方体
 		m_pd3dImmediateContext->DrawIndexed(24, 0, 0);
-
-
+		//m_pBoundingBoxEffect->Apply(m_pd3dImmediateContext.Get());
 		// 清除状态
 		return true;
 	}
 
 	Graphics::MeshData* Renderer::createBoundingBoxMesh(BoundingBox* box) {
 		Graphics::MeshData* meshData = new Graphics::MeshData();
-		meshData->m_BoundingBox = BoundingBox(XMFLOAT3(0, 0, 0), XMFLOAT3(300.0f, 300.0f, 300.0f));
-		// ******************
-		// 设置立方体顶点
-		//    5________ 6
-		//    /|      /|
-		//   /_|_____/ |
-		//  1|4|_ _ 2|_|7
-		//   | /     | /
-		//   |/______|/
-		//  0       3
+		// meshData->m_BoundingBox = BoundingBox(XMFLOAT3(0, 0, 0), XMFLOAT3(50.0f, 50.0f, 50.0f));
+		//  ******************
+		//  设置立方体顶点
+		//     5________ 6
+		//     /|      /|
+		//    /_|_____/ |
+		//   1|4|_ _ 2|_|7
+		//    | /     | /
+		//    |/______|/
+		//   0       3
 		XMFLOAT3 center, extents, mnear, mfar;
-		//center = box->Center;
-		//extents = box->Extents;
-		center = meshData->m_BoundingBox.Center;
-		extents = meshData->m_BoundingBox.Extents;
-		//center = XMFLOAT3(box->Center.x/10, box->Center.y / 10, box->Center.z / 10);
-		//extents = XMFLOAT3(box->Extents.x / 10, box->Extents.y / 10, box->Extents.z / 10);
+		center = box->Center;
+		extents = box->Extents;
+		// center = meshData->m_BoundingBox.Center;
+		// extents = meshData->m_BoundingBox.Extents;
+		//  center = XMFLOAT3(box->Center.x/10, box->Center.y / 10, box->Center.z / 10);
+		//  extents = XMFLOAT3(box->Extents.x / 10, box->Extents.y / 10, box->Extents.z / 10);
 		mnear = XMFLOAT3(center.x - extents.x, center.y - extents.y, center.z - extents.z);
 		mfar = XMFLOAT3(center.x + extents.x, center.y + extents.y, center.z + extents.z);
 
 		XMFLOAT3 vertices[] =
 		{
-			{ mnear},
-			{ XMFLOAT3(mnear.x, mfar.y, mnear.z)},
-			{ XMFLOAT3(mfar.x, mfar.y, mnear.z)},
-			{ XMFLOAT3(mfar.x, mnear.y, mnear.z)},
+			{mnear},
+			{XMFLOAT3(mnear.x, mfar.y, mnear.z)},
+			{XMFLOAT3(mfar.x, mfar.y, mnear.z)},
+			{XMFLOAT3(mfar.x, mnear.y, mnear.z)},
 
-			{ XMFLOAT3(mnear.x, mnear.y, mfar.z)},
-			{ XMFLOAT3(mnear.x, mfar.y, mfar.z)},
-			{ mfar},
-			{ XMFLOAT3(mfar.x, mfar.y, mfar.z)}
-		};
+			{XMFLOAT3(mnear.x, mnear.y, mfar.z)},
+			{XMFLOAT3(mnear.x, mfar.y, mfar.z)},
+			{mfar},
+			{XMFLOAT3(mfar.x, mnear.y, mfar.z)} };
 
 		XMFLOAT4 colors[] = {
-			XMFLOAT4(1.0f,1.0f,0.5f,1.0f),
-			XMFLOAT4(1.0f,1.0f,0.5f,1.0f),
-			XMFLOAT4(1.0f,1.0f,0.5f,1.0f),
-			XMFLOAT4(1.0f,1.0f,0.5f,1.0f),
-			XMFLOAT4(1.0f,1.0f,0.5f,1.0f),
-			XMFLOAT4(1.0f,1.0f,0.5f,1.0f),
-			XMFLOAT4(1.0f,1.0f,0.5f,1.0f),
-			XMFLOAT4(1.0f,1.0f,0.5f,1.0f)
-		};
-		//VertexPosColor vertices[] =
+			XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f),
+			XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f),
+			XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f),
+			XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f),
+			XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f),
+			XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f),
+			XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f),
+			XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f) };
+		// VertexPosColor vertices[] =
 		//{
 		//	{ XMFLOAT3(-300.0f, -300.0f, -300.0f), XMFLOAT4(0.5f, 1.0f, 1.0f, 1.0f) },
 		//	{ XMFLOAT3(-300.0f, 300.0f, -300.0f), XMFLOAT4(0.5f, 1.0f, 1.0f, 1.0f) },
@@ -750,42 +802,40 @@ namespace Graphics {
 		initData.pSysMem = colors;
 		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pColors.GetAddressOf()));
 		// ******************
-	// 设置立方体顶点
-	//    5________ 6
-	//    /|      /|
-	//   /_|_____/ |
-	//  1|4|_ _ 2|_|7
-	//   | /     | /
-	//   |/______|/
-	//  0       3
+		// 设置立方体顶点
+		//    5________ 6
+		//    /|      /|
+		//   /_|_____/ |
+		//  1|4|_ _ 2|_|7
+		//   | /     | /
+		//   |/______|/
+		//  0       3
 		// ******************
 		// 索引数组
 		//
 		DWORD indices[] = {
 			// 正面
 			0, 1,
-			1,2,
+			1, 2,
 			2, 3,
-			3,0,
+			3, 0,
 			// 左面
-			1,5,
-			5,4,
-			4,0,
+			1, 5,
+			5, 4,
+			4, 0,
 			// 背面
-			4,7,
-			7,6,
-			6,5,
-			2,6,
-			3,7
-		};
+			4, 7,
+			7, 6,
+			6, 5,
+			2, 6,
+			3, 7 };
 		// 设置索引缓冲区描述
 		bufferDesc = CD3D11_BUFFER_DESC(sizeof indices, D3D11_BIND_INDEX_BUFFER);
 
 		// 新建索引缓冲区
 		initData.pSysMem = indices;
 		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pIndices.GetAddressOf()));
-
-
+		meshData->m_IndexCount = 24;
 		return meshData;
 	}
 

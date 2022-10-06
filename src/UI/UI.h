@@ -29,7 +29,7 @@ public:
 private:
 	void drawRendererControlPanel();
 private:
-	int speed = 0;
+	int speed = 1;
 };
 
 #endif //UI_H

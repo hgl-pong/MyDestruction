@@ -316,7 +316,6 @@
 
 #ifndef VOROPP_HH
 #define VOROPP_HH
-
 #include "config.hh"
 #include "common.hh"
 #include "cell.hh"

@@ -14,8 +14,8 @@ public:
 	bool Release();
 	bool ReInit();
 
-	bool AddActor();
-	bool RemoveActor();
+	bool AddActor(FActor*actor);
+	bool RemoveActor(FActor* actor);
 	bool RemoveAllActors();
 	bool Update();
 

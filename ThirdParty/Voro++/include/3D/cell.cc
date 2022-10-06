@@ -2706,6 +2706,46 @@ void voronoicell_neighbor::print_edges_neighbors(int i) {
 	} else printf("     ()");
 }
 
+/** Computes Unreal TArrays of all cell info. */
+void voronoicell::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices)
+{
+	Vertices.resize(p);
+	double* ptsp = pts;
+	for (int i = 0; i < p; i++)
+	{
+		Vertices[i].X = CellPosition.X + *(ptsp++) * 0.5;
+		Vertices[i].Y = CellPosition.Y + *(ptsp++) * 0.5;
+		Vertices[i].Z = CellPosition.Z + *(ptsp++) * 0.5;
+	}
+
+	FaceVertexIndices.clear();
+
+	// Vertex indices code (face_vertices)
+	int i, j, k, l, m, vp(0), vn;
+	for (i = 1; i < p; i++) for (j = 0; j < nu[i]; j++) {
+		k = ed[i][j];
+		if (k >= 0) { // on a new face
+			FaceVertexIndices.push_back(0); // placeholder for face vertex count
+			FaceVertexIndices.push_back(i);
+
+			ed[i][j] = -1 - k;
+			l = cycle_up(ed[i][nu[i] + j], k);
+			do {
+				FaceVertexIndices.push_back(k);
+				m = ed[k][l];
+				ed[k][l] = -1 - m;
+
+				l = cycle_up(ed[k][nu[k] + l], m);
+				k = m;
+			} while (k != i);
+
+			vn = FaceVertexIndices.size();
+			FaceVertexIndices[vp] = vn - vp - 1;
+			vp = vn;
+		}
+	}
+	reset_edges();
+}
 // Explicit instantiation
 template bool voronoicell_base::nplane(voronoicell&,double,double,double,double,int);
 template bool voronoicell_base::nplane(voronoicell_neighbor&,double,double,double,double,int);
