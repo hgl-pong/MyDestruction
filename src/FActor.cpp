@@ -1,5 +1,5 @@
 #include "FActor.h"
-
+#include "FScene.h"
 FActor::FActor()
 {
 
@@ -47,6 +47,7 @@ bool FActor::Update()
 
 bool FActor::OnEnterScene(FScene* scene)
 {
+	scene->AddActor(this);
 	return false;
 }
 

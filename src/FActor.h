@@ -40,6 +40,8 @@ private:
 	FWireMesh* m_pWireMesh;
 
 	Graphics::MeshData* m_pMeshData;
+	Graphics::MeshData* m_pVoroMeshData;
+
 	PxMaterial* m_pMaterial;
 
 	char* name;

@@ -3,7 +3,7 @@
 #include "../Common/XUtil.h"
 #include <Windows.h>
 #include <DirectXColors.h>
-
+#include "../FScene.h"
 using namespace DirectX;
 UIDrawer::UIDrawer(Application*application)
 {
@@ -86,7 +86,7 @@ LRESULT UIDrawer::UIHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 void UIDrawer::drawRendererControlPanel()
 {
 	ImGui::Begin("Control Panel",0, ImGuiWindowFlags_NoCollapse);
-	ImGui::SliderInt("Camera Speed", &speed, 0, 10);
+	ImGui::SliderInt("Camera Speed", &speed, 1, 10);
 
 	if (ImGui::Button("OK")) {
 
@@ -127,11 +127,11 @@ void UIDrawer::drawMenuBar()
 
 			if (ImGui::MenuItem("Run"))
 			{
-
+				app->m_pScene->SetSimulateState(true);
 			}
 			if (ImGui::MenuItem("Pause"))
 			{
-
+				app->m_pScene->SetSimulateState(false);
 			}
 			if (ImGui::MenuItem("Replay"))
 			{

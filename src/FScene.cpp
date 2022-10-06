@@ -9,6 +9,11 @@ FScene::FScene():
 
 }
 
+FScene::FScene()
+{
+
+}
+
 FScene::~FScene()
 {
 	Release();
@@ -48,19 +53,26 @@ bool FScene::ReInit()
 	return false;
 }
 
-bool FScene::AddActor()
+bool FScene::AddActor(FActor* actor)
 {
-	return false;
+	return m_Actors.emplace(actor).second;
 }
 
-bool FScene::RemoveActor()
+bool FScene::RemoveActor(FActor* actor)
 {
+	auto it = m_Actors.find(actor);
+	if (it != m_Actors.end())
+	{
+		m_Actors.erase(actor);
+		return true;
+	}
 	return false;
 }
 
 bool FScene::RemoveAllActors()
 {
-	return false;
+	m_Actors.clear();
+	return true;
 }
 
 bool FScene::Update()

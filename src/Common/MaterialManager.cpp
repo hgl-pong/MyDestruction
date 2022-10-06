@@ -44,6 +44,8 @@ Material* MaterialManager::createMaterial(std::string_view filename, const XMFLO
 	const XMFLOAT4 reflective) 
 {
 	XID nameID = StringToID(filename);
+	if (m_pMaterials.find(nameID) != m_pMaterials.end())
+		return m_pMaterials[nameID];
 	Material* material = new Material();
 	XMFLOAT4 vec{};
 	float value{};
@@ -73,7 +75,7 @@ bool MaterialManager::AddMaterial(std::string_view name, Material* material)
 Material* MaterialManager::GetMaterial(std::string_view filename)
 {
 	XID fileID = StringToID(filename);
-	if (m_pMaterials[fileID])
+	if (m_pMaterials.find(fileID) != m_pMaterials.end())
 		return m_pMaterials[fileID];
 	return nullptr;
 }
