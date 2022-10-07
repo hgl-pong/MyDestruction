@@ -845,11 +845,10 @@ namespace Graphics {
 		std::vector<XMFLOAT3> vertices;
 		std::vector<XMFLOAT4> colors;
 		std::vector<UINT> indices;
-			int vbsize = vertices.size();
 			XMFLOAT3 center(pos.X,pos.Y,pos.Z);
 			XMFLOAT4 color = XMFLOAT4(0.5f, 0.5f, 0.9f, 1.0f);
-			int vertsPerRow = 16;
-			int nRows = 16;
+			int vertsPerRow = 18;
+			int nRows = 17;
 
 			int nVerts = vertsPerRow * nRows + 2;
 
@@ -873,15 +872,15 @@ namespace Graphics {
 				}
 			}
 
-			int size = vbsize + vertsPerRow * nRows;
+			int size =  (vertsPerRow+1) * nRows;
 			//添加顶部和底部两个顶点信息
-			vertices.push_back( XMFLOAT3(0.f + center.x, radius + center.y, 0.f + center.z));
+			vertices.push_back( XMFLOAT3(center.x, center.y+radius  ,center.z));
 			colors.push_back(color);
-			vertices.push_back( XMFLOAT3(0.f + center.x, -radius + center.y, 0.f + center.z));
+			vertices.push_back( XMFLOAT3( center.x, center.y -radius,  center.z));
 			colors.push_back(color);
 
-			int start1 = vbsize + 0;
-			int start2 = size - vertsPerRow;
+			int start1 = 0;
+			int start2 = size - vertsPerRow-1;
 			int top = size;
 			int bottom = size + 1;
 			for (int i = 0; i < vertsPerRow; i++)
@@ -906,23 +905,23 @@ namespace Graphics {
 
 			}
 
-			for (int i = 0; i < nRows - 1; i++)
+			for (int i = 0; i < nRows-1 ; i++)
 			{
 				for (int j = 0; j < vertsPerRow; j++)
 				{
-					indices.push_back(vbsize + i * vertsPerRow + j);
-					indices.push_back(vbsize + (i + 1) * vertsPerRow + j + 1);
-					indices.push_back(vbsize + (i + 1) * vertsPerRow + j);
-					indices.push_back(vbsize + (i + 1) * vertsPerRow + j + 1);
-					indices.push_back(vbsize + (i + 1) * vertsPerRow + j);
-					indices.push_back(vbsize + i * vertsPerRow + j);
+					indices.push_back(i * vertsPerRow+i + j);
+					indices.push_back((i + 1) * vertsPerRow + i + j + 1);
+					indices.push_back((i + 1) * vertsPerRow + i + j + 1);
+					indices.push_back((i + 1) * vertsPerRow + i + j);
+					indices.push_back((i + 1) * vertsPerRow + i + j);
+					indices.push_back(i * vertsPerRow + i + j);
 
-					indices.push_back(vbsize + i * vertsPerRow + j);
-					indices.push_back(vbsize + i * vertsPerRow + j + 1);
-					indices.push_back(vbsize + (i + 1) * vertsPerRow + j + 1);
-					indices.push_back(vbsize + i * vertsPerRow + j + 1);
-					indices.push_back(vbsize + (i + 1) * vertsPerRow + j + 1);
-					indices.push_back(vbsize + i * vertsPerRow + j);
+					indices.push_back(i * vertsPerRow + i + j);
+					indices.push_back(i * vertsPerRow + i + j + 1);
+					indices.push_back(i * vertsPerRow + i + j + 1);
+					indices.push_back((i + 1) * vertsPerRow + i + j + 1);
+					indices.push_back((i + 1) * vertsPerRow + i + j + 1);
+					indices.push_back(i * vertsPerRow + i + j);
 
 				}
 			}

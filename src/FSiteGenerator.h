@@ -2,16 +2,21 @@
 #define FSITE_GENERATOR_H
 #include "vec.h"
 #include <vector>
+enum RandomType
+{
+	NORMAL,
+	GAUSSION,
+};
 class FSiteGenerator
 {
 public:
-	static void ImpactDamage(FVec3& pos, FVec3& transform, float radius, int num, std::vector<FVec3>&sites);
+	static void ImpactDamage(FVec3& pos, FVec3& transform, float radius, int num, std::vector<FVec3>&sites,RandomType type=NORMAL);
 private:
 	static double _RandomNumber(float min, float max)
 	{
 		return min + double(rand()) / RAND_MAX * (max - min);
 	}
-	static double generateGaussianNoise(double mu, double sigma)
+	static double _GaussianRandom(double mu, double sigma)
 	{
 		const double epsilon = (std::numeric_limits<double>::min)();
 		const double two_pi = 2.0 * 3.14159265358979323846;

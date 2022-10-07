@@ -115,7 +115,7 @@ bool FActor::Intersection(Ray& ray)
 	FVec3 transform(m_pMeshData->m_Transform.GetPosition().x,
 		m_pMeshData->m_Transform.GetPosition().y,
 		m_pMeshData->m_Transform.GetPosition().z);
-	FSiteGenerator::ImpactDamage(damage.center,transform , damage.radius, 500, sites);
+	FSiteGenerator::ImpactDamage(damage.center,transform , damage.radius, 500, sites,RandomType::GAUSSION);
 	Graphics::MeshData* newMesh;
 	
 	FASSERT(m_pWireMesh->VoronoiFracture(sites));
