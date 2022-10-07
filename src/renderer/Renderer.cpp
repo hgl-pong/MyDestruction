@@ -30,6 +30,7 @@ namespace Graphics {
 		m_pSkyboxEffect(std::make_unique<SkyboxToneMapEffect>()),
 		m_pBoundingBoxEffect(std::make_unique<BoudingBoxEffect>()),
 		m_pShadowEffect(std::make_unique<ShadowEffect>()),
+		m_pHitPos(new Graphics::MeshData()),
 		m_CSManager()
 	{
 		name = "Renderer";
@@ -199,7 +200,7 @@ namespace Graphics {
 		bufferDesc = CD3D11_BUFFER_DESC(sizeof(uint32_t) * mesh->indices.size(), D3D11_BIND_INDEX_BUFFER);
 
 		// 新建索引缓冲区
-		initData.pSysMem = mesh->vertices.data();
+		initData.pSysMem = mesh->indices.data();
 		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pIndices.GetAddressOf()));
 
 		meshData->m_VertexCount = mesh->vertices.size();
@@ -837,6 +838,125 @@ namespace Graphics {
 		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pIndices.GetAddressOf()));
 		meshData->m_IndexCount = 24;
 		return meshData;
+	}
+
+	Graphics::MeshData* Renderer::createHitPosSphere(FVec3& pos, float radius)
+	{
+		std::vector<XMFLOAT3> vertices;
+		std::vector<XMFLOAT4> colors;
+		std::vector<UINT> indices;
+			int vbsize = vertices.size();
+			XMFLOAT3 center(pos.X,pos.Y,pos.Z);
+			XMFLOAT4 color = XMFLOAT4(0.5f, 0.5f, 0.9f, 1.0f);
+			int vertsPerRow = 16;
+			int nRows = 16;
+
+			int nVerts = vertsPerRow * nRows + 2;
+
+
+			for (int i = 1; i <= nRows; i++)
+			{
+				float phy = XM_PI * i / (nRows + 1);
+				float tmpRadius = radius * sin(phy);
+				for (int j = 0; j <= vertsPerRow; j++)
+				{
+					float theta = XM_2PI * j / vertsPerRow;
+
+					float x = tmpRadius * cos(theta);
+					float y = radius * cos(phy);
+					float z = tmpRadius * sin(theta);
+
+					//位置坐标
+					vertices.push_back( XMFLOAT3(x + center.x, y + center.y, z + center.z));
+					colors.push_back(color);
+
+				}
+			}
+
+			int size = vbsize + vertsPerRow * nRows;
+			//添加顶部和底部两个顶点信息
+			vertices.push_back( XMFLOAT3(0.f + center.x, radius + center.y, 0.f + center.z));
+			colors.push_back(color);
+			vertices.push_back( XMFLOAT3(0.f + center.x, -radius + center.y, 0.f + center.z));
+			colors.push_back(color);
+
+			int start1 = vbsize + 0;
+			int start2 = size - vertsPerRow;
+			int top = size;
+			int bottom = size + 1;
+			for (int i = 0; i < vertsPerRow; i++)
+			{
+				indices.push_back(top);
+				indices.push_back(start1 + i + 1);
+				indices.push_back(start1 + i);
+				indices.push_back(start1 + i + 1);
+				indices.push_back(start1 + i);
+				indices.push_back(top);
+			}
+
+			for (int i = 0; i < vertsPerRow; i++)
+			{
+				indices.push_back(bottom);
+				indices.push_back(start2 + i);
+				indices.push_back(start2 + i);
+				indices.push_back(start2 + i + 1);
+				indices.push_back(start2 + i + 1);
+				indices.push_back(bottom);
+
+
+			}
+
+			for (int i = 0; i < nRows - 1; i++)
+			{
+				for (int j = 0; j < vertsPerRow; j++)
+				{
+					indices.push_back(vbsize + i * vertsPerRow + j);
+					indices.push_back(vbsize + (i + 1) * vertsPerRow + j + 1);
+					indices.push_back(vbsize + (i + 1) * vertsPerRow + j);
+					indices.push_back(vbsize + (i + 1) * vertsPerRow + j + 1);
+					indices.push_back(vbsize + (i + 1) * vertsPerRow + j);
+					indices.push_back(vbsize + i * vertsPerRow + j);
+
+					indices.push_back(vbsize + i * vertsPerRow + j);
+					indices.push_back(vbsize + i * vertsPerRow + j + 1);
+					indices.push_back(vbsize + (i + 1) * vertsPerRow + j + 1);
+					indices.push_back(vbsize + i * vertsPerRow + j + 1);
+					indices.push_back(vbsize + (i + 1) * vertsPerRow + j + 1);
+					indices.push_back(vbsize + i * vertsPerRow + j);
+
+				}
+			}
+		D3D11_BUFFER_DESC vbd;
+		ZeroMemory(&vbd, sizeof(vbd));
+		vbd.Usage = D3D11_USAGE_IMMUTABLE;
+		vbd.ByteWidth = sizeof(XMFLOAT3) * vertices.size();
+		vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vbd.CPUAccessFlags = 0;
+		// 新建顶点缓冲区
+		D3D11_SUBRESOURCE_DATA InitData;
+		ZeroMemory(&InitData, sizeof(InitData));
+		InitData.pSysMem = vertices.data();
+		HR(m_pd3dDevice->CreateBuffer(&vbd, &InitData, m_pHitPos->m_pVertices.GetAddressOf()));
+
+
+		vbd.ByteWidth = sizeof(XMFLOAT4) * colors.size();
+		InitData.pSysMem = colors.data();
+		HR(m_pd3dDevice->CreateBuffer(&vbd, &InitData, m_pHitPos->m_pColors.GetAddressOf()));
+		// ******************
+		// 索引数组
+		//
+		D3D11_BUFFER_DESC ibd;
+		ZeroMemory(&ibd, sizeof(ibd));
+		ibd.Usage = D3D11_USAGE_IMMUTABLE;
+		ibd.ByteWidth = sizeof(UINT) * indices.size();
+		ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		ibd.CPUAccessFlags = 0;
+		// 新建索引缓冲区
+		InitData.pSysMem = indices.data();
+		HR(m_pd3dDevice->CreateBuffer(&ibd, &InitData, m_pHitPos->m_pIndices.GetAddressOf()));
+		m_pHitPos->m_IndexCount = indices.size();
+
+		return m_pHitPos;
 	}
 
 	void Renderer::CreateBuffer(const CD3D11_BUFFER_DESC* desc, const D3D11_SUBRESOURCE_DATA* initData, ID3D11Buffer** buffer) {

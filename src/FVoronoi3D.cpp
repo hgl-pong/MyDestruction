@@ -16,6 +16,7 @@ FVoronoi3D::~FVoronoi3D()
 void FVoronoi3D::Clear()
 {
 	NumSites = 0;
+	Cells.clear();
 	Container->clear();
 }
 
@@ -49,6 +50,7 @@ void FVoronoi3D::AddSites(int count, float SquaredDistSkipPtThreshold /*= 0.0f*/
 
 void FVoronoi3D::ComputeAllCells()
 {
+	voro::voro_compute<voro::container> VoroCompute = Container->make_compute();
 
 	FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
 	Cells.resize(NumSites);
@@ -60,7 +62,7 @@ void FVoronoi3D::ComputeAllCells()
 	{
 		do
 		{
-			bool bCouldComputeCell = Container->compute_cell(cell, CellIterator);
+			bool bCouldComputeCell = Container->compute_cell(cell, CellIterator,VoroCompute);
 			if (bCouldComputeCell)
 			{
 				int32_t id = CellIterator.pid();
@@ -70,10 +72,10 @@ void FVoronoi3D::ComputeAllCells()
 				VoronoiCellInfo& Cell = Cells[id];
 				FVec3 pos(x, y, z);
 				std::vector<FVec3>normals;
-				//cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, normals, Cell.Uvs);
+				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, Cell.Neighbors,Cell.Normals);
 				Cell.position = { (float)x,(float)y,(float)z };
 
-				cell.neighbors(Cell.Neighbors);
+				/*cell.neighbors(Cell.Neighbors);*/
 
 				cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
 			}
@@ -84,9 +86,60 @@ void FVoronoi3D::ComputeAllCells()
 	Container->draw_cells_gnuplot("random_points_v.gnu");
 }
 
-void FVoronoi3D::ComputeCellEdgesSerial(std::vector<Edge>& Edges, std::vector<int32_t>& CellMember)
+void FVoronoi3D::ComputeCellEdgesSerial()
 {
+	voro::voro_compute<voro::container> VoroCompute = Container->make_compute();
 
+	FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
+	Cells.resize(NumSites);
+
+	voro::c_loop_all CellIterator(*Container);
+	voro::voronoicell cell;
+
+	if (CellIterator.start())
+	{
+		do
+		{
+			bool bCouldComputeCell = Container->compute_cell(cell, CellIterator, VoroCompute);
+			if (bCouldComputeCell)
+			{
+				int32_t id = CellIterator.pid();
+				double x, y, z;
+				CellIterator.pos(x, y, z);
+
+				VoronoiCellInfo& Cell = Cells[id];
+				//FVec3 pos(x * 2, y * 2, z * 2);
+				FVec3 pos(x , y , z );
+				std::vector<FVec3>normals;
+				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces,true);
+
+				Cell.position = { x,y,z };
+				Cell.Edges.clear();
+				uint32_t FaceOffset = 0;
+				for (size_t ii = 0, ni = Cell.Faces.size(); ii < ni; ii += Cell.Faces[ii] + 1)
+				{
+					uint32_t VertCount = Cell.Faces[ii];
+					uint32_t PreviousVertexIndex = Cell.Faces[FaceOffset + VertCount];
+					for (uint32_t kk = 0; kk < VertCount; ++kk)
+					{
+						uint32_t VertexIndex = Cell.Faces[1 + FaceOffset + kk]; // Index of vertex X coordinate in raw coordinates array
+
+						Cell.Edges.push_back({ PreviousVertexIndex, VertexIndex });
+						PreviousVertexIndex = VertexIndex;
+					}
+					FaceOffset += VertCount + 1;
+				}
+
+				//cell.neighbors(Cell.Neighbors);
+
+				cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
+
+			}
+		} while (CellIterator.inc());
+	}
+
+	fclose(f1);
+	Container->draw_cells_gnuplot("random_points_v.gnu");
 }
 
 void FVoronoi3D::ComputeCellEdges()
@@ -115,26 +168,19 @@ void FVoronoi3D::ComputeCellEdges()
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces);
 
-				Cell.position = { (float)x,(float)y,(float)z };
-
-				uint32_t FaceOffset = 0;
-				for (size_t ii = 0, ni = Cell.Faces.size(); ii < ni; ii += Cell.Faces[ii] + 1)
+				Cell.position = { x,y,z };
+				Cell.Edges.clear();
+				for (int i = 0; i<Cell.Faces.size()/3;  i++)
 				{
-					uint32_t VertCount = Cell.Faces[ii];
-					uint32_t PreviousVertexIndex = Cell.Faces[FaceOffset + VertCount];
-					for (uint32_t kk = 0; kk < VertCount; ++kk)
-					{
-						uint32_t VertexIndex = Cell.Faces[1 + FaceOffset + kk]; // Index of vertex X coordinate in raw coordinates array
-
-						Cell.Edges.push_back({ PreviousVertexIndex, VertexIndex });
-						PreviousVertexIndex = VertexIndex;
-					}
-					FaceOffset += VertCount + 1;
+					Cell.Edges.push_back({ Cell.Faces[3 * i],Cell.Faces[3 * i+1] });
+					Cell.Edges.push_back({ Cell.Faces[3 * i],Cell.Faces[3 * i+2] });
+					Cell.Edges.push_back({ Cell.Faces[3 * i+1],Cell.Faces[3 * i+2] });
 				}
 
-				cell.neighbors(Cell.Neighbors);
+				//cell.neighbors(Cell.Neighbors);
 
 				cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
+
 			}
 		} while (CellIterator.inc());
 	}

@@ -132,6 +132,13 @@ void Camera::Strafe(float d)
 	m_Transform.Translate(m_Transform.GetRightAxis(), d);
 }
 
+
+
+void Camera::UpAndDown(float d)
+{
+    m_Transform.Translate(XMFLOAT3(0, 1, 0), d);
+}
+
 void Camera::MoveForward(float d)
 {
 	m_Transform.Translate(m_Transform.GetForwardAxis(), d);

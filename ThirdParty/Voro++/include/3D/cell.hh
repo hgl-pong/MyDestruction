@@ -168,7 +168,8 @@ class voronoicell_base {
 			std::vector<int> v;face_freq_table(v);
 			voro_print_vector(v,fp);
 		}
-		void face_vertices(std::vector<int> &v);
+		void face_vertices(std::vector<int>& v);
+		void face_vertices(std::vector<uint32_t>& v);
 		/** Outputs the */
 		inline void output_face_vertices(FILE *fp=stdout) {
 			std::vector<int> v;face_vertices(v);
@@ -401,6 +402,7 @@ class voronoicell : public voronoicell_base {
 		}
 		void init_l_shape();
 		void extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices);
+		void extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices,bool a);
 	private:
 		inline void n_allocate(int i,int m) {};
 		inline void n_add_memory_vertices(int i) {};
@@ -512,6 +514,8 @@ class voronoicell_neighbor : public voronoicell_base {
 			std::vector<int> v;neighbors(v);
 			voro_print_vector(v,fp);
 		}
+
+		void extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices, std::vector<uint32_t>& Nbrs, std::vector<FVec3>& Normals);
 	private:
 		int *paux1;
 		int *paux2;

@@ -25,7 +25,7 @@ struct VoronoiCellInfo
 	std::vector<FVec3> Vertices;
 	std::vector<uint32_t> Faces;
 	std::vector<Edge> Edges;
-	std::vector<int> Neighbors;
+	std::vector<uint32_t> Neighbors;
 	std::vector<FVec3> Normals;
 	//std::vector<vec2> Uvs;
 };
@@ -67,7 +67,7 @@ public:
 
 	void ComputeAllCells();
 
-	void ComputeCellEdgesSerial(std::vector<Edge>& Edges, std::vector<int32_t>& CellMember);
+	void ComputeCellEdgesSerial();
 	void ComputeCellEdges();
 
 	bool  VoronoiNeighbors(std::vector<std::vector<int>>& Neighbors, bool bExcludeBounds = true, float SquaredDistSkipPtThreshold = KINDA_SMALL_NUMBER);

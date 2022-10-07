@@ -17,7 +17,7 @@
 #include <imgui_impl_win32.h>
 #include <filesystem>
 #include <set>
-
+#include "vec.h"
 class FWireMesh;
 namespace Graphics {
     class Renderer :public Base {
@@ -81,7 +81,8 @@ namespace Graphics {
         float AspectRatio()const;
 
         void LoadSceneBuffer(); 
-        Graphics::MeshData* createBoundingBoxMesh(BoundingBox* box);
+		Graphics::MeshData* createBoundingBoxMesh(BoundingBox* box);
+        Graphics::MeshData* createHitPosSphere(FVec3& pos, float radius);
     private:
 
         bool InitResource();
@@ -161,7 +162,7 @@ namespace Graphics {
 
 		std::set<Graphics::MeshData*>m_RenderMesh;
 		std::set<Graphics::MeshData*>m_VoroMesh;
-
+        Graphics::MeshData* m_pHitPos;
         int m_ClientWidth;                                           // 视口宽度
         int m_ClientHeight;                                          // 视口高度
     };

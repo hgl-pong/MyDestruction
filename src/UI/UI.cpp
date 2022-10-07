@@ -45,7 +45,7 @@ void UIDrawer::Move(float dt) {
 	// ******************
 	// 自由摄像机的操作
 	//
-	float d1 = 0.0f, d2 = 0.0f;
+	float d1 = 0.0f, d2 = 0.0f, d3 = 0.0f;
 	if (ImGui::IsKeyDown('W'))
 		d1 += dt;
 	if (ImGui::IsKeyDown('S'))
@@ -54,9 +54,13 @@ void UIDrawer::Move(float dt) {
 		d2 -= dt;
 	if (ImGui::IsKeyDown('D'))
 		d2 += dt;
-	
+	if (ImGui::IsKeyDown('E'))
+		d3 -= dt;
+	if (ImGui::IsKeyDown('Q'))
+		d3 += dt;
 	app->m_pViewerCamera->MoveForward(d1 * 45.0f*speed);
 	app->m_pViewerCamera->Strafe(d2 * 45.0f*speed);
+	app->m_pViewerCamera->UpAndDown(d3 * 45.0f * speed);
 
 	if (io.WantCaptureMouse)
 		return;
@@ -98,7 +102,7 @@ void UIDrawer::UpdateUI() {
 	drawRendererControlPanel();
 	//drawSceneWindow();
 	drawMenuBar();
-
+	pick();
 	//drawCascadeShadowWindow();
 }
 
@@ -159,5 +163,20 @@ void UIDrawer::drawMenuBar()
 		ImGui::EndMainMenuBar();
 		style.Colors[ImGuiCol_Text] = previous_color;
 	}
+}
+
+void UIDrawer::pick()
+{
+
+	ImGuiIO& io = ImGui::GetIO();
+	if (!io.WantCaptureMouse)
+	{
+		XMFLOAT3 pos = app->m_pViewerCamera->GetPosition();
+		//Ray ray = Ray(pos, XMFLOAT3(-pos.x,26-pos.y,-pos.z));
+		Ray ray = Ray::ScreenToRay(*app->m_pViewerCamera.get(), (float)io.MousePos.x, (float)io.MousePos.y);
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+			app->m_pScene->Intersection(ray);
+	}
+
 }
 

@@ -1,6 +1,7 @@
 #ifndef FSCENE_H
 #define FSCENE_H
 #include "PxPhysicsAPI.h"
+#include "Common/Collision.h"
 #include <set>
 using namespace physx;
 class FActor;
@@ -19,6 +20,7 @@ public:
 	bool RemoveAllActors();
 	bool Update();
 
+	bool Intersection(Ray& ray);
 	bool SetSimulateState(bool simulate);
 	bool GetSimulateState();
 private:

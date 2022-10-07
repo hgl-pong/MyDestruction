@@ -25,6 +25,7 @@ public:
 	void RenderUI();
 	void UpdateUI();
 	void drawMenuBar();
+	void pick();
 	LRESULT UIHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 private:
 	void drawRendererControlPanel();

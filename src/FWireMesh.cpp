@@ -10,9 +10,11 @@ FWireMesh::FWireMesh(BoundingBox& box)
 	bbox.Min = { box.Center.x - box.Extents.x,box.Center.y - box.Extents.y ,box.Center.z - box.Extents.z };
 	m_pVoronoi3D = new FVoronoi3D(bbox);
 
-	m_pVoronoi3D->AddSites(100);
-	m_pVoronoi3D->ComputeCellEdges();
-	m_pCellInfo = m_pVoronoi3D->GetAllCells();
+	//m_pVoronoi3D->AddSites(100);
+	//m_pVoronoi3D->ComputeCellEdges();
+	//m_pVoronoi3D->ComputeCellEdgesSerial();
+	//m_pVoronoi3D->ComputeAllCells();
+	//m_pCellInfo = m_pVoronoi3D->GetAllCells();
 }
 
 FWireMesh::~FWireMesh()
@@ -22,19 +24,23 @@ FWireMesh::~FWireMesh()
 
 bool FWireMesh::LoadMeshData()
 {
+
 	Graphics::MeshData* newMesh;
 	vertices.clear();
 	colors.clear();
 	indices.clear();
 	uint32_t vCount = 0;
 
+	if (!m_pVoronoi3D->Size()) {
+		return false;
+	}
 	FASSERT(m_pCellInfo);
 	newMesh = new Graphics::MeshData();
 
 	for (int i = 0; i < m_pVoronoi3D->Size(); i++) {
 		for (auto pos : m_pCellInfo[i].Vertices) {
 			vertices.push_back({ (float)pos.X,(float)pos.Y,(float)pos.Z });
-			colors.push_back({ 1.0f,1.0f,0.5f,1.0f });
+			colors.push_back({ 1.0f,0.5f,0.5f,1.0f });
 		}
 		for (auto edge : m_pCellInfo[i].Edges) {
 			indices.push_back(edge.s+vCount);
@@ -60,6 +66,13 @@ bool FWireMesh::Release()
 
 bool FWireMesh::VoronoiFracture(std::vector<FVec3>& sites)
 {
-	
+	m_pVoronoi3D->Clear();
+	m_pCellInfo = nullptr;
+	FASSERT(!sites.empty());
+	m_pVoronoi3D->AddSites(sites);
+	m_pVoronoi3D->ComputeCellEdgesSerial();
+	m_pCellInfo = m_pVoronoi3D->GetAllCells();	
+	return true;
+Exit0:
 	return false;
 }

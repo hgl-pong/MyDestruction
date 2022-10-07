@@ -1,6 +1,7 @@
 #include "FScene.h"
 #include "PxPhysicsAPI.h"
 #include "FPhysics.h"
+#include "FActor.h"
 FScene::FScene():
 	m_pScene(nullptr),
 	m_pMaterial(nullptr),
@@ -77,6 +78,14 @@ bool FScene::Update()
 	m_pScene->fetchResults(true);
 Exit0:
 	return false;
+}
+
+bool FScene::Intersection(Ray& ray)
+{
+	bool hit = false;
+	for (auto actor : m_Actors)
+		hit = actor->Intersection(ray);
+	return hit;
 }
 
 bool FScene::SetSimulateState(bool simulate)

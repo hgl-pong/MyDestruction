@@ -2306,7 +2306,30 @@ void voronoicell_base::face_vertices(std::vector<int> &v) {
 	}
 	reset_edges();
 }
-
+void voronoicell_base::face_vertices(std::vector<uint32_t>& v) {
+	uint32_t i, j, k, l, m, vp(0), vn;
+	v.clear();
+	for (i = 1; i < p; i++) for (j = 0; j < nu[i]; j++) {
+		k = ed[i][j];
+		if (k >= 0) {
+			v.push_back(0);
+			v.push_back(i);
+			ed[i][j] = -1 - k;
+			l = cycle_up(ed[i][nu[i] + j], k);
+			do {
+				v.push_back(k);
+				m = ed[k][l];
+				ed[k][l] = -1 - m;
+				l = cycle_up(ed[k][nu[k] + l], m);
+				k = m;
+			} while (k != i);
+			vn = v.size();
+			v[vp] = vn - vp - 1;
+			vp = vn;
+		}
+	}
+	reset_edges();
+}
 /** Outputs a list of the number of edges in each face.
  * \param[out] v the vector to store the results in. */
 void voronoicell_base::face_orders(std::vector<int> &v) {
@@ -2709,19 +2732,53 @@ void voronoicell_neighbor::print_edges_neighbors(int i) {
 /** Computes Unreal TArrays of all cell info. */
 void voronoicell::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices)
 {
+	int i, j, k, l, m, n;
+	double* ptsp = pts;
+	Vertices.resize(p);
+	for (i = 0; i < p; i++, ptsp += 4)
+	{
+		Vertices[i].X = CellPosition.X + ptsp[0] * 0.5;
+		Vertices[i].Y = CellPosition.Y + ptsp[1] * 0.5;
+		Vertices[i].Z = CellPosition.Z + ptsp[2] * 0.5;
+	}
+	FaceVertexIndices.clear();
+	//face_vertices(FaceVertexIndices);
+	for (i = 1; i < p; i++) for (j = 0; j < nu[i]; j++) {
+		k = ed[i][j];
+		if (k >= 0) {
+			ed[i][j] = -1 - k;
+			l = cycle_up(ed[i][nu[i] + j], k);
+			m = ed[k][l]; ed[k][l] = -1 - m;
+			while (m != i) {
+				n = cycle_up(ed[k][nu[k] + l], m);
+				//printf("<%d,%d,%d>\n", i, k, m);
+				FaceVertexIndices.push_back(i);
+				FaceVertexIndices.push_back(k);
+				FaceVertexIndices.push_back(m);
+				k = m; l = n;
+				m = ed[k][l]; ed[k][l] = -1 - m;
+			}
+		}
+	}
+	reset_edges();
+}
+
+void voronoicell::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices,bool a)
+{
+	int i, j, k, l, m, n;
 	Vertices.resize(p);
 	double* ptsp = pts;
-	for (int i = 0; i < p; i++)
+	for (int i = 0; i < p; i++,ptsp+=4)
 	{
-		Vertices[i].X = CellPosition.X + *(ptsp++) * 0.5;
-		Vertices[i].Y = CellPosition.Y + *(ptsp++) * 0.5;
-		Vertices[i].Z = CellPosition.Z + *(ptsp++) * 0.5;
+		Vertices[i].X = CellPosition.X + ptsp[0] * 0.5;
+		Vertices[i].Y = CellPosition.Y + ptsp[1] * 0.5;
+		Vertices[i].Z = CellPosition.Z + ptsp[2] * 0.5;
 	}
 
 	FaceVertexIndices.clear();
 
-	// Vertex indices code (face_vertices)
-	int i, j, k, l, m, vp(0), vn;
+	 //Vertex indices code (face_vertices)
+	int  vp(0), vn;
 	for (i = 1; i < p; i++) for (j = 0; j < nu[i]; j++) {
 		k = ed[i][j];
 		if (k >= 0) { // on a new face
@@ -2746,6 +2803,90 @@ void voronoicell::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>&
 	}
 	reset_edges();
 }
+
+void voronoicell_neighbor::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices, std::vector<uint32_t>& Nbrs, std::vector<FVec3>& Normals) {
+
+	Vertices.resize(p);
+	double* ptsp = pts;
+	for (int i = 0; i < p; i++, ptsp += 4)
+	{
+		Vertices[i].X = CellPosition.X + ptsp[0] * 0.5;
+		Vertices[i].Y = CellPosition.Y + ptsp[1] * 0.5;
+		Vertices[i].Z = CellPosition.Z + ptsp[2] * 0.5;
+	}
+
+
+	FaceVertexIndices.clear(); 
+	Nbrs.clear(); 
+	Normals.clear();
+
+	// Vertex indices code (face_vertices)
+	int i, j, k, l, m, vp(0), vn;
+	for (i = 1; i < p; i++) for (j = 0; j < nu[i]; j++) {
+		k = ed[i][j];
+		if (k >= 0) { // on a new face
+			Nbrs.push_back(ne[i][j]);
+			FaceVertexIndices.push_back(0); // placeholder for face vertex count
+			FaceVertexIndices.push_back(i);
+			FVec3 Normal(0, 0, 0);
+			double foundEdgeMag = 0;
+			double ux = 0, uy = 0, uz = 0, vx, vy, vz, wx, wy, wz, wmag = 0;
+
+			ed[i][j] = -1 - k;
+			l = cycle_up(ed[i][nu[i] + j], k);
+			do {
+				FaceVertexIndices.push_back(k);
+				m = ed[k][l];
+				ed[k][l] = -1 - m;
+
+				if (wmag <= tolerance*tolerance) // Haven't found a Normal yet
+				{
+					if (foundEdgeMag <= tolerance * tolerance) // Haven't found a first edge yet
+					{
+						ux = pts[3 * m] - pts[3 * k];
+						uy = pts[3 * m + 1] - pts[3 * k + 1];
+						uz = pts[3 * m + 2] - pts[3 * k + 2];
+						foundEdgeMag = ux * ux + uy * uy + uz * uz;
+					}
+					else // Have a first edge; try constructing the Normal from each following edge
+					{
+						vx = pts[3 * m] - pts[3 * k];
+						vy = pts[3 * m + 1] - pts[3 * k + 1];
+						vz = pts[3 * m + 2] - pts[3 * k + 2];
+
+						// Construct the vector product of this edge with
+						// the previously-found one
+						wx = uz * vy - uy * vz;
+						wy = ux * vz - uz * vx;
+						wz = uy * vx - ux * vy;
+						wmag = wx * wx + wy * wy + wz * wz;
+
+						// Test to see if this vector product of the
+						// two edges is above the tolerance
+						if (wmag > tolerance*tolerance) {
+							// Set the normal vector
+							double wmagInv = 1.0 / sqrt(wmag);
+							Normal.X = wx * wmagInv;
+							Normal.Y = wy * wmagInv;
+							Normal.Z = wz * wmagInv;
+						}
+					}
+				}
+
+				l = cycle_up(ed[k][nu[k] + l], m);
+				k = m;
+			} while (k != i);
+
+			Normals.push_back(Normal);
+			vn = FaceVertexIndices.size();
+			FaceVertexIndices[vp] = vn - vp - 1;
+			vp = vn;
+		}
+	}
+	reset_edges();
+}
+
+
 // Explicit instantiation
 template bool voronoicell_base::nplane(voronoicell&,double,double,double,double,int);
 template bool voronoicell_base::nplane(voronoicell_neighbor&,double,double,double,double,int);

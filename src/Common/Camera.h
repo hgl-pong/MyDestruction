@@ -80,7 +80,7 @@ public:
     virtual void LookTo(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& to, const DirectX::XMFLOAT3& up) = 0;
 	// 平移
 	virtual void Strafe(float d);
-
+    virtual void UpAndDown(float d);
 	// 前进(朝前向移动)
 	virtual void MoveForward(float d);
 
