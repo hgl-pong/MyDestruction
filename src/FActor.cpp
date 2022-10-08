@@ -8,6 +8,7 @@
 #include "renderer/Renderer.h"
 #include "FSiteGenerator.h"
 #include "FDamage.h"
+#include "FPhysics.h"
 FActor::FActor()
 	:m_pWireMesh(nullptr),
 	m_pRenderMesh(nullptr),
@@ -91,7 +92,7 @@ bool FActor::OnLeaveScene(FScene* scene)
 	return true;
 }
 
-bool FActor::Intersection(Ray& ray)
+bool FActor::Intersection(Ray& ray,FScene*scene)
 {
 	float dis = 0; 
 	//FVec3 HitPoint;
@@ -116,10 +117,21 @@ bool FActor::Intersection(Ray& ray)
 		m_pMeshData->m_Transform.GetPosition().y,
 		m_pMeshData->m_Transform.GetPosition().z);
 	FSiteGenerator::ImpactDamage(damage.center,transform , damage.radius, 500, sites,RandomType::GAUSSION);
+	//FVec3 normal(ray.direction.x, ray.direction.y, ray.direction.z);
+	//FSiteGenerator::PlaneImpactDamage(m_pMeshData->m_BoundingBox,damage.center,normal, transform ,500, sites);
 	Graphics::MeshData* newMesh;
-	
+
+	Transform trans;
+	trans.SetPosition(0, 100, 0);
+	trans.Translate(XMFLOAT3(0, 0, 1), 100 * m_HitTime);
+	m_HitTime++;
+
 	FASSERT(m_pWireMesh->VoronoiFracture(sites));
 	m_pWireMesh->LoadMeshData();
+	
+
+	m_pWireMesh->CreaePhysicsActor(trans);
+
 	FASSERT(!m_pWireMesh->vertices.empty());
 
 	newMesh=Graphics::Renderer::Get()->CreateVoroMeshData(m_pWireMesh);
@@ -131,6 +143,8 @@ bool FActor::Intersection(Ray& ray)
 	Graphics::Renderer::Get()->createHitPosSphere(damage.center,damage.radius);
 	//Graphics::Renderer::Get()->m_pHitPos->m_Transform = m_pMeshData->m_Transform;
 	Graphics::Renderer::Get()->AddVoroMesh(Graphics::Renderer::Get()->m_pHitPos);
+
+	m_pWireMesh->AddToScene(scene);
 	return hit;
 Exit0:
 	return hit;

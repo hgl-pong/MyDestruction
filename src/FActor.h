@@ -36,7 +36,7 @@ public:
 	bool OnEnterScene(FScene* scene);
 	bool OnLeaveScene(FScene* scene);
 	
-	bool Intersection(Ray&ray);
+	bool Intersection(Ray&ray,FScene* scene);
 
 	bool SetRenderWireFrame();
 
@@ -49,6 +49,7 @@ private:
 
 	PxMaterial* m_pMaterial;
 
+	int m_HitTime = 0;
 	char* m_Name;
 };
 

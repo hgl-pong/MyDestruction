@@ -113,7 +113,7 @@ void FVoronoi3D::ComputeCellEdgesSerial()
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces,true);
 
-				Cell.position = { x,y,z };
+				Cell.position = { (float)x,(float)y,(float)z };
 				Cell.Edges.clear();
 				uint32_t FaceOffset = 0;
 				for (size_t ii = 0, ni = Cell.Faces.size(); ii < ni; ii += Cell.Faces[ii] + 1)
@@ -168,7 +168,7 @@ void FVoronoi3D::ComputeCellEdges()
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces);
 
-				Cell.position = { x,y,z };
+				Cell.position = { (float)x,(float)y,(float)z };
 				Cell.Edges.clear();
 				for (int i = 0; i<Cell.Faces.size()/3;  i++)
 				{
@@ -250,9 +250,9 @@ VoronoiCellInfo* FVoronoi3D::GetAllCells() const
 
 bool FVoronoi3D::_OutOfBox(const FVec3& p)
 {
-	if ((p.X > Bounds.Min.X && p.X < Bounds.Max.X) &&
-		(p.Y > Bounds.Min.Y && p.Y < Bounds.Max.Y) &&
-		(p.Z > Bounds.Min.Z && p.Z < Bounds.Max.Z))
+	if ((p.X >= Bounds.Min.X && p.X <= Bounds.Max.X) &&
+		(p.Y >= Bounds.Min.Y && p.Y <= Bounds.Max.Y) &&
+		(p.Z >= Bounds.Min.Z && p.Z <= Bounds.Max.Z))
 		return false;
 	else
 		return true;

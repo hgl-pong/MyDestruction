@@ -84,7 +84,7 @@ bool FScene::Intersection(Ray& ray)
 {
 	bool hit = false;
 	for (auto actor : m_Actors)
-		hit = actor->Intersection(ray);
+		hit = actor->Intersection(ray,this);
 	return hit;
 }
 

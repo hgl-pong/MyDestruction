@@ -2,6 +2,7 @@
 #define FSITE_GENERATOR_H
 #include "vec.h"
 #include <vector>
+#include <DirectXCollision.h>
 enum RandomType
 {
 	NORMAL,
@@ -11,6 +12,7 @@ class FSiteGenerator
 {
 public:
 	static void ImpactDamage(FVec3& pos, FVec3& transform, float radius, int num, std::vector<FVec3>&sites,RandomType type=NORMAL);
+	static void PlaneImpactDamage(DirectX::BoundingBox& box,FVec3& pos, FVec3& normals, FVec3& transform, int num, std::vector<FVec3>& sites);
 private:
 	static double _RandomNumber(float min, float max)
 	{

@@ -6,7 +6,7 @@
 #include <vector>
 #include <voro++.hh>
 #include "vec.h"
-
+#include "PxPhysicsAPI.h"
 //const vec3 axisX(1.0, 0.0, 0.0);
 //const vec3 axisY(0.0f, 1.0f, 0.0f);
 //const vec3 axisZ(0.0f, 0.0f, 1.0f);
@@ -28,6 +28,7 @@ struct VoronoiCellInfo
 	std::vector<uint32_t> Neighbors;
 	std::vector<FVec3> Normals;
 	//std::vector<vec2> Uvs;
+	physx::PxRigidDynamic* rigidDynamic;
 };
 
 

@@ -1,5 +1,6 @@
 #include "FWireMesh.h"
 #include "Utils.h"
+#include "FPhysics.h"
 FWireMesh::FWireMesh(BoundingBox& box)
 	:m_pVoronoi3D(nullptr),
 	m_pCellInfo(nullptr),
@@ -75,4 +76,28 @@ bool FWireMesh::VoronoiFracture(std::vector<FVec3>& sites)
 	return true;
 Exit0:
 	return false;
+}
+
+bool FWireMesh::AddToScene(FScene* scene)
+{
+	for (int i = 0; i < m_pVoronoi3D->Size(); i++) {
+		PxRigidDynamic* actor = m_pCellInfo[i].rigidDynamic;
+		FPhysics::Get()->AddToScene(actor, scene);
+	}
+	return false;
+}
+
+bool FWireMesh::CreaePhysicsActor(Transform& trans)
+{
+	if (!m_pVoronoi3D->Size()) {
+		return false;
+	}
+
+	PxVec3 pos(trans.GetPosition().x, trans.GetPosition().y, trans.GetPosition().z);
+	PxTransform tran(pos);
+	for (int i = 0; i < m_pVoronoi3D->Size(); i++) {
+		if (!m_pCellInfo[i].Vertices.empty())
+			m_pCellInfo[i].rigidDynamic = FPhysics::Get()->CreatePhysicActor(m_pCellInfo[i], FPhysics::Get()->CreateMaterial(STONE), tran);
+	}
+	return true;
 }

@@ -6,6 +6,7 @@
 using namespace DirectX;
 class FVoronoi3D;
 
+class FScene;
 class FWireMesh
 {
 public:
@@ -15,14 +16,20 @@ public:
 	bool LoadMeshData();
 	bool Release();
 	bool VoronoiFracture(std::vector<FVec3>& sites);
+
+	bool AddToScene(FScene* scene);
+	bool CreaePhysicsActor(Transform& trans);
 private:
-	VoronoiCellInfo* m_pCellInfo;
+
 	FVoronoi3D* m_pVoronoi3D;
 	BoundingBox m_Box;
 public:
 	std::vector<XMFLOAT3>vertices;
 	std::vector<XMFLOAT4>colors;
 	std::vector<uint32_t>indices;
+
+	VoronoiCellInfo* m_pCellInfo;
+
 };
 
 #endif // FWIRE_MESH_H

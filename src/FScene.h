@@ -20,9 +20,14 @@ public:
 	bool RemoveAllActors();
 	bool Update();
 
+
 	bool Intersection(Ray& ray);
 	bool SetSimulateState(bool simulate);
 	bool GetSimulateState();
+
+	PxScene* GetPhysicsScene()const {
+		return m_pScene;
+	}
 private:
 	PxScene* m_pScene;
 	PxMaterial* m_pMaterial;

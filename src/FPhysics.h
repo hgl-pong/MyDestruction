@@ -3,6 +3,7 @@
 #include "PxPhysicsAPI.h"
 #include "Fracture.h"
 #include <set>
+#include"FVoronoi3D.h"
 #define PVD_HOST "127.0.0.1"
 using namespace physx;
 struct FMaterial
@@ -12,7 +13,7 @@ struct FMaterial
 	float restitution;
 	float identity;
 };
-static FMaterial STONE = { 0.5,0.5,0.5,1000 };
+static FMaterial STONE = { 0.8,0.8,0.2,1000 };
 
 class FScene;
 class FPhysics {
@@ -29,6 +30,10 @@ public:
 	bool AddScene(FScene* scene);
 	bool RemoveScene(FScene* scene);
 
+	bool AddToScene(PxRigidDynamic*, FScene* scene);
+	bool REmoveFromScene(PxRigidDynamic*, FScene* scene);
+	PxRigidDynamic* CreatePhysicActor(VoronoiCellInfo& cellInfo,PxMaterial* material,PxTransform& tran);
+
 	bool Update();
 public:
 	PxPhysics* m_pPhysics;
@@ -41,5 +46,6 @@ private:
 	PxDefaultAllocator m_DefaultAllocator;
 
 	std::set<FScene*> m_SimulatingScenes;
+
 };
 #endif //FPHYSICS_H

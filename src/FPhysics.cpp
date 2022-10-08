@@ -95,6 +95,63 @@ bool FPhysics::RemoveScene(FScene* scene)
 		return false;
 }
 
+bool FPhysics::AddToScene(PxRigidDynamic*actor, FScene* scene)
+{
+	FASSERT(actor);
+	scene->GetPhysicsScene()->addActor(*actor);
+	return true;
+	Exit0:
+	return false;
+}
+
+bool FPhysics::REmoveFromScene(PxRigidDynamic*actor, FScene* scene)
+{
+	scene->GetPhysicsScene()->removeActor(*actor);
+	return true;
+}
+
+PxRigidDynamic* FPhysics::CreatePhysicActor(VoronoiCellInfo& cellInfo,PxMaterial* material, PxTransform& tran)
+{
+	const PxU32 numVertices = cellInfo.Vertices.size();
+	const PxU32 numTriangles = cellInfo.Faces.size() / 3;
+
+	PxVec3* vertices = new PxVec3[numVertices];
+	PxU32* indices = cellInfo.Faces.data();
+
+	// 加载顶点
+	memcpy_s(vertices, sizeof(PxVec3) * numVertices, cellInfo.Vertices.data(), sizeof(FVec3) * numVertices);
+
+	PxConvexMeshDesc meshDesc1;
+	meshDesc1.points.count = numVertices;
+	meshDesc1.points.data = vertices;
+	meshDesc1.points.stride = sizeof(PxVec3);
+
+	meshDesc1.indices.count = numTriangles;
+	meshDesc1.indices.data = indices;
+	meshDesc1.indices.stride = sizeof(PxU32) * 3;
+
+	meshDesc1.flags = PxConvexFlag::eCOMPUTE_CONVEX;
+
+	PxConvexMesh *convexMesh = m_pCooking->createConvexMesh(meshDesc1,
+															m_pPhysics->getPhysicsInsertionCallback());
+
+	PxConvexMeshGeometry geom(convexMesh);
+	// 创建网格面
+	PxRigidDynamic* convexActor = m_pPhysics->createRigidDynamic(tran);
+
+	// 创建三角网格形状 *gMaterial
+	PxShape* shape = m_pPhysics->createShape(geom, *material);
+
+
+	convexActor->attachShape(*shape);
+
+	PxRigidBodyExt::updateMassAndInertia(*convexActor, 2000.0f);	//convexActor->setMass(1000.0f);
+	shape->release();
+
+	convexActor->setAngularDamping(0.1f);
+	return convexActor;
+}
+
 bool FPhysics::Update()
 {
 	for (auto scene : m_SimulatingScenes)
