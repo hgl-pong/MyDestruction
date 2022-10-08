@@ -1,6 +1,13 @@
 #ifndef VEC_H
 #define VEC_H
-
+struct FVec2
+{
+	float X, Y;
+};
+struct FVec4
+{
+	float X, Y, Z, W;
+};
 class FVec3
 {
 public:

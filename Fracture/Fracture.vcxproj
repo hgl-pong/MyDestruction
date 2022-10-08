@@ -169,8 +169,10 @@
     <ClCompile Include="..\src\Common\WICTextureLoader.cpp" />
     <ClCompile Include="..\src\FActor.cpp" />
     <ClCompile Include="..\src\FAttack.cpp" />
+    <ClCompile Include="..\src\FChunk.cpp" />
     <ClCompile Include="..\src\FDamage.cpp" />
     <ClCompile Include="..\src\FDamageManager.cpp" />
+    <ClCompile Include="..\src\FFractureGraph.cpp" />
     <ClCompile Include="..\src\FMeshBoolean.cpp" />
     <ClCompile Include="..\src\FPerlinNoise.cpp" />
     <ClCompile Include="..\src\FPhysics.cpp" />
@@ -220,8 +222,10 @@
     <ClInclude Include="..\src\Effects.h" />
     <ClInclude Include="..\src\FActor.h" />
     <ClInclude Include="..\src\FAttack.h" />
+    <ClInclude Include="..\src\FChunk.h" />
     <ClInclude Include="..\src\FDamage.h" />
     <ClInclude Include="..\src\FDamageManager.h" />
+    <ClInclude Include="..\src\FFractureGraph.h" />
     <ClInclude Include="..\src\FGraphics.h" />
     <ClInclude Include="..\src\FMeshBoolean.h" />
     <ClInclude Include="..\src\FPerlinNoise.h" />

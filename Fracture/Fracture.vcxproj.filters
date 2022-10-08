@@ -156,6 +156,12 @@
     <ClCompile Include="..\src\Importer\MeshImporter.cpp">
       <Filter>头文件\Importer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\FChunk.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FFractureGraph.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Resources.h">
@@ -315,6 +321,12 @@
       <Filter>头文件\Importer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Effects.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FChunk.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FFractureGraph.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

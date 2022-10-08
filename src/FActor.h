@@ -7,17 +7,12 @@
 #include "vec.h"
 #include <algorithm>
 using namespace physx;
-struct FChunk {
-	float m_Volume;
-	PxVec3 m_Center;
-	PxRigidDynamic* m_pPxRigidActor;
-	float m_Life;
-	bool m_IsSleeping;
-};
 
 class FRenderMesh;
 class FWireMesh;
 class FScene;
+class FChunk;
+class FFractureGraph;
 class FActor
 {
 public:
@@ -47,6 +42,8 @@ private:
 	Graphics::MeshData* m_pMeshData;
 	Graphics::MeshData* m_pVoroMeshData;
 
+	//std::set<FChunk*> m_Chunks;
+	//std::set<FFractureGraph*> m_Graphs;
 	PxMaterial* m_pMaterial;
 
 	int m_HitTime = 0;
