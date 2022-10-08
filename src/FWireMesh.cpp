@@ -82,6 +82,9 @@ bool FWireMesh::AddToScene(FScene* scene)
 {
 	for (int i = 0; i < m_pVoronoi3D->Size(); i++) {
 		PxRigidDynamic* actor = m_pCellInfo[i].rigidDynamic;
+		if(!actor)
+			continue;
+		actor->setSleepThreshold(0.2);
 		FPhysics::Get()->AddToScene(actor, scene);
 	}
 	return false;
