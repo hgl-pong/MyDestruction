@@ -122,7 +122,7 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 	Graphics::MeshData* newMesh;
 
 	Transform trans;
-	trans.SetPosition(0, 26, 0);
+	trans.SetPosition(0, 100, 0);
 	trans.Translate(XMFLOAT3(0, 0, 1), 100 * m_HitTime);
 	m_HitTime++;
 
