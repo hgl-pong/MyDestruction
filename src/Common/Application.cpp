@@ -132,7 +132,7 @@ bool Application::Init()
 ;
 	m_pViewerCamera->SetViewPort(0.0f, 0.0f, (float)m_ClientWidth, (float)m_ClientHeight);
 	m_pViewerCamera->SetFrustum(XM_PI / 3, AspectRatio(), 1.0f, 1000.0f);
-	m_pViewerCamera->LookAt(XMFLOAT3(0.0f, 60.0f, -120.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	m_pViewerCamera->LookAt(XMFLOAT3(0.0f, 6.0f, -6.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
 
 
 	auto lightCamera = std::make_shared<FirstPersonCamera>();

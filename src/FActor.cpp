@@ -25,10 +25,10 @@ FActor::~FActor()
 bool FActor::Init(char*name)
 {
 	m_Name = name;
-	Geometry::MeshData box = Geometry::CreateBox(50, 50, 50);
+	Geometry::MeshData box = Geometry::CreateBox(2.5,2.5, 2.5);
 	m_pMeshData = new Graphics::MeshData();;
 	*m_pMeshData = MeshImporter::Get().CreateFromGeometry("box", box)->meshData;
-	m_pMeshData->m_Transform.SetPosition(0, 26, 0);
+	m_pMeshData->m_Transform.SetPosition(0, 1.3, 0);
 	BoundingBox::CreateFromPoints(m_pMeshData->m_BoundingBox, box.vertices.size(),
 		box.vertices.data(), sizeof(XMFLOAT3));
 
@@ -110,7 +110,7 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 		return hit;
 	FSphereDamage damage;
 	damage.center = HitPoint;
-	damage.radius = 20;
+	damage.radius = 1;
 
 	std::vector<FVec3>sites;
 	FVec3 transform(m_pMeshData->m_Transform.GetPosition().x,
@@ -122,8 +122,8 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 	Graphics::MeshData* newMesh;
 
 	Transform trans;
-	trans.SetPosition(0, 100, 0);
-	trans.Translate(XMFLOAT3(0, 0, 1), 100 * m_HitTime);
+	trans.SetPosition(0, 3                                                                                                                                                                                                                                                                             , 0);
+	trans.Translate(XMFLOAT3(0, 0, 1), 5 * m_HitTime);
 	m_HitTime++;
 
 	FASSERT(m_pWireMesh->VoronoiFracture(sites));

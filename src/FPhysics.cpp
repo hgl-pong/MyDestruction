@@ -152,6 +152,38 @@ PxRigidDynamic* FPhysics::CreatePhysicActor(VoronoiCellInfo& cellInfo,PxMaterial
 	return convexActor;
 }
 
+PxShape* FPhysics::CreateConvexShape(VoronoiCellInfo& cellInfo, PxMaterial* material)
+{
+	const PxU32 numVertices = cellInfo.Vertices.size();
+	const PxU32 numTriangles = cellInfo.Faces.size() / 3;
+
+	PxVec3* vertices = new PxVec3[numVertices];
+	PxU32* indices = cellInfo.Faces.data();
+
+	// 加载顶点
+	memcpy_s(vertices, sizeof(PxVec3) * numVertices, cellInfo.Vertices.data(), sizeof(FVec3) * numVertices);
+
+	PxConvexMeshDesc meshDesc1;
+	meshDesc1.points.count = numVertices;
+	meshDesc1.points.data = vertices;
+	meshDesc1.points.stride = sizeof(PxVec3);
+
+	meshDesc1.indices.count = numTriangles;
+	meshDesc1.indices.data = indices;
+	meshDesc1.indices.stride = sizeof(PxU32) * 3;
+
+	meshDesc1.flags = PxConvexFlag::eCOMPUTE_CONVEX;
+
+	PxConvexMesh* convexMesh = m_pCooking->createConvexMesh(meshDesc1,
+		m_pPhysics->getPhysicsInsertionCallback());
+
+	PxConvexMeshGeometry geom(convexMesh);
+
+	// 创建三角网格形状 *gMaterial
+	PxShape* shape = m_pPhysics->createShape(geom, *material);
+	return shape;
+}
+
 bool FPhysics::Update()
 {
 	for (auto scene : m_SimulatingScenes)

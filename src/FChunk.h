@@ -16,14 +16,18 @@ public:
 	~FChunk();
 	bool Release();
 	bool CreatePhysicsActor();
+	bool Attach(PxRigidDynamic* actor);
 	bool Tick();
 	bool IsDestructable();
 	bool Intersection(Ray& ray);
 
 	bool Intersection(FDamage& damage);
 private:
+	void _CalculateNormals(std::vector<Edge>& edges, std::vector<FVec3>& normals);
+private:
 	float m_Volume;
 	PxVec3 m_Center;
+	PxShape* m_pConvexMesh;
 	PxRigidDynamic* m_pPxRigidActor;
 	BoundingBox box;
 
@@ -32,6 +36,8 @@ private:
 	bool m_IsDestructable;
 public:
 	PxTransform m_Transform;
+	PxVec3 m_Volocity;
+	uint32_t start;
 
 	std::vector<FVec3> m_Vertices;
 	std::vector<FVec3> m_Normals;

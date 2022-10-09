@@ -58,9 +58,9 @@ void UIDrawer::Move(float dt) {
 		d3 -= dt;
 	if (ImGui::IsKeyDown('Q'))
 		d3 += dt;
-	app->m_pViewerCamera->MoveForward(d1 * 45.0f*speed);
-	app->m_pViewerCamera->Strafe(d2 * 45.0f*speed);
-	app->m_pViewerCamera->UpAndDown(d3 * 45.0f * speed);
+	app->m_pViewerCamera->MoveForward(d1 * 10.0f*speed);
+	app->m_pViewerCamera->Strafe(d2 * 10.0f*speed);
+	app->m_pViewerCamera->UpAndDown(d3 * 10.0f * speed);
 
 	if (io.WantCaptureMouse)
 		return;

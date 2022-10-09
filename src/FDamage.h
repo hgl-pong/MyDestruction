@@ -2,6 +2,7 @@
 #include "vec.h"
 class FDamage
 {
+
 };
 
 class FSphereDamage {
@@ -11,5 +12,6 @@ public:
 	FVec3 center;
 	float radius;
 
+	float damage;
 };
 
