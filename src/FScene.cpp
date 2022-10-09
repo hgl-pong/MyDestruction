@@ -25,7 +25,7 @@ bool FScene::Init()
 
 	m_pScene = FPhysics::Get()->m_pPhysics->createScene(sceneDesc);
 	FASSERT(m_pScene);
-	
+
 	m_pMaterial = FPhysics::Get()->CreateMaterial(STONE);
 
 	groundPlane = PxCreatePlane(*FPhysics::Get()->m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
