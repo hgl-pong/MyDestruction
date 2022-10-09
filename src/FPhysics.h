@@ -33,7 +33,7 @@ public:
 	bool AddToScene(PxRigidDynamic*, FScene* scene);
 	bool REmoveFromScene(PxRigidDynamic*, FScene* scene);
 	PxRigidDynamic* CreatePhysicActor(VoronoiCellInfo& cellInfo,PxMaterial* material,PxTransform& tran);
-	PxShape* CreateConvexShape(VoronoiCellInfo& cellInfo, PxMaterial* material);
+	PxShape* CreateConvexShape(std::vector<FVec3>& Vertices, std::vector<uint32_t>& Indices, PxMaterial* material);
 	bool Update();
 public:
 	PxPhysics* m_pPhysics;

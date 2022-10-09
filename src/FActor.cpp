@@ -116,9 +116,9 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 	FVec3 transform(m_pMeshData->m_Transform.GetPosition().x,
 		m_pMeshData->m_Transform.GetPosition().y,
 		m_pMeshData->m_Transform.GetPosition().z);
-	FSiteGenerator::ImpactDamage(damage.center,transform , damage.radius, 500, sites,RandomType::GAUSSION);
+	FSiteGenerator::ImpactDamage(damage.center,transform , damage.radius, 100, sites,RandomType::GAUSSION);
 	//FVec3 normal(ray.direction.x, ray.direction.y, ray.direction.z);
-	//FSiteGenerator::PlaneImpactDamage(m_pMeshData->m_BoundingBox,damage.center,normal, transform ,500, sites);
+	//FSiteGenerator::PlaneImpactDamage(m_pMeshData->m_BoundingBox,damage.center,normal, transform ,100, sites);
 	Graphics::MeshData* newMesh;
 
 	Transform trans;

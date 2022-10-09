@@ -6,7 +6,7 @@ void FSiteGenerator::ImpactDamage(FVec3& pos, FVec3&transform,float radius, int 
 	FVec3 min(pos.X - radius, pos.Y - radius, pos.Z - radius);
 	FVec3 max(pos.X + radius, pos.Y + radius, pos.Z + radius);
 	FVec3 newSite;
-	for (int i = 0; i < num; i++) {
+	for (int i = 0; i < num; ) {
 
 		switch (type)
 		{
@@ -21,6 +21,7 @@ void FSiteGenerator::ImpactDamage(FVec3& pos, FVec3&transform,float radius, int 
 		if (disq <= radius * radius) {
 			//printf("%f,%f,%f\n", newSite.X, newSite.Y, newSite.Z);
 			output.push_back(newSite-transform);
+			i++;
 		}
 	}
 }
@@ -31,14 +32,16 @@ void FSiteGenerator::PlaneImpactDamage(DirectX::BoundingBox&box,FVec3& pos, FVec
 	FVec3 max(box.Center.x + box.Extents.x, box.Center.y + box.Extents.y, box.Center.z + box.Extents.z);
 
 	FVec3 newSite;
-	for (int i = 0; i < num; i++) {
+	for (int i = 0; i < num; ) {
 
 		newSite = FVec3(_RandomNumber(min.X, max.X), _RandomNumber(min.Y, max.Y), _RandomNumber(min.Z, max.Z));
 
 		FVec3 temp = newSite - pos + transform;
 		double dot = normals.Dot(temp);
-		if(dot<=0)
-		sites.push_back(newSite);
+		if (dot <= 0) {
+			sites.push_back(newSite);
+			i++;
+		}
 
 	}
 }

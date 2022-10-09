@@ -152,16 +152,16 @@ PxRigidDynamic* FPhysics::CreatePhysicActor(VoronoiCellInfo& cellInfo,PxMaterial
 	return convexActor;
 }
 
-PxShape* FPhysics::CreateConvexShape(VoronoiCellInfo& cellInfo, PxMaterial* material)
+PxShape* FPhysics::CreateConvexShape(std::vector<FVec3>&Vertices,std::vector<uint32_t>&Indices, PxMaterial* material)
 {
-	const PxU32 numVertices = cellInfo.Vertices.size();
-	const PxU32 numTriangles = cellInfo.Faces.size() / 3;
+	const PxU32 numVertices = Vertices.size();
+	const PxU32 numTriangles = Indices.size() / 3;
 
 	PxVec3* vertices = new PxVec3[numVertices];
-	PxU32* indices = cellInfo.Faces.data();
+	PxU32* indices = Indices.data();
 
 	// º”‘ÿ∂•µ„
-	memcpy_s(vertices, sizeof(PxVec3) * numVertices, cellInfo.Vertices.data(), sizeof(FVec3) * numVertices);
+	memcpy_s(vertices, sizeof(PxVec3) * numVertices, Vertices.data(), sizeof(FVec3) * numVertices);
 
 	PxConvexMeshDesc meshDesc1;
 	meshDesc1.points.count = numVertices;

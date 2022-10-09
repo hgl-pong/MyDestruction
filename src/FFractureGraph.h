@@ -11,6 +11,7 @@ class FActor;
 class FFractureGraph {
 public:
 	FFractureGraph() = default;
+	FFractureGraph(std::vector<FChunk*>& chunks);
 	~FFractureGraph();
 	bool Release();
 	bool Intersection(FDamage& damage);

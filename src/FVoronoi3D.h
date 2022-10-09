@@ -21,12 +21,15 @@ struct Edge
 // All the info you would typically want about a single cell in the Voronoi diagram, in the format that is easiest to compute
 struct VoronoiCellInfo
 {
-	FVec3 position;
+	FVec3 Position;
+	float Volume;
+	
 	std::vector<FVec3> Vertices;
 	std::vector<uint32_t> Faces;
 	std::vector<Edge> Edges;
 	std::vector<uint32_t> Neighbors;
 	std::vector<FVec3> Normals;
+	std::vector<double> Areas;
 	//std::vector<vec2> Uvs;
 	physx::PxRigidDynamic* rigidDynamic;
 };

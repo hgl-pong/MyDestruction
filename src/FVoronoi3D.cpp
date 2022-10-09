@@ -73,7 +73,7 @@ void FVoronoi3D::ComputeAllCells()
 				FVec3 pos(x, y, z);
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, Cell.Neighbors,Cell.Normals);
-				Cell.position = { (float)x,(float)y,(float)z };
+				Cell.Position = { (float)x,(float)y,(float)z };
 
 				/*cell.neighbors(Cell.Neighbors);*/
 
@@ -113,7 +113,7 @@ void FVoronoi3D::ComputeCellEdgesSerial()
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces,true);
 
-				Cell.position = { (float)x,(float)y,(float)z };
+				Cell.Position = { (float)x,(float)y,(float)z };
 				Cell.Edges.clear();
 				uint32_t FaceOffset = 0;
 				for (size_t ii = 0, ni = Cell.Faces.size(); ii < ni; ii += Cell.Faces[ii] + 1)
@@ -156,7 +156,7 @@ void FVoronoi3D::ComputeCellEdges()
 	{
 		do
 		{
-			bool bCouldComputeCell = Container->compute_cell(cell, CellIterator,VoroCompute);
+			bool bCouldComputeCell = Container->compute_cell(cell, CellIterator, VoroCompute);
 			if (bCouldComputeCell)
 			{
 				int32_t id = CellIterator.pid();
@@ -168,7 +168,7 @@ void FVoronoi3D::ComputeCellEdges()
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces);
 
-				Cell.position = { (float)x,(float)y,(float)z };
+				Cell.Position = { (float)x,(float)y,(float)z };
 				Cell.Edges.clear();
 				for (int i = 0; i<Cell.Faces.size()/3;  i++)
 				{
