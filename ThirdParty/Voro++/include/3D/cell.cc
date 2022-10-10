@@ -1820,6 +1820,38 @@ void voronoicell_base::face_areas(std::vector<double> &v) {
 	}
 	reset_edges();
 }
+void voronoicell_base::face_areas(std::vector<float>& v) {
+	float area;
+	v.clear();
+	int i, j, k, l, m, n;
+	double ux, uy, uz, vx, vy, vz, wx, wy, wz;
+	for (i = 1; i < p; i++) for (j = 0; j < nu[i]; j++) {
+		k = ed[i][j];
+		if (k >= 0) {
+			area = 0;
+			ed[i][j] = -1 - k;
+			l = cycle_up(ed[i][nu[i] + j], k);
+			m = ed[k][l]; ed[k][l] = -1 - m;
+			while (m != i) {
+				n = cycle_up(ed[k][nu[k] + l], m);
+				ux = pts[4 * k] - pts[4 * i];
+				uy = pts[4 * k + 1] - pts[4 * i + 1];
+				uz = pts[4 * k + 2] - pts[4 * i + 2];
+				vx = pts[4 * m] - pts[4 * i];
+				vy = pts[4 * m + 1] - pts[4 * i + 1];
+				vz = pts[4 * m + 2] - pts[4 * i + 2];
+				wx = uy * vz - uz * vy;
+				wy = uz * vx - ux * vz;
+				wz = ux * vy - uy * vx;
+				area += sqrt(wx * wx + wy * wy + wz * wz);
+				k = m; l = n;
+				m = ed[k][l]; ed[k][l] = -1 - m;
+			}
+			v.push_back(0.125 * area);
+		}
+	}
+	reset_edges();
+}
 
 /** Calculates the total surface area of the Voronoi cell.
  * \return The computed area. */
@@ -2729,7 +2761,31 @@ void voronoicell_neighbor::print_edges_neighbors(int i) {
 	} else printf("     ()");
 }
 
-/** Computes Unreal TArrays of all cell info. */
+void voronoicell_base::indices(std::vector<uint32_t>& indices) {
+	int i, j, k, l, m, n;
+	double* ptsp = pts;
+
+	indices.clear();
+	//face_vertices(FaceVertexIndices);
+	for (i = 1; i < p; i++) for (j = 0; j < nu[i]; j++) {
+		k = ed[i][j];
+		if (k >= 0) {
+			ed[i][j] = -1 - k;
+			l = cycle_up(ed[i][nu[i] + j], k);
+			m = ed[k][l]; ed[k][l] = -1 - m;
+			while (m != i) {
+				n = cycle_up(ed[k][nu[k] + l], m);
+				//printf("<%d,%d,%d>\n", i, k, m);
+				indices.push_back(i);
+				indices.push_back(k);
+				indices.push_back(m);
+				k = m; l = n;
+				m = ed[k][l]; ed[k][l] = -1 - m;
+			}
+		}
+	}
+	reset_edges();
+}
 void voronoicell::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices)
 {
 	int i, j, k, l, m, n;

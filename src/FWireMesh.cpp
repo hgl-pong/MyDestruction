@@ -71,7 +71,7 @@ bool FWireMesh::VoronoiFracture(std::vector<FVec3>& sites)
 	m_pCellInfo = nullptr;
 	FASSERT(!sites.empty());
 	m_pVoronoi3D->AddSites(sites);
-	m_pVoronoi3D->ComputeCellEdgesSerial();
+	m_pVoronoi3D->ComputeAllCells();
 	m_pCellInfo = m_pVoronoi3D->GetAllCells();	
 	return true;
 Exit0:

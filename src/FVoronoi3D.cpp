@@ -75,6 +75,26 @@ void FVoronoi3D::ComputeAllCells()
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, Cell.Neighbors,Cell.Normals);
 				Cell.Position = { (float)x,(float)y,(float)z };
 
+				Cell.Edges.clear();
+				Cell.Indices.clear();
+				Cell.Areas.clear();
+				uint32_t FaceOffset = 0;
+				for (size_t ii = 0, ni = Cell.Faces.size(); ii < ni; ii += Cell.Faces[ii] + 1)
+				{
+					uint32_t VertCount = Cell.Faces[ii];
+					uint32_t PreviousVertexIndex = Cell.Faces[FaceOffset + VertCount];
+					for (uint32_t kk = 0; kk < VertCount; ++kk)
+					{
+						uint32_t VertexIndex = Cell.Faces[1 + FaceOffset + kk]; // Index of vertex X coordinate in raw coordinates array
+
+						Cell.Edges.push_back({ PreviousVertexIndex, VertexIndex });
+						PreviousVertexIndex = VertexIndex;
+					}
+					FaceOffset += VertCount + 1;
+				}
+				cell.indices(Cell.Indices);
+				cell.face_areas(Cell.Areas);
+				Cell.Volume = cell.volume();
 				/*cell.neighbors(Cell.Neighbors);*/
 
 				cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);

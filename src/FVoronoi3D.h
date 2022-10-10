@@ -24,7 +24,7 @@ struct VoroCellInfo
 	std::vector<Edge> Edges;
 	std::vector<uint32_t> Neighbors;
 	std::vector<FVec3> Normals;
-	std::vector<double> Areas;
+	std::vector<float> Areas;
 	//std::vector<vec2> Uvs;
 	physx::PxRigidDynamic* rigidDynamic;
 };

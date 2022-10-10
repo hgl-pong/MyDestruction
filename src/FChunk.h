@@ -57,7 +57,7 @@ public:
 	std::vector<uint32_t> m_Indices;
 
 	std::vector<uint32_t> m_Neighbors;
-	std::vector<double> m_Areas;
+	std::vector<float> m_Areas;
 
 };
 #endif // FCHUNK_H
