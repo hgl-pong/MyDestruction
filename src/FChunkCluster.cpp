@@ -82,6 +82,7 @@ bool FChunkCluster::Init(std::vector<FChunk*>& chunks, FActor* actor)
 			newEdge.connectHealth = chunk->m_Areas[chunk->m_Neighbors[i]] * actor->m_Material.hardness;
 			m_Edges.emplace(newEdge);
 		}
+		chunk->m_pRigidActor = m_pRigidActor;
 		m_pRigidActor->attachShape(*chunk->m_pConvexMeshShape);
 		m_ChunkCount++;
 	}
