@@ -8,12 +8,13 @@
 using namespace physx;
 struct FMaterial
 {
-	float dynamicFriction;
-	float staticFriction;
-	float restitution;
+	PxMaterial* material;
 	float identity;
+	float hardness;
+	~FMaterial() {
+		PHYSX_RELEASE(material);
+	}
 };
-static FMaterial STONE = { 0.8,0.8,0.2,1000 };
 
 class FScene;
 class FPhysics {
@@ -25,15 +26,15 @@ public:
 	bool Release();
 	static FPhysics* Get();
 
-	PxMaterial* CreateMaterial(FMaterial& material);
+	FMaterial* CreateMaterial(float staticFriction,float dynamicFriction,float restitution,float identity,float hardness);
 
 	bool AddScene(FScene* scene);
 	bool RemoveScene(FScene* scene);
 
 	bool AddToScene(PxRigidDynamic*, FScene* scene);
-	bool REmoveFromScene(PxRigidDynamic*, FScene* scene);
-	PxRigidDynamic* CreatePhysicActor(VoronoiCellInfo& cellInfo,PxMaterial* material,PxTransform& tran);
-	PxShape* CreateConvexShape(std::vector<FVec3>& Vertices, std::vector<uint32_t>& Indices, PxMaterial* material);
+	bool RemoveFromScene(PxRigidDynamic*, FScene* scene);
+	PxRigidDynamic* CreatePhysicActor(VoroCellInfo& cellInfo,FMaterial& material,PxTransform& tran);
+	PxShape* CreateConvexShape(std::vector<FVec3>& Vertices, std::vector<uint32_t>& Indices, FMaterial& material);
 	bool Update();
 public:
 	PxPhysics* m_pPhysics;
@@ -41,11 +42,19 @@ public:
 	PxCooking* m_pCooking;
 	PxDefaultCpuDispatcher* m_pPhysxCPUDispatcher;
 	PxPvd* m_pPvd;
+
+	FMaterial STONE;
+	FMaterial PLASTIC;
+	FMaterial GLASS;
 private:
 	PxDefaultErrorCallback m_DefaultErrorCallBack;
 	PxDefaultAllocator m_DefaultAllocator;
 
 	std::set<FScene*> m_SimulatingScenes;
 
+
+
 };
+
+
 #endif //FPHYSICS_H

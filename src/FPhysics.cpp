@@ -44,6 +44,11 @@ bool FPhysics::Init()
 
 	m_pPhysxCPUDispatcher = PxDefaultCpuDispatcherCreate(uNumTreads);
 	FASSERT(m_pPhysxCPUDispatcher);
+
+	STONE = *CreateMaterial(0.6, 0.6, 0.5, 2000, 1000);
+	PLASTIC = *CreateMaterial(0.4, 0.4, 0.3, 500, 500);
+	GLASS = *CreateMaterial(0.1, 0.1, 0.1, 1000, 1000);
+
 	nResult = true;
 	return nResult;
 	Exit0:
@@ -72,10 +77,15 @@ FPhysics* FPhysics::Get() {
 }
 
 
-physx::PxMaterial* FPhysics::CreateMaterial(FMaterial& material)
+FMaterial* FPhysics::CreateMaterial(float staticFriction, float dynamicFriction, float restitution, float identity, float hardness)
 {
+	FMaterial* newMaterial;
 	FASSERT(m_pPhysics);
-	return m_pPhysics->createMaterial(material.staticFriction, material.dynamicFriction, material.restitution);
+	newMaterial = new FMaterial();
+	newMaterial->material=m_pPhysics->createMaterial(staticFriction, dynamicFriction,restitution);
+	newMaterial->identity = identity;
+	newMaterial->hardness = hardness;
+	return newMaterial;
 Exit0:
 	return nullptr;
 }
@@ -104,13 +114,13 @@ bool FPhysics::AddToScene(PxRigidDynamic*actor, FScene* scene)
 	return false;
 }
 
-bool FPhysics::REmoveFromScene(PxRigidDynamic*actor, FScene* scene)
+bool FPhysics::RemoveFromScene(PxRigidDynamic*actor, FScene* scene)
 {
 	scene->GetPhysicsScene()->removeActor(*actor);
 	return true;
 }
 
-PxRigidDynamic* FPhysics::CreatePhysicActor(VoronoiCellInfo& cellInfo,PxMaterial* material, PxTransform& tran)
+PxRigidDynamic* FPhysics::CreatePhysicActor(VoroCellInfo& cellInfo, FMaterial& material, PxTransform& tran)
 {
 	const PxU32 numVertices = cellInfo.Vertices.size();
 	const PxU32 numTriangles = cellInfo.Faces.size() / 3;
@@ -140,19 +150,19 @@ PxRigidDynamic* FPhysics::CreatePhysicActor(VoronoiCellInfo& cellInfo,PxMaterial
 	PxRigidDynamic* convexActor = m_pPhysics->createRigidDynamic(tran);
 
 	// 创建三角网格形状 *gMaterial
-	PxShape* shape = m_pPhysics->createShape(geom, *material);
+	PxShape* shape = m_pPhysics->createShape(geom, *material.material);
 
 
 	convexActor->attachShape(*shape);
 
-	PxRigidBodyExt::updateMassAndInertia(*convexActor, 2000.0f);	//convexActor->setMass(1000.0f);
+	PxRigidBodyExt::updateMassAndInertia(*convexActor,material.identity);	//convexActor->setMass(1000.0f);
 	shape->release();
 
 	convexActor->setAngularDamping(0.1f);
 	return convexActor;
 }
 
-PxShape* FPhysics::CreateConvexShape(std::vector<FVec3>&Vertices,std::vector<uint32_t>&Indices, PxMaterial* material)
+PxShape* FPhysics::CreateConvexShape(std::vector<FVec3>&Vertices,std::vector<uint32_t>&Indices, FMaterial& material)
 {
 	const PxU32 numVertices = Vertices.size();
 	const PxU32 numTriangles = Indices.size() / 3;
@@ -180,7 +190,7 @@ PxShape* FPhysics::CreateConvexShape(std::vector<FVec3>&Vertices,std::vector<uin
 	PxConvexMeshGeometry geom(convexMesh);
 
 	// 创建三角网格形状 *gMaterial
-	PxShape* shape = m_pPhysics->createShape(geom, *material);
+	PxShape* shape = m_pPhysics->createShape(geom, *material.material);
 	return shape;
 }
 

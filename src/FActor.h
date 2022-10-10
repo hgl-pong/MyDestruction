@@ -6,13 +6,14 @@
 #include "Common/Collision.h"
 #include "vec.h"
 #include <algorithm>
+#include"FPhysics.h"
 using namespace physx;
 
 class FRenderMesh;
 class FWireMesh;
 class FScene;
 class FChunk;
-class FFractureGraph;
+class FChunkCluster;
 class FActor
 {
 public:
@@ -33,18 +34,23 @@ public:
 	
 	bool Intersection(Ray&ray,FScene* scene);
 
-	bool SetRenderWireFrame();
+	bool RemoveChunk(FChunk* chunk);
+	bool RemoveChunkCluser(FChunkCluster* chunkCluster);
+	bool SetRenderWireFrame(bool render);
 
 private:
+	friend class FChunk;
+	friend class FChunkCluster;
 	FRenderMesh* m_pRenderMesh;
 	FWireMesh* m_pWireMesh;
 
+	std::set<FScene*> m_Scenes;
 	Graphics::MeshData* m_pMeshData;
 	Graphics::MeshData* m_pVoroMeshData;
 
 	//std::set<FChunk*> m_Chunks;
 	//std::set<FFractureGraph*> m_Graphs;
-	PxMaterial* m_pMaterial;
+	FMaterial m_Material;
 
 	int m_HitTime = 0;
 	char* m_Name;

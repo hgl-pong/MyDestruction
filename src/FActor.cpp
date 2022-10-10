@@ -9,6 +9,9 @@
 #include "FSiteGenerator.h"
 #include "FDamage.h"
 #include "FPhysics.h"
+#include "FChunk.h"
+#include "FChunkCluster.h"
+
 FActor::FActor()
 	:m_pWireMesh(nullptr),
 	m_pRenderMesh(nullptr),
@@ -83,12 +86,16 @@ bool FActor::Update()
 bool FActor::OnEnterScene(FScene* scene)
 {
 	scene->AddActor(this);
+	m_Scenes.emplace(scene);
 	return true;
 }
 
 bool FActor::OnLeaveScene(FScene* scene)
 {
 	scene->RemoveActor(this);
+	auto it = m_Scenes.find(scene);
+	if (it != m_Scenes.end())
+		m_Scenes.erase(it);
 	return true;
 }
 
@@ -150,7 +157,39 @@ Exit0:
 	return hit;
 }
 
-bool FActor::SetRenderWireFrame()
+bool FActor::RemoveChunk(FChunk* chunk)
 {
+	FASSERT(chunk);
+	for (auto scene : m_Scenes) {
+		if (!chunk->GetPhysicsActor())
+			continue;
+		FPhysics::Get()->RemoveFromScene(chunk->GetPhysicsActor(),scene);
+	}
+	return true;
+Exit0:
 	return false;
+}
+
+bool FActor::RemoveChunkCluser(FChunkCluster* chunkCluster)
+{
+	FASSERT(chunkCluster);
+	for (auto scene : m_Scenes) {
+		if (!chunkCluster->GetPhysicsActor())
+			continue;
+		FPhysics::Get()->RemoveFromScene(chunkCluster->GetPhysicsActor(), scene);
+	}
+	return true;
+Exit0:
+	return false;
+}
+
+bool FActor::SetRenderWireFrame(bool render)
+{
+	if (render) {
+		Graphics::Renderer::Get()->AddVoroMesh(m_pVoroMeshData);
+	}
+	else {
+		Graphics::Renderer::Get()->RemoveVoroMesh(m_pVoroMeshData);
+	}
+	return true;
 }

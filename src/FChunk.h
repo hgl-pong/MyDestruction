@@ -9,19 +9,20 @@
 #include "FDamage.h"
 using namespace physx;
 using namespace DirectX;
+class FActor;
 class FChunk
 {
 public:
 	FChunk() = default;
-	FChunk(VoronoiCellInfo &cellInfo, PxMaterial* material);
+	FChunk(VoroCellInfo &cellInfo, FActor*actor);
 	~FChunk();
 	bool Release();
-	bool InitPhysicsActor(float identity);
+	bool InitUniquePhysicsActor();
 	bool Attach(PxRigidDynamic *actor);
 	bool Tick();
 	bool IsDestructable();
 	bool Intersection(Ray &ray);
-	bool InitPhyiscShape(PxMaterial *material);
+	bool InitPhyiscShape();
 	bool InitBoundingBox();
 	bool Intersection(FDamage &damage);
 	PxRigidDynamic *GetPhysicsActor();
@@ -30,8 +31,9 @@ private:
 	void _CalculateNormals(std::vector<Edge> &edges, std::vector<FVec3> &normals);
 
 private:
-	friend class FFractureGraph;
+	friend class FChunkCluster;
 	float m_Volume;
+	FActor* m_pActor;
 	FVec3 m_Center;
 	PxShape *m_pConvexMeshShape;
 	PxRigidDynamic *m_pRigidActor;
@@ -40,13 +42,12 @@ private:
 	float m_Life;
 	bool m_IsSleeping;
 	bool m_IsDestructable;
-
+	float m_ChunkHealth;
 public:
 	PxTransform m_Transform;
 	PxVec3 m_Volocity;
 	uint32_t m_VBStartPos;
-
-	bool m_NeedToBeRemove;
+	uint32_t m_Offset;
 
 	std::vector<FVec3> m_Vertices;
 	std::vector<FVec3> m_Normals;
@@ -57,5 +58,6 @@ public:
 
 	std::vector<uint32_t> m_Neighbors;
 	std::vector<double> m_Areas;
+
 };
 #endif // FCHUNK_H

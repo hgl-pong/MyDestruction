@@ -2,6 +2,7 @@
 #define FSCENE_H
 #include "PxPhysicsAPI.h"
 #include "Common/Collision.h"
+#include"FPhysics.h"
 #include <set>
 using namespace physx;
 class FActor;
@@ -30,7 +31,7 @@ public:
 	}
 private:
 	PxScene* m_pScene;
-	PxMaterial* m_pMaterial;
+	FMaterial m_Material;
 	bool m_Simulating;
 	std::set<FActor*> m_Actors;
 };

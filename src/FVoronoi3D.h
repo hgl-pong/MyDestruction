@@ -7,25 +7,20 @@
 #include <voro++.hh>
 #include "vec.h"
 #include "PxPhysicsAPI.h"
-//const vec3 axisX(1.0, 0.0, 0.0);
-//const vec3 axisY(0.0f, 1.0f, 0.0f);
-//const vec3 axisZ(0.0f, 0.0f, 1.0f);
-//const vec3 vec3Zero(0.0f, 0.0f, 0.0f);
-
 struct Edge
 {
 	uint32_t s;
 	uint32_t e;
 };
 
-// All the info you would typically want about a single cell in the Voronoi diagram, in the format that is easiest to compute
-struct VoronoiCellInfo
+struct VoroCellInfo
 {
 	FVec3 Position;
 	float Volume;
 	
 	std::vector<FVec3> Vertices;
 	std::vector<uint32_t> Faces;
+	std::vector<uint32_t> Indices;
 	std::vector<Edge> Edges;
 	std::vector<uint32_t> Neighbors;
 	std::vector<FVec3> Normals;
@@ -50,7 +45,7 @@ private:
 	int32_t NumSites;
 	voro::container* Container;
 	BBox Bounds;
-	std::vector<VoronoiCellInfo> Cells;
+	std::vector<VoroCellInfo> Cells;
 
 public:
 
@@ -80,7 +75,7 @@ public:
 	void BoxSampling(BBox& box, std::vector<int32_t>& CellMember, bool random);
 	void SphereSampling(FVec3& center, float radius, std::vector<int32_t>& CellMember, bool random);
 
-	VoronoiCellInfo* GetAllCells()const;
+	VoroCellInfo* GetAllCells()const;
 private:
 
 	bool _OutOfBox(const FVec3& p);

@@ -159,7 +159,7 @@
     <ClCompile Include="..\src\FChunk.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\FFractureGraph.cpp">
+    <ClCompile Include="..\src\FChunkCluster.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -326,7 +326,7 @@
     <ClInclude Include="..\src\FChunk.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\FFractureGraph.h">
+    <ClInclude Include="..\src\FChunkCluster.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

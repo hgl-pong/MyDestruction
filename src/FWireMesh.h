@@ -28,7 +28,7 @@ public:
 	std::vector<XMFLOAT4>colors;
 	std::vector<uint32_t>indices;
 
-	VoronoiCellInfo* m_pCellInfo;
+	VoroCellInfo* m_pCellInfo;
 
 };
 

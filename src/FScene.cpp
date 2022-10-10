@@ -4,7 +4,6 @@
 #include "FActor.h"
 FScene::FScene():
 	m_pScene(nullptr),
-	m_pMaterial(nullptr),
 	m_Simulating(false)
 {
 
@@ -26,9 +25,9 @@ bool FScene::Init()
 	m_pScene = FPhysics::Get()->m_pPhysics->createScene(sceneDesc);
 	FASSERT(m_pScene);
 
-	m_pMaterial = FPhysics::Get()->CreateMaterial(STONE);
+	m_Material = FPhysics::Get()->STONE;
 
-	groundPlane = PxCreatePlane(*FPhysics::Get()->m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
+	groundPlane = PxCreatePlane(*FPhysics::Get()->m_pPhysics, PxPlane(0, 1, 0, 0), *m_Material.material);
 	m_pScene->addActor(*groundPlane);
 	return true;
 Exit0:
@@ -38,7 +37,6 @@ Exit0:
 bool FScene::Release()
 {
 	PHYSX_RELEASE(m_pScene);
-	PHYSX_RELEASE(m_pMaterial);
 	return false;
 }
 

@@ -35,4 +35,5 @@ if(X)\
 	X = nullptr; \
 }
 
+
 #endif // UTILS_H

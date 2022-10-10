@@ -69,7 +69,7 @@ void FVoronoi3D::ComputeAllCells()
 				double x, y, z;
 				CellIterator.pos(x, y, z);
 
-				VoronoiCellInfo& Cell = Cells[id];
+				VoroCellInfo& Cell = Cells[id];
 				FVec3 pos(x, y, z);
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, Cell.Neighbors,Cell.Normals);
@@ -107,7 +107,7 @@ void FVoronoi3D::ComputeCellEdgesSerial()
 				double x, y, z;
 				CellIterator.pos(x, y, z);
 
-				VoronoiCellInfo& Cell = Cells[id];
+				VoroCellInfo& Cell = Cells[id];
 				//FVec3 pos(x * 2, y * 2, z * 2);
 				FVec3 pos(x , y , z );
 				std::vector<FVec3>normals;
@@ -163,7 +163,7 @@ void FVoronoi3D::ComputeCellEdges()
 				double x, y, z;
 				CellIterator.pos(x, y, z);
 
-				VoronoiCellInfo& Cell = Cells[id];
+				VoroCellInfo& Cell = Cells[id];
 				FVec3 pos(x, y, z);
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces);
@@ -243,9 +243,9 @@ void FVoronoi3D::SphereSampling(FVec3& center, float radius, std::vector<int32_t
 
 }
 
-VoronoiCellInfo* FVoronoi3D::GetAllCells() const
+VoroCellInfo* FVoronoi3D::GetAllCells() const
 {
-	return const_cast<VoronoiCellInfo*>(Cells.data());
+	return const_cast<VoroCellInfo*>(Cells.data());
 }
 
 bool FVoronoi3D::_OutOfBox(const FVec3& p)
