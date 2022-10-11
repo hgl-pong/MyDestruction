@@ -296,7 +296,7 @@ const Model* MeshImporter::CreateFromGeometry(std::string_view name, const Geome
 
     model.materials.resize(1);
     model.meshData.m_pTexcoordArrays.resize(1);
-    model.meshData.m_IndexCount = (uint32_t)(!data.indices16.empty() ? data.indices16.size() : data.indices32.size());
+    model.meshData.m_IndexCount = (uint32_t)(data.indices32.size());
     model.meshData.m_MaterialIndex = 0;
     CD3D11_BUFFER_DESC bufferDesc(0, D3D11_BIND_VERTEX_BUFFER);
     D3D11_SUBRESOURCE_DATA initData{ nullptr, 0, 0 };
@@ -317,18 +317,11 @@ const Model* MeshImporter::CreateFromGeometry(std::string_view name, const Geome
     bufferDesc.ByteWidth = (uint32_t)data.tangents.size() * sizeof(XMFLOAT4);
     m_pDevice->CreateBuffer(&bufferDesc, &initData, model.meshData.m_pTangents.ReleaseAndGetAddressOf());
 
-    if (!data.indices16.empty())
-    {
-        initData.pSysMem = data.indices16.data();
-        bufferDesc = CD3D11_BUFFER_DESC((uint16_t)data.indices16.size() * sizeof(uint16_t), D3D11_BIND_INDEX_BUFFER);
-        m_pDevice->CreateBuffer(&bufferDesc, &initData, model.meshData.m_pIndices.ReleaseAndGetAddressOf());
-    }
-    else
-    {
+
         initData.pSysMem = data.indices32.data();
         bufferDesc = CD3D11_BUFFER_DESC((uint32_t)data.indices32.size() * sizeof(uint32_t), D3D11_BIND_INDEX_BUFFER);
         m_pDevice->CreateBuffer(&bufferDesc, &initData, model.meshData.m_pIndices.ReleaseAndGetAddressOf());
-    }
+
 
     return &model;
 }

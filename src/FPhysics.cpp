@@ -45,9 +45,9 @@ bool FPhysics::Init()
 	m_pPhysxCPUDispatcher = PxDefaultCpuDispatcherCreate(uNumTreads);
 	FASSERT(m_pPhysxCPUDispatcher);
 
-	STONE = *CreateMaterial(0.6, 0.6, 0.5, 2000, 1000);
-	PLASTIC = *CreateMaterial(0.4, 0.4, 0.3, 500, 500);
-	GLASS = *CreateMaterial(0.1, 0.1, 0.1, 1000, 1000);
+	STONE = *CreateMaterial(0.6, 0.6, 0.5, 2000, 100);
+	PLASTIC = *CreateMaterial(0.4, 0.4, 0.3, 500, 50);
+	GLASS = *CreateMaterial(0.1, 0.1, 0.1, 1000, 100);
 
 	nResult = true;
 	return nResult;
@@ -116,8 +116,11 @@ bool FPhysics::AddToScene(PxRigidDynamic*actor, FScene* scene)
 
 bool FPhysics::RemoveFromScene(PxRigidDynamic*actor, FScene* scene)
 {
+	FASSERT(actor);
 	scene->GetPhysicsScene()->removeActor(*actor);
 	return true;
+Exit0:
+	return false;
 }
 
 PxRigidDynamic* FPhysics::CreatePhysicActor(VoroCellInfo& cellInfo, FMaterial& material, PxTransform& tran)

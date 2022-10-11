@@ -26,16 +26,16 @@ void FVoronoi3D::SetBBox(BBox& boundingBox)
 	Bounds.Min = boundingBox.Min;
 }
 
-void FVoronoi3D::AddSites(const std::vector< FVec3>& Sites, float SquaredDistSkipPtThreshold /*= 0.0f*/)
+void FVoronoi3D::AddSites(const std::vector< FVec3>& Sites, float SquaredDistSkipPtThreshold /*= 0.0f*/, FVec3 transform)
 {
 	int32_t OrigSitesNum = NumSites;
 	if (SquaredDistSkipPtThreshold > 0)
 	{
-		_PutSitesWithDistanceCheck(Container, Sites, OrigSitesNum, SquaredDistSkipPtThreshold);
+		_PutSitesWithDistanceCheck(Container, Sites, OrigSitesNum, transform, SquaredDistSkipPtThreshold);
 	}
 	else
 	{
-		_PutSites(Container, Sites, OrigSitesNum);
+		_PutSites(Container, Sites, OrigSitesNum,transform);
 	}
 	NumSites += Sites.size();
 }
@@ -70,6 +70,7 @@ void FVoronoi3D::ComputeAllCells()
 				CellIterator.pos(x, y, z);
 
 				VoroCellInfo& Cell = Cells[id];
+				Cell.Id = id;
 				FVec3 pos(x, y, z);
 				std::vector<FVec3>normals;
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, Cell.Neighbors,Cell.Normals);
@@ -278,11 +279,12 @@ bool FVoronoi3D::_OutOfBox(const FVec3& p)
 		return true;
 }
 
-void FVoronoi3D::_PutSites(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset)
+void FVoronoi3D::_PutSites(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, FVec3 &transform)
 {
 	for (int i = 0; i < Sites.size(); i++)
 	{
-		const FVec3& V = Sites[i];
+		FVec3 V = Sites[i];
+		V = V + transform;
 		if (_OutOfBox(V))
 		{
 			continue;
@@ -294,12 +296,13 @@ void FVoronoi3D::_PutSites(voro::container* Container, const std::vector< FVec3>
 	}
 }
 
-int32_t FVoronoi3D::_PutSitesWithDistanceCheck(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, float SquaredDistThreshold /*= 1e-4*/)
+int32_t FVoronoi3D::_PutSitesWithDistanceCheck(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, FVec3 &transform, float SquaredDistThreshold /*= 1e-4*/)
 {
 	int32_t SkippedPts = 0;
 	for (int i = 0; i < Sites.size(); i++)
 	{
-		const FVec3& V = Sites[i];
+		FVec3 V = Sites[i];
+		V = V + transform;
 		if (_OutOfBox(V))
 		{
 			SkippedPts++;
@@ -311,16 +314,16 @@ int32_t FVoronoi3D::_PutSitesWithDistanceCheck(voro::container* Container, const
 			int ExistingPtID;
 			if (Container->find_voronoi_cell(V.X, V.Y, V.Z, EX, EY, EZ, ExistingPtID))
 			{
-				float dx = V.X - EX;
-				float dy = V.Y - EY;
-				float dz = V.Z - EZ;
+				float dx = V.X- EX;
+				float dy =  V.Y- EY;
+				float dz =  V.Z- EZ;
 				if (dx * dx + dy * dy + dz * dz < SquaredDistThreshold)
 				{
 					SkippedPts++;
 					continue;
 				}
 			}
-			Container->put(Offset + i, V.X, V.Y, V.Z);
+			Container->put(Offset + i, V.X , V.Y, V.Z);
 		}
 	}
 	return SkippedPts;

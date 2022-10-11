@@ -2860,7 +2860,7 @@ void voronoicell::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>&
 	reset_edges();
 }
 
-void voronoicell_neighbor::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices, std::vector<uint32_t>& Nbrs, std::vector<FVec3>& Normals) {
+void voronoicell_neighbor::extractCellInfo(const FVec3& CellPosition, std::vector<FVec3>& Vertices, std::vector<uint32_t>& FaceVertexIndices, std::vector<int>& Nbrs, std::vector<FVec3>& Normals) {
 
 	Vertices.resize(p);
 	double* ptsp = pts;

@@ -561,7 +561,7 @@ namespace voro
 			voro_print_vector(v, fp);
 		}
 
-		void extractCellInfo(const FVec3 &CellPosition, std::vector<FVec3> &Vertices, std::vector<uint32_t> &FaceVertexIndices, std::vector<uint32_t> &Nbrs, std::vector<FVec3> &Normals);
+		void extractCellInfo(const FVec3 &CellPosition, std::vector<FVec3> &Vertices, std::vector<uint32_t> &FaceVertexIndices, std::vector<int> &Nbrs, std::vector<FVec3> &Normals);
 
 	private:
 		int *paux1;

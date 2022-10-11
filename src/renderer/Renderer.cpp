@@ -490,7 +490,7 @@ namespace Graphics {
 			{
 				m_pd3dImmediateContext->IASetVertexBuffers(0, (uint32_t)input.pVertexBuffers.size(),
 					input.pVertexBuffers.data(), input.strides.data(), input.offsets.data());
-				m_pd3dImmediateContext->IASetIndexBuffer(input.pIndexBuffer, input.indexCount > 65535 ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT, 0);
+				m_pd3dImmediateContext->IASetIndexBuffer(input.pIndexBuffer,  DXGI_FORMAT_R32_UINT , 0);
 
 				m_pd3dImmediateContext->DrawIndexed(input.indexCount, 0, 0);
 			}

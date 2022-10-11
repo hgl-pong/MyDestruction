@@ -11,8 +11,9 @@ enum RandomType
 class FSiteGenerator
 {
 public:
-	static void ImpactDamage(FVec3& pos, FVec3& transform, float radius, int num, std::vector<FVec3>&sites,RandomType type=NORMAL);
-	static void PlaneImpactDamage(DirectX::BoundingBox& box,FVec3& pos, FVec3& normals, FVec3& transform, int num, std::vector<FVec3>& sites);
+	static void ImpactAABBoxDamage(DirectX::BoundingBox&box, int num, std::vector<FVec3>&sites,RandomType type=NORMAL,FVec3 transform= FVec3(0, 0, 0));
+	static void ImpactSphereDamage(FVec3& pos, float radius, int num, std::vector<FVec3>& sites, RandomType type = NORMAL,FVec3 transform=FVec3(0, 0, 0));
+	static void ImpactPlaneDamage(DirectX::BoundingBox& box,FVec3& pos, FVec3& normals, int num, std::vector<FVec3>& sites,FVec3 transform= FVec3(0, 0, 0));
 private:
 	static double _RandomNumber(float min, float max)
 	{

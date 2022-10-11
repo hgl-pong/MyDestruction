@@ -166,8 +166,8 @@ bool Application::Init()
 
     FActor* actor=new FActor();
     char name[] = "box";
-    actor->Init(name);
     actor->OnEnterScene(m_pScene);
+    actor->Init(name);
 
     return true;
 }

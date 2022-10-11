@@ -17,12 +17,12 @@ struct VoroCellInfo
 {
 	FVec3 Position;
 	float Volume;
-	
+	int Id;
 	std::vector<FVec3> Vertices;
 	std::vector<uint32_t> Faces;
 	std::vector<uint32_t> Indices;
 	std::vector<Edge> Edges;
-	std::vector<uint32_t> Neighbors;
+	std::vector<int> Neighbors;
 	std::vector<FVec3> Normals;
 	std::vector<float> Areas;
 	//std::vector<vec2> Uvs;
@@ -60,7 +60,7 @@ public:
 	void Clear();
 	void SetBBox(BBox& boundingBox);
 
-	void AddSites(const std::vector< FVec3>& Sites, float SquaredDistSkipPtThreshold = 0.0f);
+	void AddSites(const std::vector< FVec3>& Sites, float SquaredDistSkipPtThreshold = 0.0f,FVec3 transform=FVec3(0,0,0));
 	void AddSite(const FVec3& Site, float SquaredDistSkipPtThreshold = 0.0f);
 	void AddSites(int  count, float SquaredDistSkipPtThreshold = 0.0f);
 
@@ -81,9 +81,9 @@ private:
 	bool _OutOfBox(const FVec3& p);
 
 	// Add sites to Voronoi container, with contiguous ids, ignoring NaNs
-	void _PutSites(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset);
+	void _PutSites(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, FVec3& transform);
 	// Add sites to Voronoi container, with contiguous ids, ignoring NaNs, ignoring Sites that are on top of existing sites
-	int32_t _PutSitesWithDistanceCheck(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, float SquaredDistThreshold = 1e-4);
+	int32_t _PutSitesWithDistanceCheck(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, FVec3& transform, float SquaredDistThreshold = 1e-4);
 
 	voro::container* _StandardVoroContainerInit(int SiteCount, float SquaredDistSkipPtThreshold = 0.0f);
 

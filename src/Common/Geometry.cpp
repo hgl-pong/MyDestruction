@@ -19,10 +19,7 @@ namespace Geometry
         meshData.normals.resize(vertexCount);
         meshData.texcoords.resize(vertexCount);
         meshData.tangents.resize(vertexCount);
-        if (indexCount > 65535)
-            meshData.indices32.resize(indexCount);
-        else
-            meshData.indices16.resize(indexCount);
+        meshData.indices32.resize(indexCount);
 
         uint32_t vIndex = 0, iIndex = 0;
 
@@ -70,18 +67,9 @@ namespace Geometry
         {
             for (uint32_t j = 1; j <= slices; ++j)
             {
-                if (indexCount > 65535)
-                {
                     meshData.indices32[iIndex++] = 0;
                     meshData.indices32[iIndex++] = j % (slices + 1) + 1;
                     meshData.indices32[iIndex++] = j;
-                }
-                else
-                {
-                    meshData.indices16[iIndex++] = 0;
-                    meshData.indices16[iIndex++] = j % (slices + 1) + 1;
-                    meshData.indices16[iIndex++] = j;
-                }
             }
         }
 
@@ -90,8 +78,7 @@ namespace Geometry
         {
             for (uint32_t j = 1; j <= slices; ++j)
             {
-                if (indexCount > 65535)
-                {
+
                     meshData.indices32[iIndex++] = (i - 1) * (slices + 1) + j;
                     meshData.indices32[iIndex++] = (i - 1) * (slices + 1) + j % (slices + 1) + 1;
                     meshData.indices32[iIndex++] = i * (slices + 1) + j % (slices + 1) + 1;
@@ -99,17 +86,7 @@ namespace Geometry
                     meshData.indices32[iIndex++] = i * (slices + 1) + j % (slices + 1) + 1;
                     meshData.indices32[iIndex++] = i * (slices + 1) + j;
                     meshData.indices32[iIndex++] = (i - 1) * (slices + 1) + j;
-                }
-                else
-                {
-                    meshData.indices16[iIndex++] = (i - 1) * (slices + 1) + j;
-                    meshData.indices16[iIndex++] = (i - 1) * (slices + 1) + j % (slices + 1) + 1;
-                    meshData.indices16[iIndex++] = i * (slices + 1) + j % (slices + 1) + 1;
-
-                    meshData.indices16[iIndex++] = i * (slices + 1) + j % (slices + 1) + 1;
-                    meshData.indices16[iIndex++] = i * (slices + 1) + j;
-                    meshData.indices16[iIndex++] = (i - 1) * (slices + 1) + j;
-                }
+               
                 
             }
         }
@@ -119,18 +96,11 @@ namespace Geometry
         {
             for (uint32_t j = 1; j <= slices; ++j)
             {
-                if (indexCount > 65535)
-                {
+
                     meshData.indices32[iIndex++] = (levels - 2) * (slices + 1) + j;
                     meshData.indices32[iIndex++] = (levels - 2) * (slices + 1) + j % (slices + 1) + 1;
                     meshData.indices32[iIndex++] = (levels - 1) * (slices + 1) + 1;
-                }
-                else
-                {
-                    meshData.indices16[iIndex++] = (levels - 2) * (slices + 1) + j;
-                    meshData.indices16[iIndex++] = (levels - 2) * (slices + 1) + j % (slices + 1) + 1;
-                    meshData.indices16[iIndex++] = (levels - 1) * (slices + 1) + 1;
-                }
+
             }
         }
 
@@ -211,9 +181,9 @@ namespace Geometry
             meshData.texcoords[i * 4 + 3] = XMFLOAT2(1.0f, 1.0f);
         }
 
-        meshData.indices16.resize(36);
+        meshData.indices32.resize(36);
         
-        uint16_t indices[] = {
+        uint32_t indices[] = {
             0, 1, 2, 2, 3, 0,		// 右面(+X面)
             4, 5, 6, 6, 7, 4,		// 左面(-X面)
             8, 9, 10, 10, 11, 8,	// 顶面(+Y面)
@@ -221,7 +191,7 @@ namespace Geometry
             16, 17, 18, 18, 19, 16, // 背面(+Z面)
             20, 21, 22, 22, 23, 20	// 正面(-Z面)
         };
-        memcpy_s(meshData.indices16.data(), sizeof indices, indices, sizeof indices);
+        memcpy_s(meshData.indices32.data(), sizeof indices, indices, sizeof indices);
 
         return meshData;
     }
@@ -240,10 +210,7 @@ namespace Geometry
         meshData.tangents.resize(vertexCount);
         meshData.texcoords.resize(vertexCount);
 
-        if (indexCount > 65535)
             meshData.indices32.resize(indexCount);
-        else
-            meshData.indices16.resize(indexCount);
 
         float h2 = height / 2;
         float theta = 0.0f;
@@ -278,8 +245,6 @@ namespace Geometry
             {
                 for (uint32_t j = 0; j < slices; ++j)
                 {
-                    if (indexCount > 65535)
-                    {
                         meshData.indices32[iIndex++] = i * (slices + 1) + j;
                         meshData.indices32[iIndex++] = (i + 1) * (slices + 1) + j;
                         meshData.indices32[iIndex++] = (i + 1) * (slices + 1) + j + 1;
@@ -287,17 +252,7 @@ namespace Geometry
                         meshData.indices32[iIndex++] = i * (slices + 1) + j;
                         meshData.indices32[iIndex++] = (i + 1) * (slices + 1) + j + 1;
                         meshData.indices32[iIndex++] = i * (slices + 1) + j + 1;
-                    }
-                    else
-                    {
-                        meshData.indices16[iIndex++] = i * (slices + 1) + j;
-                        meshData.indices16[iIndex++] = (i + 1) * (slices + 1) + j;
-                        meshData.indices16[iIndex++] = (i + 1) * (slices + 1) + j + 1;
 
-                        meshData.indices16[iIndex++] = i * (slices + 1) + j;
-                        meshData.indices16[iIndex++] = (i + 1) * (slices + 1) + j + 1;
-                        meshData.indices16[iIndex++] = i * (slices + 1) + j + 1;
-                    }
                 }
             }
         }
@@ -349,18 +304,11 @@ namespace Geometry
             // 放入顶部三角形索引
             for (uint32_t i = 1; i <= slices; ++i)
             {
-                if (indexCount > 65535)
-                {
+
                     meshData.indices32[iIndex++] = offset;
                     meshData.indices32[iIndex++] = offset + i % (slices + 1) + 1;
                     meshData.indices32[iIndex++] = offset + i;
-                }
-                else
-                {
-                    meshData.indices16[iIndex++] = offset;
-                    meshData.indices16[iIndex++] = offset + i % (slices + 1) + 1;
-                    meshData.indices16[iIndex++] = offset + i;
-                }
+
 
             }
 
@@ -368,18 +316,10 @@ namespace Geometry
             offset += slices + 2;
             for (uint32_t i = 1; i <= slices; ++i)
             {
-                if (indexCount > 65535)
-                {
                     meshData.indices32[iIndex++] = offset;
                     meshData.indices32[iIndex++] = offset + i;
                     meshData.indices32[iIndex++] = offset + i % (slices + 1) + 1;
-                }
-                else
-                {
-                    meshData.indices16[iIndex++] = offset;
-                    meshData.indices16[iIndex++] = offset + i;
-                    meshData.indices16[iIndex++] = offset + i % (slices + 1) + 1;
-                }
+
             }
         }
         
@@ -400,10 +340,8 @@ namespace Geometry
         meshData.tangents.resize(vertexCount);
         meshData.texcoords.resize(vertexCount);
 
-        if (indexCount > 65535)
+
             meshData.indices32.resize(indexCount);
-        else
-            meshData.indices16.resize(indexCount);
 
         float h2 = height / 2;
         float theta = 0.0f;
@@ -440,18 +378,10 @@ namespace Geometry
             // 放入索引
             for (uint32_t i = 0; i < slices; ++i)
             {
-                if (indexCount > 65535)
-                {
                     meshData.indices32[iIndex++] = i;
                     meshData.indices32[iIndex++] = slices + (i + 1) % slices;
                     meshData.indices32[iIndex++] = slices + i % slices;
-                }
-                else
-                {
-                    meshData.indices16[iIndex++] = i;
-                    meshData.indices16[iIndex++] = slices + (i + 1) % slices;
-                    meshData.indices16[iIndex++] = slices + i % slices;
-                }
+
             }
         }
         
@@ -481,18 +411,10 @@ namespace Geometry
             uint32_t offset = 2 * slices;
             for (uint32_t i = 0; i < slices; ++i)
             {
-                if (indexCount > 65535)
-                {
                     meshData.indices32[iIndex++] = offset + slices;
                     meshData.indices32[iIndex++] = offset + i % slices;
                     meshData.indices32[iIndex++] = offset + (i + 1) % slices;
-                }
-                else
-                {
-                    meshData.indices16[iIndex++] = offset + slices;
-                    meshData.indices16[iIndex++] = offset + i % slices;
-                    meshData.indices16[iIndex++] = offset + (i + 1) % slices;
-                }
+
 
             }
         }
@@ -539,7 +461,7 @@ namespace Geometry
         meshData.tangents[vIndex] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
         meshData.texcoords[vIndex++] = XMFLOAT2(texU, texV);
 
-        meshData.indices16 = { 0, 1, 2, 2, 3, 0 };
+        meshData.indices32 = { 0, 1, 2, 2, 3, 0 };
 
         return meshData;
     }

@@ -1,7 +1,20 @@
 #include "FSiteGenerator.h"
 #include <random>
 #include <time.h>
-void FSiteGenerator::ImpactDamage(FVec3& pos, FVec3&transform,float radius, int num, std::vector<FVec3> &output, RandomType type)
+void FSiteGenerator::ImpactAABBoxDamage(DirectX::BoundingBox& box, int num, std::vector<FVec3>& sites, RandomType type, FVec3 transform)
+{
+	FVec3 min(box.Center.x - box.Extents.x, box.Center.y - box.Extents.y, box.Center.z - box.Extents.z);
+	FVec3 max(box.Center.x + box.Extents.x, box.Center.y + box.Extents.y, box.Center.z + box.Extents.z);
+
+	FVec3 newSite;
+	for (int i = 0; i < num; i++) {
+
+		newSite = FVec3(_RandomNumber(min.X, max.X), _RandomNumber(min.Y, max.Y), _RandomNumber(min.Z, max.Z));
+		sites.push_back(newSite+transform);
+	}
+}
+
+void FSiteGenerator::ImpactSphereDamage(FVec3& pos,float radius, int num, std::vector<FVec3> &output, RandomType type, FVec3 transform)
 {
 	FVec3 min(pos.X - radius, pos.Y - radius, pos.Z - radius);
 	FVec3 max(pos.X + radius, pos.Y + radius, pos.Z + radius);
@@ -26,7 +39,7 @@ void FSiteGenerator::ImpactDamage(FVec3& pos, FVec3&transform,float radius, int 
 	}
 }
 
-void FSiteGenerator::PlaneImpactDamage(DirectX::BoundingBox&box,FVec3& pos, FVec3& normals, FVec3& transform, int num, std::vector<FVec3>& sites)
+void FSiteGenerator::ImpactPlaneDamage(DirectX::BoundingBox&box,FVec3& pos, FVec3& normals,  int num, std::vector<FVec3>& sites, FVec3 transform)
 {
 	FVec3 min(box.Center.x - box.Extents.x, box.Center.y - box.Extents.y, box.Center.z - box.Extents.z);
 	FVec3 max(box.Center.x + box.Extents.x, box.Center.y + box.Extents.y, box.Center.z + box.Extents.z);

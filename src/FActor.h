@@ -24,13 +24,12 @@ public:
 	bool Release();
 	bool ReInit();
 
-	bool AddActor();
-	bool RemoveActor();
-	bool RemoveAllActors();
 	bool Update();
 	
 	bool OnEnterScene(FScene* scene);
 	bool OnLeaveScene(FScene* scene);
+
+	bool AddPhysicsActorToScene(PxRigidDynamic* actor);
 	
 	bool Intersection(Ray&ray,FScene* scene);
 
@@ -48,8 +47,8 @@ private:
 	Graphics::MeshData* m_pMeshData;
 	Graphics::MeshData* m_pVoroMeshData;
 
-	//std::set<FChunk*> m_Chunks;
-	//std::set<FFractureGraph*> m_Graphs;
+	std::set<FChunk*> m_Chunks;
+	std::set<FChunkCluster*> m_ChunkClusters;
 	FMaterial m_Material;
 
 	int m_HitTime = 0;

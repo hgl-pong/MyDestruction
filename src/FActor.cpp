@@ -48,32 +48,30 @@ bool FActor::Init(char*name)
 		m_pVoroMeshData->m_BoundingBox = m_pMeshData->m_BoundingBox;
 		Graphics::Renderer::Get()->AddVoroMesh(m_pVoroMeshData);
 	}
+	m_Material = FPhysics::Get()->STONE;
+	FChunk* chunk = new FChunk(box, this);
+	chunk->m_Transform = PxTransform(PxVec3(m_pMeshData->m_Transform.GetPosition().x, m_pMeshData->m_Transform.GetPosition().y, m_pMeshData->m_Transform.GetPosition().z));
+	std::unordered_map<int,FChunk*> chunks;
+	chunks.emplace(chunk->m_Id,chunk);
+	FChunkCluster* chunkCluster = new FChunkCluster(this);
+	chunkCluster->Init(chunks, this,chunk->m_Transform);
+	//m_ChunkClusters.emplace(chunkCluster);
+	chunk->InitUniquePhysicsActor();
+	chunk->m_IsDestructable = true;
+	m_Chunks.emplace(chunk);
+	AddPhysicsActorToScene(chunk->GetPhysicsActor());
+
+	//AddPhysicsActorToScene(chunkCluster->GetPhysicsActor());
 	return true;
 }
 
 bool FActor::Release()
 {
 	FRELEASE(m_pWireMesh);
-
 	return true;
 }
 
 bool FActor::ReInit()
-{
-	return false;
-}
-
-bool FActor::AddActor()
-{
-	return false;
-}
-
-bool FActor::RemoveActor()
-{
-	return false;
-}
-
-bool FActor::RemoveAllActors()
 {
 	return false;
 }
@@ -87,6 +85,9 @@ bool FActor::OnEnterScene(FScene* scene)
 {
 	scene->AddActor(this);
 	m_Scenes.emplace(scene);
+
+		
+
 	return true;
 }
 
@@ -97,6 +98,17 @@ bool FActor::OnLeaveScene(FScene* scene)
 	if (it != m_Scenes.end())
 		m_Scenes.erase(it);
 	return true;
+}
+
+bool FActor::AddPhysicsActorToScene(PxRigidDynamic* actor)
+{
+	FASSERT(actor);
+	for (auto scene : m_Scenes) {
+		FPhysics::Get()->AddToScene(actor, scene);
+	}
+	return true;
+Exit0:
+	return false;
 }
 
 bool FActor::Intersection(Ray& ray,FScene*scene)
@@ -115,15 +127,34 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 		ray.origin.z + dis * ray.direction.z);
 	if (!hit)
 		return hit;
-	FSphereDamage damage;
-	damage.center = HitPoint;
-	damage.radius = 1;
+	FSphereDamage damage(HitPoint,2,100);
+	damage.GenerateSites(m_Material,NORMAL);
+	for (auto chunk : m_Chunks) {
+		damage.Intersection(chunk);
+		chunk->m_Damage.Y = -chunk->m_Damage.X;
+	}
+
+	for (auto it = m_ChunkClusters.begin(); it != m_ChunkClusters.end();) {
+		(*it)->Intersection(&damage);
+		if ((*it)->Size() == 0) {
+			RemoveChunkCluser(*it++);
+			continue;
+		}
+		it++;
+	}
+
+	for (auto chunk : damage.m_DamagingChunks) {
+		if (chunk->VoronoiFracture(damage.m_Sites)) {
+			chunk->Release();
+		}
+	}
+
 
 	std::vector<FVec3>sites;
 	FVec3 transform(m_pMeshData->m_Transform.GetPosition().x,
 		m_pMeshData->m_Transform.GetPosition().y,
 		m_pMeshData->m_Transform.GetPosition().z);
-	FSiteGenerator::ImpactDamage(damage.center,transform , damage.radius, 100, sites,RandomType::GAUSSION);
+	FSiteGenerator::ImpactSphereDamage(damage.m_Position, damage.m_Radius, 100, sites,RandomType::GAUSSION,transform);
 	//FVec3 normal(ray.direction.x, ray.direction.y, ray.direction.z);
 	//FSiteGenerator::PlaneImpactDamage(m_pMeshData->m_BoundingBox,damage.center,normal, transform ,100, sites);
 	Graphics::MeshData* newMesh;
@@ -137,7 +168,7 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 	m_pWireMesh->LoadMeshData();
 	
 
-	m_pWireMesh->CreaePhysicsActor(trans);
+	//m_pWireMesh->CreaePhysicsActor(trans);
 
 	FASSERT(!m_pWireMesh->vertices.empty());
 
@@ -147,7 +178,7 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 	m_pVoroMeshData->m_Transform = m_pMeshData->m_Transform;
 	m_pVoroMeshData->m_BoundingBox = m_pMeshData->m_BoundingBox;
 
-	Graphics::Renderer::Get()->createHitPosSphere(damage.center,damage.radius);
+	Graphics::Renderer::Get()->createHitPosSphere(damage.m_Position,damage.m_Radius);
 	//Graphics::Renderer::Get()->m_pHitPos->m_Transform = m_pMeshData->m_Transform;
 	Graphics::Renderer::Get()->AddVoroMesh(Graphics::Renderer::Get()->m_pHitPos);
 
@@ -165,6 +196,10 @@ bool FActor::RemoveChunk(FChunk* chunk)
 			continue;
 		FPhysics::Get()->RemoveFromScene(chunk->GetPhysicsActor(),scene);
 	}
+	if (m_Chunks.find(chunk) != m_Chunks.end()) {
+		m_Chunks.erase(chunk);
+		chunk->Release();
+	}
 	return true;
 Exit0:
 	return false;
@@ -177,6 +212,10 @@ bool FActor::RemoveChunkCluser(FChunkCluster* chunkCluster)
 		if (!chunkCluster->GetPhysicsActor())
 			continue;
 		FPhysics::Get()->RemoveFromScene(chunkCluster->GetPhysicsActor(), scene);
+	}
+	if (m_ChunkClusters.find(chunkCluster) != m_ChunkClusters.end()) {
+		m_ChunkClusters.erase(chunkCluster);
+		chunkCluster->Release();
 	}
 	return true;
 Exit0:

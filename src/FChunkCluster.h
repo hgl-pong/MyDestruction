@@ -2,6 +2,7 @@
 #define FFRACTURE_GRAPH_H
 #include"FDamage.h"
 #include <unordered_set>
+#include <unordered_map>
 #include <vector>
 #include "PxPhysicsAPI.h"
 #include "Utils.h"
@@ -15,9 +16,9 @@ struct GraphEdge {
 	float connectHealth;
 };
 template<typename T>
-inline size_t ChunkHash(const T& valA, const T& valB, const float& i)
+inline size_t ChunkHash(const T& valA, const T& valB)
 {
-	return std::hash<T>()(valA) ^ std::hash<T>()(valB) ^ std::hash<float>()(i);
+	return std::hash<T>()(valA) ^ std::hash<T>()(valB);
 };
 namespace std
 {
@@ -26,7 +27,7 @@ namespace std
 	{
 		std::size_t operator()(const GraphEdge& edge) const
 		{
-			size_t num = ChunkHash(edge.chunkA, edge.chunkA, edge.connectHealth);
+			size_t num = ChunkHash(edge.chunkA, edge.chunkA);
 			return num;
 		}
 	};
@@ -50,13 +51,13 @@ public:
 	FChunkCluster(FActor* actor);
 	~FChunkCluster();
 	bool Release();
-	bool Intersection(FDamage& damage);
+	bool Intersection(FDamage* damage);
 	bool Seperate(FChunk* chunk);
 	int Size();
 	bool InitSharedPhysicsActor();
 	PxRigidDynamic* GetPhysicsActor();
 	bool Tick();
-	bool Init(std::vector<FChunk*>& chunks, FActor* actor);
+	bool Init(std::unordered_map<int,FChunk*>& chunks, FActor* actor, PxTransform& tran);
 private:
 	FActor* m_pActor;
 
@@ -64,7 +65,7 @@ private:
 	PxTransform m_Transform;
 
 	int m_ChunkCount;
-	std::vector<bool> m_Connecting;
+	std::set<FChunk*> m_Chunks;
 	std::unordered_set<GraphEdge> m_Edges;
 };
 

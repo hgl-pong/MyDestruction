@@ -39,7 +39,7 @@ void SkyBox::Draw(ID3D11DeviceContext * deviceContext, IEffect * effect)
         {
             deviceContext->IASetVertexBuffers(0, (uint32_t)input.pVertexBuffers.size(), 
                 input.pVertexBuffers.data(), input.strides.data(), input.offsets.data());
-            deviceContext->IASetIndexBuffer(input.pIndexBuffer, input.indexCount > 65535 ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT, 0);
+            deviceContext->IASetIndexBuffer(input.pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
             deviceContext->DrawIndexed(input.indexCount, 0, 0);
         }
