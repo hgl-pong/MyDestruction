@@ -78,6 +78,10 @@ bool FActor::ReInit()
 
 bool FActor::Update()
 {
+	for (auto chunk : m_Chunks)
+		chunk->Update();
+	for (auto chunkCluster : m_ChunkClusters)
+		chunkCluster->Update();
 	return false;
 }
 
@@ -127,7 +131,7 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 		ray.origin.z + dis * ray.direction.z);
 	if (!hit)
 		return hit;
-	FSphereDamage damage(HitPoint,2,100);
+	FSphereDamage damage(HitPoint,1,100);
 	damage.GenerateSites(m_Material,NORMAL);
 	for (auto chunk : m_Chunks) {
 		damage.Intersection(chunk);
@@ -144,7 +148,9 @@ bool FActor::Intersection(Ray& ray,FScene*scene)
 	}
 
 	for (auto chunk : damage.m_DamagingChunks) {
-		if (chunk->VoronoiFracture(damage.m_Sites)) {
+		FChunkCluster* newChunkCluster=nullptr;
+		if (chunk->VoronoiFracture(damage.m_Sites,newChunkCluster)) {
+			newChunkCluster->Intersection(&damage);
 			chunk->Release();
 		}
 	}

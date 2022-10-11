@@ -3,6 +3,7 @@
 #include "FActor.h"
 #include "FChunkCluster.h"
 #include "FSiteGenerator.h"
+#include "FChunkCluster.h"
 FChunk::FChunk(VoroCellInfo& cellInfo,FActor*actor)
 	:m_IsSleeping(true),
 	m_IsDestructable(false),
@@ -81,8 +82,9 @@ Exit0:
 	return false;
 }
 
-bool FChunk::Tick()
+bool FChunk::Update()
 {
+	m_Transform = m_Transform*m_pRigidActor->getGlobalPose();
 	if (!m_IsDestructable)
 		return false;
 	if (m_Life==0) {
@@ -98,7 +100,7 @@ bool FChunk::IsDestructable()
 	return m_IsDestructable;
 }
 
-bool FChunk::VoronoiFracture(std::vector<FVec3>& sites)
+bool FChunk::VoronoiFracture(std::vector<FVec3>& sites, FChunkCluster*& chunkCluster)
 {
 	if (!m_IsDestructable)
 		return false;
@@ -129,6 +131,7 @@ bool FChunk::VoronoiFracture(std::vector<FVec3>& sites)
 	m_pActor->RemoveChunk(this);
 	m_pActor->m_ChunkClusters.emplace(newChunkCluster);
 	m_pActor->AddPhysicsActorToScene(newChunkCluster->GetPhysicsActor());
+	chunkCluster = newChunkCluster;
 	return true;
 Exit0:
 	return false;
@@ -151,7 +154,8 @@ bool FChunk::Intersection(FDamage* damage)
 
 	//FSiteGenerator::ImpactDamage(damage.center, transform, damage.radius, 100, sites, RandomType::GAUSSION);
 	m_pActor->RemoveChunk(this);
-	VoronoiFracture(sites);
+	FChunkCluster* newChunkCluster=nullptr;
+	VoronoiFracture(sites,newChunkCluster);
 	return false;
 }
 

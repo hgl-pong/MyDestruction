@@ -11,6 +11,7 @@
 using namespace physx;
 using namespace DirectX;
 class FActor;
+class FChunkCluster;
 class FChunk
 {
 public:
@@ -22,9 +23,9 @@ public:
 	bool Release();
 	bool InitUniquePhysicsActor();
 	bool Attach(PxRigidDynamic *actor);
-	bool Tick();
+	bool Update();
 	bool IsDestructable();
-	bool VoronoiFracture(std::vector<FVec3>& sites);
+	bool VoronoiFracture(std::vector<FVec3>& sites,FChunkCluster*& chunkCluster);
 
 	bool Intersection(Ray &ray);
 	bool InitPhyiscShape();

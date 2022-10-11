@@ -77,7 +77,7 @@ bool FChunkCluster::Seperate(FChunk* chunk)
 {
 	m_pRigidActor->detachShape(*chunk->m_pConvexMeshShape);
 	chunk->m_Transform = m_Transform;
-	chunk->m_Volocity = m_pRigidActor->getLinearVelocity();
+	//chunk->m_Volocity = m_pRigidActor->getLinearVelocity();
 	chunk->InitUniquePhysicsActor();
 	m_pActor->m_Chunks.emplace(chunk);
 
@@ -110,9 +110,9 @@ PxRigidDynamic* FChunkCluster::GetPhysicsActor()
 	return m_pRigidActor;
 }
 
-bool FChunkCluster::Tick()
+bool FChunkCluster::Update()
 {
-
+	m_Transform = m_Transform * m_pRigidActor->getGlobalPose();
 	return true;
 }
 

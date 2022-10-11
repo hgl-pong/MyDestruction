@@ -56,7 +56,7 @@ public:
 	int Size();
 	bool InitSharedPhysicsActor();
 	PxRigidDynamic* GetPhysicsActor();
-	bool Tick();
+	bool Update();
 	bool Init(std::unordered_map<int,FChunk*>& chunks, FActor* actor, PxTransform& tran);
 private:
 	FActor* m_pActor;
