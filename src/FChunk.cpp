@@ -21,10 +21,13 @@ FChunk::FChunk(VoroCellInfo& cellInfo, FActor* actor)
 	m_Areas = cellInfo.Areas;
 	m_Id = cellInfo.Id;
 	m_Life = 1000;
-	m_ChunkHealth = actor->m_Material.hardness / m_Volume;
+	m_ChunkHealth = actor->m_Material.hardness / m_Volume;	
+	m_Vertices2 = m_Vertices;
+	Update();
 	_CalculateNormals();
 	InitPhyiscShape();
 	InitBoundingBox();
+
 }
 
 FChunk::FChunk(Geometry::MeshData& meshData, FActor* actor)
@@ -48,6 +51,7 @@ FChunk::FChunk(Geometry::MeshData& meshData, FActor* actor)
 	m_Volume = (m_BoundingBox.Extents.x * m_BoundingBox.Extents.x + m_BoundingBox.Extents.y * m_BoundingBox.Extents.y + m_BoundingBox.Extents.z * m_BoundingBox.Extents.z) * 8;
 	m_Life = 1000;
 	m_ChunkHealth = actor->m_Material.hardness / (m_Volume * m_Volume);
+	m_Vertices2 = m_Vertices;
 
 	InitPhyiscShape();
 }
@@ -97,12 +101,14 @@ Exit0:
 
 bool FChunk::Update()
 {
+	FASSERT(m_pRigidActor);
 	m_IsSleeping = m_pRigidActor->isSleeping();
-	//m_Transform = m_Transform*m_pRigidActor->getGlobalPose();
-	for (auto vertex : m_Vertices) {
-		PxVec3 temp(vertex.X, vertex.Y, vertex.Z);
+	FASSERT(!m_IsSleeping);
+	for (int i = 0; i < m_Vertices.size();i++) {
+		PxVec3 temp(m_Vertices2[i].X, m_Vertices2[i].Y, m_Vertices2[i].Z);
 		temp = m_pRigidActor->getGlobalPose().transform(temp);
-		vertex = FVec3(temp.x, temp.y, temp.z);
+		
+		m_Vertices[i] = FVec3(temp.x, temp.y, temp.z);
 	}
 	if (!m_IsDestructable)
 		return false;
@@ -112,6 +118,8 @@ bool FChunk::Update()
 	//}
 	//m_Life--;
 	return true;
+Exit0:
+	return false;
 }
 
 bool FChunk::IsDestructable()
@@ -228,7 +236,7 @@ void FChunk::_CalculateNormals() {
 		FVec3 v01 = m_Vertices[p1] - m_Vertices[p0];
 		FVec3 v02 = m_Vertices[p2] - m_Vertices[p0];
 		FVec3 normal = v01.Cross(v02);
-		normal.Normalize();
+		normal/*.Normalize()*/;
 		m_Normals[p0] = m_Normals[p0] + normal;
 		m_Normals[p1] = m_Normals[p1] + normal;
 		m_Normals[p2] = m_Normals[p2] + normal;

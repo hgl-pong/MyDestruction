@@ -69,6 +69,8 @@ void UIDrawer::Move(float dt) {
 		app->m_pViewerCamera->Pitch(io.MouseDelta.y * 0.01f);
 		app->m_pViewerCamera->RotateY(io.MouseDelta.x * 0.01f);
 	}
+	if (io.MouseWheel)
+		m_DamageRadius -= io.MouseWheel*0.2;
 }
 
 

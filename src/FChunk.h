@@ -70,6 +70,7 @@ public:
 	int m_Id;
 
 	std::vector<FVec3> m_Vertices;
+	std::vector<FVec3> m_Vertices2;
 	std::vector<FVec3> m_Normals;
 	std::vector<uint32_t> m_Diffuse;
 	std::vector<FVec4> m_Tangents;

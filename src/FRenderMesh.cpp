@@ -84,13 +84,13 @@ void FRenderMesh::UpdateMeshData() {
 		for (auto chunk : m_pActor->m_pChunkManager->m_ChunksMap) {
 			int vsize = chunk.second->m_Vertices.size();
 
-			if (!chunk.second->m_IsSleeping) {
+			/*if (!chunk.second->m_IsSleeping)*/ {
 				memcpy_s(m_Vertices.data() + chunk.second->m_VBStartPos, sizeof(FVec3) * vsize, chunk.second->m_Vertices.data(), sizeof(FVec3) * vsize);
 			}
 
 		}
 		for (auto chunkCluster : m_pActor->m_pChunkManager->m_ChunkClustersMap) {
-			if(!chunkCluster.second->m_IsSleeping)
+			/*if(!chunkCluster.second->m_IsSleeping)*/
 			for (auto chunk : chunkCluster.second->m_Chunks) {
 				int vsize = chunk->m_Vertices.size();
 				memcpy_s(m_Vertices.data() + +chunk->m_VBStartPos, sizeof(FVec3) * vsize, chunk->m_Vertices.data(), sizeof(FVec3) * vsize);
@@ -106,7 +106,7 @@ void FRenderMesh::CreateRenderData() {
 	FDELETE(m_pMeshData);
 	m_pMeshData = Graphics::Renderer::Get()->CreateRenderMeshData(this);
 	m_pMeshData->m_pMaterial = MaterialManager::Get().createMaterial("..\\Texture\\stone.dds");
-	m_pMeshData->m_Transform = m_pActor->m_Transform;
+	//m_pMeshData->m_Transform = m_pActor->m_Transform;
 	BoundingBox::CreateFromPoints(m_pMeshData->m_BoundingBox, m_Vertices.size(),
 		(XMFLOAT3*)m_Vertices.data(), sizeof(XMFLOAT3));
 	Graphics::Renderer::Get()->AddRenderMesh(m_pMeshData);

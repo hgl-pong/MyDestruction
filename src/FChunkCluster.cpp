@@ -77,7 +77,7 @@ bool FChunkCluster::Intersection(FDamage* damage)
 bool FChunkCluster::Seperate(FChunk* chunk)
 {
 	m_pRigidActor->detachShape(*chunk->m_pConvexMeshShape);
-	chunk->m_Transform = m_Transform;
+	chunk->m_Transform = m_pRigidActor->getGlobalPose();
 	//chunk->m_Volocity = m_pRigidActor->getLinearVelocity();
 	chunk->InitUniquePhysicsActor();
 	m_pActor->m_pChunkManager->Insert(chunk);
@@ -113,9 +113,17 @@ PxRigidDynamic* FChunkCluster::GetPhysicsActor()
 
 bool FChunkCluster::Update()
 {
+	FASSERT(m_pRigidActor);
 	m_IsSleeping = m_pRigidActor->isSleeping();
-	m_Transform = m_Transform * m_pRigidActor->getGlobalPose();
+	for(auto chunk:m_Chunks)
+	for (int i = 0; i < chunk->m_Vertices.size(); i++) {
+		PxVec3 temp(chunk->m_Vertices2[i].X, chunk->m_Vertices2[i].Y, chunk->m_Vertices2[i].Z);
+		temp = m_pRigidActor->getGlobalPose().transform(temp);
+		chunk->m_Vertices[i] = FVec3(temp.x, temp.y, temp.z);
+	}
 	return true;
+Exit0:
+	return false;
 }
 
 bool FChunkCluster::Init(std::unordered_map<int,FChunk*>& chunks, FActor* actor,PxTransform&tran)
@@ -141,6 +149,7 @@ bool FChunkCluster::Init(std::unordered_map<int,FChunk*>& chunks, FActor* actor,
 		chunk.second->Attach(m_pRigidActor);
 		m_ChunkCount++;
 	}
+	Update();
 	return true;
 }
 

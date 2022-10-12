@@ -127,7 +127,9 @@ bool FActor::Intersection(FDamage *damage, FScene *scene)
 {
 	FOverlapCallback overlap(m_pChunkManager, damage);
 	scene->GetPhysicsScene()->overlap(*damage->m_Shape, PxTransform(PxVec3(damage->m_Position.X, damage->m_Position.Y, damage->m_Position.Z)), overlap);
-
+	Graphics::Renderer::Get()->createHitPosSphere(damage->m_Position, 1);
+	// Graphics::Renderer::Get()->m_pHitPos->m_Transform = m_pMeshData->m_Transform;
+	Graphics::Renderer::Get()->AddVoroMesh(Graphics::Renderer::Get()->m_pHitPos);
 	m_pChunkManager->ApplyDamage(damage);
 
 	// for (auto chunk : m_Chunks) {
@@ -192,9 +194,6 @@ bool FActor::Intersection(FDamage *damage, FScene *scene)
 	m_pVoroMeshData->m_Transform = m_pMeshData->m_Transform;
 	m_pVoroMeshData->m_BoundingBox = m_pMeshData->m_BoundingBox;
 
-	Graphics::Renderer::Get()->createHitPosSphere(damage->m_Position, 1);
-	// Graphics::Renderer::Get()->m_pHitPos->m_Transform = m_pMeshData->m_Transform;
-	Graphics::Renderer::Get()->AddVoroMesh(Graphics::Renderer::Get()->m_pHitPos);
 
 	m_pWireMesh->AddToScene(scene);
 	return true;

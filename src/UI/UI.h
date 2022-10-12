@@ -31,6 +31,7 @@ private:
 	void drawRendererControlPanel();
 private:
 	int speed = 1;
+	float m_DamageRadius=0;
 };
 
 #endif //UI_H
