@@ -14,6 +14,8 @@ class FWireMesh;
 class FScene;
 class FChunk;
 class FChunkCluster;
+class FDamage;
+class FChunkManager;
 class FActor
 {
 public:
@@ -31,7 +33,7 @@ public:
 
 	bool AddPhysicsActorToScene(PxRigidDynamic* actor);
 	
-	bool Intersection(Ray&ray,FScene* scene);
+	bool Intersection(FDamage*damage,FScene* scene);
 
 	bool RemoveChunk(FChunk* chunk);
 	bool RemoveChunkCluser(FChunkCluster* chunkCluster);
@@ -40,15 +42,18 @@ public:
 private:
 	friend class FChunk;
 	friend class FChunkCluster;
+	friend class FRenderMesh;
+	friend class FChunkManager;
 	FRenderMesh* m_pRenderMesh;
 	FWireMesh* m_pWireMesh;
+	bool m_RebuildRenderMesh;
+	Transform m_Transform;
 
 	std::set<FScene*> m_Scenes;
 	Graphics::MeshData* m_pMeshData;
 	Graphics::MeshData* m_pVoroMeshData;
 
-	std::set<FChunk*> m_Chunks;
-	std::set<FChunkCluster*> m_ChunkClusters;
+	FChunkManager* m_pChunkManager;
 	FMaterial m_Material;
 
 	int m_HitTime = 0;

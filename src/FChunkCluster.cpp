@@ -2,6 +2,7 @@
 #include "FChunk.h"
 #include "FActor.h"
 #include <unordered_map>
+#include "FChunkManager.h"
 FChunkCluster::FChunkCluster( FActor* actor)
 	:m_pActor(actor),
 	m_ChunkCount(0),
@@ -79,7 +80,7 @@ bool FChunkCluster::Seperate(FChunk* chunk)
 	chunk->m_Transform = m_Transform;
 	//chunk->m_Volocity = m_pRigidActor->getLinearVelocity();
 	chunk->InitUniquePhysicsActor();
-	m_pActor->m_Chunks.emplace(chunk);
+	m_pActor->m_pChunkManager->Insert(chunk);
 
 	m_pActor->AddPhysicsActorToScene(chunk->GetPhysicsActor());
 	m_ChunkCount--;
@@ -98,7 +99,7 @@ bool FChunkCluster::InitSharedPhysicsActor()
 	PxRigidBodyExt::updateMassAndInertia(*m_pRigidActor, m_pActor->m_Material.identity);
 	m_pRigidActor->setAngularDamping(0.1f);
 
-	m_pRigidActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	//m_pRigidActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	m_pRigidActor->setSleepThreshold((1 - m_pActor->m_Material.material->getRestitution()) / 3);
 	return true;
 Exit0:
@@ -112,6 +113,7 @@ PxRigidDynamic* FChunkCluster::GetPhysicsActor()
 
 bool FChunkCluster::Update()
 {
+	m_IsSleeping = m_pRigidActor->isSleeping();
 	m_Transform = m_Transform * m_pRigidActor->getGlobalPose();
 	return true;
 }
@@ -140,4 +142,12 @@ bool FChunkCluster::Init(std::unordered_map<int,FChunk*>& chunks, FActor* actor,
 		m_ChunkCount++;
 	}
 	return true;
+}
+
+bool FChunkCluster::AddHitChunk(FChunk* chunk) {
+	FASSERT(chunk);
+	m_HitChunks.push_back(chunk);
+	return true;
+Exit0:
+	return false;
 }

@@ -58,15 +58,21 @@ public:
 	PxRigidDynamic* GetPhysicsActor();
 	bool Update();
 	bool Init(std::unordered_map<int,FChunk*>& chunks, FActor* actor, PxTransform& tran);
+	bool AddHitChunk(FChunk* chunk);
+	std::vector<FChunk*> GetHitChunks() {
+		return m_HitChunks;
+	}
 private:
+	friend class FRenderMesh;
 	FActor* m_pActor;
-
+	bool m_IsSleeping;
 	PxRigidDynamic* m_pRigidActor;
 	PxTransform m_Transform;
 
 	int m_ChunkCount;
 	std::set<FChunk*> m_Chunks;
 	std::unordered_set<GraphEdge> m_Edges;
+	std::vector<FChunk*> m_HitChunks;
 };
 
 

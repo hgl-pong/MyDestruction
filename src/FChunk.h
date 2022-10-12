@@ -1,6 +1,8 @@
 #ifndef FCHUNK_H
 #define FCHUNK_H
 #include "PxPhysicsAPI.h"
+#include "Fracture.h"
+#include <vector>
 #include <vector>
 #include "FVoronoi3D.h"
 #include "Common/Collision.h"
@@ -10,6 +12,7 @@
 #include "Common/Geometry.h"
 using namespace physx;
 using namespace DirectX;
+
 class FActor;
 class FChunkCluster;
 class FChunk
@@ -34,17 +37,19 @@ public:
 	FVec3 GetPosition() {
 		return m_Center;
 	}
-	PxRigidDynamic *GetPhysicsActor();
+	PxRigidDynamic* GetPhysicsActor();
+	PxShape *GetPhysicsShape();
 	bool CostChunkHealth(float damage);
 	BoundingBox GetBoundingBox() {
 		return m_BoundingBox;
 	}
 private:
-	void _CalculateNormals(std::vector<Edge> &edges, std::vector<FVec3> &normals);
+	void _CalculateNormals();
 
 private:
 	friend class FChunkCluster;
 	friend class FActor;
+	friend class FRenderMesh;
 	float m_Volume;
 	FActor* m_pActor;
 	FVec3 m_Center;
@@ -70,6 +75,7 @@ public:
 	std::vector<FVec4> m_Tangents;
 	std::vector<FVec2> m_UVs;
 	std::vector<uint32_t> m_Indices;
+	std::vector<uint32_t> m_Faces;
 
 	std::vector<int> m_Neighbors;
 	std::vector<float> m_Areas;

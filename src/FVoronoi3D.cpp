@@ -72,9 +72,11 @@ void FVoronoi3D::ComputeAllCells()
 				VoroCellInfo& Cell = Cells[id];
 				Cell.Id = id;
 				FVec3 pos(x, y, z);
+				//FVec3 pos(x * 2, y * 2, z * 2);
 				std::vector<FVec3>normals;
+				//cell.normals(normals);
 				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, Cell.Neighbors,Cell.Normals);
-				Cell.Position = { (float)x,(float)y,(float)z };
+				Cell.Position = pos;
 
 				Cell.Edges.clear();
 				Cell.Indices.clear();

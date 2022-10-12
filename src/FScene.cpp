@@ -2,7 +2,39 @@
 #include "PxPhysicsAPI.h"
 #include "FPhysics.h"
 #include "FActor.h"
-FScene::FScene():
+#include "FDamage.h"
+#include "FChunkManager.h"
+#include "FDamage.h"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Overlap
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+PxAgain FOverlapCallback::processTouches(const PxOverlapHit* buffer, PxU32 nbHits)
+{
+	for (PxU32 i = 0; i < nbHits; ++i)
+	{
+		PxRigidDynamic* rigidDynamic = buffer[i].actor->is<PxRigidDynamic>();
+		if (rigidDynamic)
+		{
+			FChunk* chunk = m_ChunkManager->GetFChunk(rigidDynamic);
+			if (chunk != nullptr)
+			{
+				m_Damage->m_DamagingChunks.emplace(chunk);
+			}
+			else {
+				FChunkCluster* chunkCluster = m_ChunkManager->GetFChunkCluster(rigidDynamic);
+				if (chunkCluster != nullptr)
+				{
+					m_Damage->m_DamagingChunkClusters.emplace(chunkCluster);
+				}
+			}
+		}
+	}
+	return true;
+}
+
+
+FScene::FScene() :
 	m_pScene(nullptr),
 	m_Simulating(false)
 {
@@ -20,7 +52,8 @@ bool FScene::Init()
 	PxSceneDesc sceneDesc(FPhysics::Get()->m_pPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = FPhysics::Get()->m_pPhysxCPUDispatcher;
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	//sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.filterShader = FilterShader;
 
 	m_pScene = FPhysics::Get()->m_pPhysics->createScene(sceneDesc);
 	FASSERT(m_pScene);
@@ -72,6 +105,8 @@ bool FScene::RemoveAllActors()
 bool FScene::Update()
 {
 	FASSERT(m_Simulating);
+	for (auto actor : m_Actors)
+		actor->Update();
 	m_pScene->simulate(1.0f / 60.0f);
 	m_pScene->fetchResults(true);
 Exit0:
@@ -80,10 +115,27 @@ Exit0:
 
 bool FScene::Intersection(Ray& ray)
 {
-	bool hit = false;
-	for (auto actor : m_Actors)
-		hit = actor->Intersection(ray,this);
-	return hit;
+
+	PxVec3 origin = PxVec3(ray.origin.x, ray.origin.y, ray.origin.z);
+	PxVec3 unitDir = PxVec3(ray.direction.x, ray.direction.y, ray.direction.z);
+	PxReal maxDistance = FLT_MAX;
+
+	PxRaycastBuffer hit;
+	bool status = m_pScene->raycast(origin, unitDir, maxDistance, hit);
+
+
+	if (status) {
+		FVec3 HitPoint(hit.block.position.x,
+			hit.block.position.y,
+			hit.block.position.z);
+		FSphereDamage damage(HitPoint, 1, 10);
+		damage.GenerateSites(m_Material, NORMAL);
+		for (auto actor : m_Actors)
+			actor->Intersection(&damage, this);
+	}
+
+
+	return status;
 }
 
 bool FScene::SetSimulateState(bool simulate)

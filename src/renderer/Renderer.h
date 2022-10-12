@@ -19,6 +19,7 @@
 #include <set>
 #include "vec.h"
 class FWireMesh;
+class FRenderMesh;
 namespace Graphics {
     class Renderer :public Base {
     public:
@@ -47,8 +48,9 @@ namespace Graphics {
         bool AddRenderBoundingBox(size_t mesh_id, BoundingBox* box);
         bool RemoveRenderBoundingBox(size_t mesh_id);
 
-		Graphics::MeshData* CreateVoroMeshData(FWireMesh*mesh);
-
+        Graphics::MeshData* CreateVoroMeshData(FWireMesh* mesh);
+        Graphics::MeshData* CreateRenderMeshData(FRenderMesh*mesh);
+        bool UpdateVerticesData(MeshData* meshData, std::vector<FVec3>& vertices);
 
         /**
          * …Ë÷√ ”¥∞øÌ∂»

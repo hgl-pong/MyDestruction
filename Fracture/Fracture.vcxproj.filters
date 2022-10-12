@@ -162,6 +162,9 @@
     <ClCompile Include="..\src\FChunkCluster.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\FChunkManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Resources.h">
@@ -327,6 +330,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FChunkCluster.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FChunkManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

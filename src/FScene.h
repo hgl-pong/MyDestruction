@@ -5,38 +5,10 @@
 #include"FPhysics.h"
 #include <set>
 using namespace physx;
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Overlap
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//class FOverlapCallback : public PxOverlapCallback
-//{
-//public:
-//    FOverlapCallback(std::set<FChunk*>& actorBuffer)
-//        :  m_actorBuffer(actorBuffer), PxOverlapCallback(m_hitBuffer, sizeof(m_hitBuffer) / sizeof(m_hitBuffer[0])) {}
-//
-//    PxAgain processTouches(const PxOverlapHit* buffer, PxU32 nbHits)
-//    {
-//        for (PxU32 i = 0; i < nbHits; ++i)
-//        {
-//            PxRigidDynamic* rigidDynamic = buffer[i].actor->is<PxRigidDynamic>();
-//            if (rigidDynamic)
-//            {
-//                FChunk* actor = m_pxManager.getActorFromPhysXActor(*rigidDynamic);
-//                if (actor != nullptr)
-//                {
-//                    m_actorBuffer.insert(actor);
-//                }
-//            }
-//        }
-//        return true;
-//    }
-//
-//private:
-//    std::set<FChunk*>& m_actorBuffer;
-//    PxOverlapHit m_hitBuffer[1000];
-//};
 class FActor;
+class FChunk;
+class FChunkManager;
+class FDamage;
 class FScene
 {
 public:
@@ -65,6 +37,23 @@ private:
 	FMaterial m_Material;
 	bool m_Simulating;
 	std::set<FActor*> m_Actors;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Overlap
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class FOverlapCallback : public PxOverlapCallback
+{
+public:
+	FOverlapCallback(FChunkManager* manager, FDamage* damage)
+		: m_Damage(damage),
+		m_ChunkManager(manager),
+		PxOverlapCallback(m_hitBuffer, sizeof(m_hitBuffer) / sizeof(m_hitBuffer[0])) {}
+	PxAgain processTouches(const PxOverlapHit* buffer, PxU32 nbHits);
+private:
+	FDamage* m_Damage;
+	FChunkManager* m_ChunkManager;
+	PxOverlapHit m_hitBuffer[1000];
 };
 #endif // FSCENE_H
 

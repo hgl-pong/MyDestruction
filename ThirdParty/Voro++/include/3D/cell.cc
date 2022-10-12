@@ -2126,6 +2126,16 @@ void voronoicell_base::normals(std::vector<double> &v) {
 	reset_edges();
 }
 
+void voronoicell_base::normals(std::vector<FVec3>& v) {
+	int i, j, k;
+	v.clear();
+	for (i = 1; i < p; i++) for (j = 0; j < nu[i]; j++) {
+		k = ed[i][j];
+		if (k >= 0) normals_search(v, i, j, k);
+	}
+	reset_edges();
+}
+
 /** This inline routine is called by normals(). It attempts to construct a
  * single normal vector that is associated with a particular face. It first
  * traces around the face, trying to find two vectors along the face edges
@@ -2193,6 +2203,63 @@ inline void voronoicell_base::normals_search(std::vector<double> &v,int i,int j,
 	v.push_back(0);
 	v.push_back(0);
 	v.push_back(0);
+}
+
+inline void voronoicell_base::normals_search(std::vector<FVec3>& v, int i, int j, int k) {
+	ed[i][j] = -1 - k;
+	int l = cycle_up(ed[i][nu[i] + j], k), m;
+	double ux, uy, uz, vx, vy, vz, wx, wy, wz, wmag;
+	int index1,index2, index3;
+	do {
+		m = ed[k][l]; ed[k][l] = -1 - m;
+		ux = pts[4 * m] - pts[4 * k];
+		uy = pts[4 * m + 1] - pts[4 * k + 1];
+		uz = pts[4 * m + 2] - pts[4 * k + 2];
+		index1 = m;
+		index2 = k;
+		// Test to see if the length of this edge is above the tolerance
+		if (ux * ux + uy * uy + uz * uz > tolerance* tolerance) {
+			while (m != i) {
+				l = cycle_up(ed[k][nu[k] + l], m);
+				k = m; m = ed[k][l]; ed[k][l] = -1 - m;
+				vx = pts[4 * m] - pts[4 * k];
+				vy = pts[4 * m + 1] - pts[4 * k + 1];
+				vz = pts[4 * m + 2] - pts[4 * k + 2];
+				index3 = m;
+				// Construct the vector product of this edge with
+				// the previous one
+				wx = uz * vy - uy * vz;
+				wy = ux * vz - uz * vx;
+				wz = uy * vx - ux * vy;
+				wmag = wx * wx + wy * wy + wz * wz;
+
+				// Test to see if this vector product of the
+				// two edges is above the tolerance
+				if (wmag > tolerance* tolerance) {
+
+					// Construct the normal vector and print it
+					wmag = 1 / sqrt(wmag);
+					v.push_back(FVec3(wx * wmag, wy * wmag, wz * wmag));
+					printf("<%d,%d,%d>\n", index1, index2, index3);
+					// Mark all of the remaining edges of this
+					// face and exit
+					while (m != i) {
+						l = cycle_up(ed[k][nu[k] + l], m);
+						
+						k = m; m = ed[k][l]; ed[k][l] = -1 - m;
+					}
+					return;
+				}
+			}
+			v.push_back(FVec3(0,0,0));
+
+			return;
+		}
+		l = cycle_up(ed[k][nu[k] + l], m);
+		k = m;
+	} while (k != i);
+	v.push_back(FVec3(0, 0, 0));
+
 }
 
 /** Returns the number of faces of a computed Voronoi cell.
@@ -2776,9 +2843,9 @@ void voronoicell_base::indices(std::vector<uint32_t>& indices) {
 			while (m != i) {
 				n = cycle_up(ed[k][nu[k] + l], m);
 				//printf("<%d,%d,%d>\n", i, k, m);
-				indices.push_back(i);
-				indices.push_back(k);
 				indices.push_back(m);
+				indices.push_back(k);
+				indices.push_back(i);
 				k = m; l = n;
 				m = ed[k][l]; ed[k][l] = -1 - m;
 			}

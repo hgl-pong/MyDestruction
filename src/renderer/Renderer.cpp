@@ -7,7 +7,7 @@
 #include <wrl/client.h>
 #include <DirectXColors.h>
 #include <DirectXMath.h>
-
+#include "../FRenderMesh.h"
 #include "../FWireMesh.h"
 using namespace DirectX;
 namespace
@@ -153,6 +153,8 @@ namespace Graphics {
 
 	bool Renderer::RemoveRenderMesh(MeshData* data)
 	{
+		if (!data)
+			return false;
 		auto it = m_RenderMesh.find(data);
 		if (it != m_RenderMesh.end())
 			m_RenderMesh.erase(data);
@@ -205,6 +207,40 @@ namespace Graphics {
 
 		meshData->m_VertexCount = mesh->vertices.size();
 		meshData->m_IndexCount = mesh->indices.size();
+		return meshData;
+	}
+
+	Graphics::MeshData* Renderer::CreateRenderMeshData(FRenderMesh* mesh)
+	{
+		Graphics::MeshData* meshData = new Graphics::MeshData();
+		meshData->m_pTexcoordArrays.resize(1);
+
+		CD3D11_BUFFER_DESC bufferDesc(0, D3D11_BIND_VERTEX_BUFFER);
+		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+		D3D11_SUBRESOURCE_DATA initData{ nullptr, 0, 0 };
+		bufferDesc.ByteWidth = sizeof(XMFLOAT3) * mesh->m_Vertices.size();
+		initData.pSysMem = mesh->m_Vertices.data();
+		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pVertices.GetAddressOf()));
+
+		bufferDesc.ByteWidth = sizeof(XMFLOAT3) * mesh->m_Normals.size();
+		initData.pSysMem = mesh->m_Normals.data();
+		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pNormals.GetAddressOf()));
+
+		bufferDesc.ByteWidth = sizeof(XMFLOAT2) * mesh->m_UVs.size();
+		initData.pSysMem = mesh->m_UVs.data();
+		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pTexcoordArrays[0].GetAddressOf()));
+		// 设置索引缓冲区描述
+		bufferDesc = CD3D11_BUFFER_DESC(sizeof(uint32_t) * mesh->m_Indices.size(), D3D11_BIND_INDEX_BUFFER);
+
+		// 新建索引缓冲区
+		initData.pSysMem = mesh->m_Indices.data();
+		HR(m_pd3dDevice->CreateBuffer(&bufferDesc, &initData, meshData->m_pIndices.GetAddressOf()));
+
+		meshData->m_pMaterial = mesh->m_pMaterial;
+		meshData->m_VertexCount = mesh->m_Vertices.size();
+		meshData->m_IndexCount = mesh->m_Indices.size();
 		return meshData;
 	}
 
@@ -964,5 +1000,15 @@ namespace Graphics {
 
 	void Renderer::LoadSceneBuffer() {
 		m_pd3dImmediateContext->ResolveSubresource(m_pSceneBuffer->GetTexture(), 0, m_pLitBuffer->GetTexture(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	bool Renderer::UpdateVerticesData(MeshData* meshData, std::vector<FVec3>& vertices) {
+		D3D11_MAPPED_SUBRESOURCE MapedResource;
+		HR(m_pd3dImmediateContext->Map(meshData->m_pVertices.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MapedResource));
+		memcpy_s(MapedResource.pData,  sizeof(FVec3) * vertices.size(), vertices.data(), sizeof(FVec3) * vertices.size());
+
+		m_pd3dImmediateContext->Unmap(meshData->m_pVertices.Get(), 0);
+		
+		return true;
 	}
 }

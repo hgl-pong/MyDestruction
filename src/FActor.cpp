@@ -11,12 +11,15 @@
 #include "FPhysics.h"
 #include "FChunk.h"
 #include "FChunkCluster.h"
-
+#include "FChunkManager.h"
+#include "FRenderMesh.h"
 FActor::FActor()
-	:m_pWireMesh(nullptr),
+	: m_pWireMesh(nullptr),
 	m_pRenderMesh(nullptr),
 	m_pVoroMeshData(nullptr),
-	m_pMeshData(nullptr)
+	m_pMeshData(nullptr),
+	m_pChunkManager(new FChunkManager(this)),
+	m_RebuildRenderMesh(false)
 {
 }
 
@@ -25,49 +28,57 @@ FActor::~FActor()
 	Release();
 }
 
-bool FActor::Init(char*name)
+bool FActor::Init(char *name)
 {
 	m_Name = name;
-	Geometry::MeshData box = Geometry::CreateBox(2.5,2.5, 2.5);
-	m_pMeshData = new Graphics::MeshData();;
+	Geometry::MeshData box = Geometry::CreateBox(2.5, 2.5, 2.5);
+	m_pMeshData = new Graphics::MeshData();
+	;
 	*m_pMeshData = MeshImporter::Get().CreateFromGeometry("box", box)->meshData;
 	m_pMeshData->m_Transform.SetPosition(0, 1.3, 0);
+	m_Transform = m_pMeshData->m_Transform;
 	BoundingBox::CreateFromPoints(m_pMeshData->m_BoundingBox, box.vertices.size(),
-		box.vertices.data(), sizeof(XMFLOAT3));
+								  box.vertices.data(), sizeof(XMFLOAT3));
+	m_pRenderMesh = new FRenderMesh(this);
 
 	m_pWireMesh = new FWireMesh(m_pMeshData->m_BoundingBox);
-	if (m_pWireMesh->LoadMeshData()) {
+	if (m_pWireMesh->LoadMeshData())
+	{
 		m_pVoroMeshData = Graphics::Renderer::Get()->CreateVoroMeshData(m_pWireMesh);
 		m_pVoroMeshData->m_Transform = m_pMeshData->m_Transform;
 		m_pVoroMeshData->m_BoundingBox = m_pMeshData->m_BoundingBox;
 		Graphics::Renderer::Get()->AddVoroMesh(m_pVoroMeshData);
 	}
-	else {
+	else
+	{
 		m_pVoroMeshData = Graphics::Renderer::Get()->createBoundingBoxMesh(&m_pMeshData->m_BoundingBox);
 		m_pVoroMeshData->m_Transform = m_pMeshData->m_Transform;
 		m_pVoroMeshData->m_BoundingBox = m_pMeshData->m_BoundingBox;
 		Graphics::Renderer::Get()->AddVoroMesh(m_pVoroMeshData);
 	}
 	m_Material = FPhysics::Get()->STONE;
-	FChunk* chunk = new FChunk(box, this);
+	FChunk *chunk = new FChunk(box, this);
 	chunk->m_Transform = PxTransform(PxVec3(m_pMeshData->m_Transform.GetPosition().x, m_pMeshData->m_Transform.GetPosition().y, m_pMeshData->m_Transform.GetPosition().z));
-	std::unordered_map<int,FChunk*> chunks;
-	chunks.emplace(chunk->m_Id,chunk);
-	FChunkCluster* chunkCluster = new FChunkCluster(this);
-	chunkCluster->Init(chunks, this,chunk->m_Transform);
-	//m_ChunkClusters.emplace(chunkCluster);
+	std::unordered_map<int, FChunk *> chunks;
+	chunks.emplace(chunk->m_Id, chunk);
+	FChunkCluster *chunkCluster = new FChunkCluster(this);
+	chunkCluster->Init(chunks, this, chunk->m_Transform);
+	// m_ChunkClusters.emplace(chunkCluster);
 	chunk->InitUniquePhysicsActor();
 	chunk->m_IsDestructable = true;
-	m_Chunks.emplace(chunk);
+
+	m_pChunkManager->Insert(chunk);
 	AddPhysicsActorToScene(chunk->GetPhysicsActor());
 
-	//AddPhysicsActorToScene(chunkCluster->GetPhysicsActor());
+	// AddPhysicsActorToScene(chunkCluster->GetPhysicsActor());
 	return true;
 }
 
 bool FActor::Release()
 {
 	FRELEASE(m_pWireMesh);
+	FRELEASE(m_pRenderMesh);
+	FRELEASE(m_pChunkManager);
 	return true;
 }
 
@@ -78,24 +89,20 @@ bool FActor::ReInit()
 
 bool FActor::Update()
 {
-	for (auto chunk : m_Chunks)
-		chunk->Update();
-	for (auto chunkCluster : m_ChunkClusters)
-		chunkCluster->Update();
+	m_pChunkManager->UpdateChunks();
+	m_pRenderMesh->UpdateMeshData();
 	return false;
 }
 
-bool FActor::OnEnterScene(FScene* scene)
+bool FActor::OnEnterScene(FScene *scene)
 {
 	scene->AddActor(this);
 	m_Scenes.emplace(scene);
 
-		
-
 	return true;
 }
 
-bool FActor::OnLeaveScene(FScene* scene)
+bool FActor::OnLeaveScene(FScene *scene)
 {
 	scene->RemoveActor(this);
 	auto it = m_Scenes.find(scene);
@@ -104,10 +111,11 @@ bool FActor::OnLeaveScene(FScene* scene)
 	return true;
 }
 
-bool FActor::AddPhysicsActorToScene(PxRigidDynamic* actor)
+bool FActor::AddPhysicsActorToScene(PxRigidDynamic *actor)
 {
 	FASSERT(actor);
-	for (auto scene : m_Scenes) {
+	for (auto scene : m_Scenes)
+	{
 		FPhysics::Get()->AddToScene(actor, scene);
 	}
 	return true;
@@ -115,114 +123,110 @@ Exit0:
 	return false;
 }
 
-bool FActor::Intersection(Ray& ray,FScene*scene)
+bool FActor::Intersection(FDamage *damage, FScene *scene)
 {
-	float dis = 0; 
-	//FVec3 HitPoint;
-	DirectX::BoundingBox box = m_pMeshData->m_BoundingBox;
-	box.Center = { box.Center.x + m_pMeshData->m_Transform.GetPosition().x,
-		box.Center.y + m_pMeshData->m_Transform.GetPosition().y,
-		box.Center.z + m_pMeshData->m_Transform.GetPosition().z };
+	FOverlapCallback overlap(m_pChunkManager, damage);
+	scene->GetPhysicsScene()->overlap(*damage->m_Shape, PxTransform(PxVec3(damage->m_Position.X, damage->m_Position.Y, damage->m_Position.Z)), overlap);
 
-	//bool hit = Hit(ray,box, HitPoint);
-	bool hit = ray.Hit(box, &dis);
-	FVec3 HitPoint(ray.origin.x + dis * ray.direction.x,
-		ray.origin.y + dis * ray.direction.y,
-		ray.origin.z + dis * ray.direction.z);
-	if (!hit)
-		return hit;
-	FSphereDamage damage(HitPoint,1,100);
-	damage.GenerateSites(m_Material,NORMAL);
-	for (auto chunk : m_Chunks) {
-		damage.Intersection(chunk);
-		chunk->m_Damage.Y = -chunk->m_Damage.X;
-	}
+	m_pChunkManager->ApplyDamage(damage);
 
-	for (auto it = m_ChunkClusters.begin(); it != m_ChunkClusters.end();) {
-		(*it)->Intersection(&damage);
-		if ((*it)->Size() == 0) {
-			RemoveChunkCluser(*it++);
-			continue;
-		}
-		it++;
-	}
+	// for (auto chunk : m_Chunks) {
+	//	damage->Intersection(chunk);
+	//	chunk->m_Damage.Y = -chunk->m_Damage.X;
+	// }
 
-	for (auto chunk : damage.m_DamagingChunks) {
-		FChunkCluster* newChunkCluster=nullptr;
-		if (chunk->VoronoiFracture(damage.m_Sites,newChunkCluster)) {
-			newChunkCluster->Intersection(&damage);
-			chunk->Release();
-		}
-	}
+	// for (auto it = m_ChunkClusters.begin(); it != m_ChunkClusters.end();) {
+	//	(*it)->Intersection(damage);
+	//	if ((*it)->Size() == 0) {
+	//		RemoveChunkCluser(*it++);
+	//		continue;
+	//	}
+	//	it++;
+	// }
 
+	// for (auto chunk : damage->m_DamagingChunks) {
+	//	FChunkCluster* newChunkCluster=nullptr;
+	//	if (chunk->VoronoiFracture(damage->m_Sites,newChunkCluster)) {
+	//		newChunkCluster->Intersection(damage);
+	//		chunk->Release();
+	//	}
+	// }
 
-	std::vector<FVec3>sites;
+	//std::vector<FVec3> sites;
 	FVec3 transform(m_pMeshData->m_Transform.GetPosition().x,
-		m_pMeshData->m_Transform.GetPosition().y,
-		m_pMeshData->m_Transform.GetPosition().z);
-	FSiteGenerator::ImpactSphereDamage(damage.m_Position, damage.m_Radius, 100, sites,RandomType::GAUSSION,transform);
-	//FVec3 normal(ray.direction.x, ray.direction.y, ray.direction.z);
-	//FSiteGenerator::PlaneImpactDamage(m_pMeshData->m_BoundingBox,damage.center,normal, transform ,100, sites);
-	Graphics::MeshData* newMesh;
+					m_pMeshData->m_Transform.GetPosition().y,
+					m_pMeshData->m_Transform.GetPosition().z);
+	//FSiteGenerator::ImpactSphereDamage(damage->m_Position, 1, 100, sites, RandomType::GAUSSION, transform);
+	// FVec3 normal(ray.direction.x, ray.direction.y, ray.direction.z);
+	// FSiteGenerator::PlaneImpactDamage(m_pMeshData->m_BoundingBox,damage.center,normal, transform ,100, sites);
+	Graphics::MeshData *newMesh;
 
 	Transform trans;
-	trans.SetPosition(0, 3                                                                                                                                                                                                                                                                             , 0);
+	trans.SetPosition(0, 10, 0);
 	trans.Translate(XMFLOAT3(0, 0, 1), 5 * m_HitTime);
 	m_HitTime++;
 
-	FASSERT(m_pWireMesh->VoronoiFracture(sites));
-	m_pWireMesh->LoadMeshData();
-	
+	PxVec3 pos(trans.GetPosition().x, trans.GetPosition().y, trans.GetPosition().z);
+	PxTransform tran(pos);
 
-	//m_pWireMesh->CreaePhysicsActor(trans);
+	FASSERT(m_pWireMesh->VoronoiFracture(damage->m_Sites));
+	m_pWireMesh->LoadMeshData();
+
+	// m_pWireMesh->CreaePhysicsActor(trans);
+	// for (int i = 0; i < m_pWireMesh->m_pVoronoi3D->Size(); i++) {
+	//	//if (m_pWireMesh->m_pCellInfo[i].Vertices.empty())
+	//	//	continue;
+	//	//FChunk* newchunk = new FChunk(m_pWireMesh->m_pCellInfo[i], this);
+	//	//newchunk->m_Transform = tran;
+	//	//newchunk->InitUniquePhysicsActor();
+	//	//FPhysics::Get()->AddToScene(newchunk->GetPhysicsActor(), scene);
+	//	FPhysics::Get()->AddToScene(m_pWireMesh->m_pCellInfo[i].rigidDynamic, scene);
+
+	//}
 
 	FASSERT(!m_pWireMesh->vertices.empty());
 
-	newMesh=Graphics::Renderer::Get()->CreateVoroMeshData(m_pWireMesh);
+	newMesh = Graphics::Renderer::Get()->CreateVoroMeshData(m_pWireMesh);
 	*m_pVoroMeshData = *newMesh;
 	delete newMesh;
 	m_pVoroMeshData->m_Transform = m_pMeshData->m_Transform;
 	m_pVoroMeshData->m_BoundingBox = m_pMeshData->m_BoundingBox;
 
-	Graphics::Renderer::Get()->createHitPosSphere(damage.m_Position,damage.m_Radius);
-	//Graphics::Renderer::Get()->m_pHitPos->m_Transform = m_pMeshData->m_Transform;
+	Graphics::Renderer::Get()->createHitPosSphere(damage->m_Position, 1);
+	// Graphics::Renderer::Get()->m_pHitPos->m_Transform = m_pMeshData->m_Transform;
 	Graphics::Renderer::Get()->AddVoroMesh(Graphics::Renderer::Get()->m_pHitPos);
 
 	m_pWireMesh->AddToScene(scene);
-	return hit;
-Exit0:
-	return hit;
-}
-
-bool FActor::RemoveChunk(FChunk* chunk)
-{
-	FASSERT(chunk);
-	for (auto scene : m_Scenes) {
-		if (!chunk->GetPhysicsActor())
-			continue;
-		FPhysics::Get()->RemoveFromScene(chunk->GetPhysicsActor(),scene);
-	}
-	if (m_Chunks.find(chunk) != m_Chunks.end()) {
-		m_Chunks.erase(chunk);
-		chunk->Release();
-	}
 	return true;
 Exit0:
 	return false;
 }
 
-bool FActor::RemoveChunkCluser(FChunkCluster* chunkCluster)
+bool FActor::RemoveChunk(FChunk *chunk)
+{
+	FASSERT(chunk);
+	for (auto scene : m_Scenes)
+	{
+		if (!chunk->GetPhysicsActor())
+			continue;
+		FPhysics::Get()->RemoveFromScene(chunk->GetPhysicsActor(), scene);
+	}
+	m_pChunkManager->RemoveChunk(chunk);
+	return true;
+Exit0:
+	return false;
+}
+
+bool FActor::RemoveChunkCluser(FChunkCluster *chunkCluster)
 {
 	FASSERT(chunkCluster);
-	for (auto scene : m_Scenes) {
+	for (auto scene : m_Scenes)
+	{
 		if (!chunkCluster->GetPhysicsActor())
 			continue;
 		FPhysics::Get()->RemoveFromScene(chunkCluster->GetPhysicsActor(), scene);
 	}
-	if (m_ChunkClusters.find(chunkCluster) != m_ChunkClusters.end()) {
-		m_ChunkClusters.erase(chunkCluster);
-		chunkCluster->Release();
-	}
+	m_pChunkManager->RemoveChunkCluster(chunkCluster);
 	return true;
 Exit0:
 	return false;
@@ -230,10 +234,12 @@ Exit0:
 
 bool FActor::SetRenderWireFrame(bool render)
 {
-	if (render) {
+	if (render)
+	{
 		Graphics::Renderer::Get()->AddVoroMesh(m_pVoroMeshData);
 	}
-	else {
+	else
+	{
 		Graphics::Renderer::Get()->RemoveVoroMesh(m_pVoroMeshData);
 	}
 	return true;

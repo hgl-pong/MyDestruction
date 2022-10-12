@@ -3,6 +3,7 @@
 struct FVec2
 {
 	float X, Y;
+	FVec2() = default;
 	FVec2(float x, float y):X(x),Y(y) {
 
 	}

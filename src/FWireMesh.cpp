@@ -105,18 +105,20 @@ bool FWireMesh::CreaePhysicsActor(Transform &trans)
 	PxVec3 pos(trans.GetPosition().x, trans.GetPosition().y, trans.GetPosition().z);
 	PxTransform tran(pos);
 
-	PxRigidDynamic *m_pRigidActor = FPhysics::Get()->m_pPhysics->createRigidDynamic(tran);
+	//PxRigidDynamic *m_pRigidActor = FPhysics::Get()->m_pPhysics->createRigidDynamic(tran);
 
-	PxRigidBodyExt::updateMassAndInertia(*m_pRigidActor, 1000);
+	//PxRigidBodyExt::updateMassAndInertia(*m_pRigidActor, 1000);
 
-	m_pRigidActor->setAngularDamping(0.1f);
+	//m_pRigidActor->setAngularDamping(0.1f);
 	for (int i = 0; i < m_pVoronoi3D->Size(); i++)
 	{
 		if (!m_pCellInfo[i].Vertices.empty())
 		{
-			PxShape *newshape = FPhysics::Get()->CreateConvexShape(m_pCellInfo[i].Vertices, m_pCellInfo[i].Faces, FPhysics::Get()->STONE);
-			m_pRigidActor->attachShape(*newshape);
-			m_pCellInfo[i].rigidDynamic = m_pRigidActor;
+			//PxShape *newshape = FPhysics::Get()->CreateConvexShape(m_pCellInfo[i].Vertices, m_pCellInfo[i].Faces, FPhysics::Get()->STONE);
+			//m_pRigidActor->attachShape(*newshape);
+			//m_pCellInfo[i].rigidDynamic = m_pRigidActor;
+			m_pCellInfo[i].rigidDynamic = FPhysics::Get()->CreatePhysicActor(m_pCellInfo[i], FPhysics::Get()->STONE, tran);
+
 		}
 	}
 	return true;

@@ -45,9 +45,9 @@ bool FPhysics::Init()
 	m_pPhysxCPUDispatcher = PxDefaultCpuDispatcherCreate(uNumTreads);
 	FASSERT(m_pPhysxCPUDispatcher);
 
-	STONE = *CreateMaterial(0.6, 0.6, 0.5, 2000, 100);
-	PLASTIC = *CreateMaterial(0.4, 0.4, 0.3, 500, 50);
-	GLASS = *CreateMaterial(0.1, 0.1, 0.1, 1000, 100);
+	STONE = *CreateMaterial(0.6, 0.6, 0.1, 2000, 0.7);
+	PLASTIC = *CreateMaterial(0.4, 0.4, 0.3, 500, 0.2);
+	GLASS = *CreateMaterial(0.1, 0.1, 0.1, 1000, 0.7);
 
 	nResult = true;
 	return nResult;
@@ -203,4 +203,6 @@ bool FPhysics::Update()
 		scene->Update();
 	return true;
 }
+
+
 

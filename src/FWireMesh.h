@@ -21,13 +21,13 @@ public:
 	bool CreaePhysicsActor(Transform& trans);
 private:
 
-	FVoronoi3D* m_pVoronoi3D;
+
 	BoundingBox m_Box;
 public:
 	std::vector<XMFLOAT3>vertices;
 	std::vector<XMFLOAT4>colors;
 	std::vector<uint32_t>indices;
-
+	FVoronoi3D* m_pVoronoi3D;
 	VoroCellInfo* m_pCellInfo;
 
 };

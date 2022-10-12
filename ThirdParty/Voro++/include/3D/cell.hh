@@ -201,7 +201,8 @@ namespace voro
 			face_perimeters(v);
 			voro_print_vector(v, fp);
 		}
-		void normals(std::vector<double> &v);
+		void normals(std::vector<double>& v);
+		void normals(std::vector<FVec3> &v);
 		/** Outputs a list of the perimeters of each face.
 		 * \param[in] fp the file handle to write to. */
 		inline void output_normals(FILE *fp = stdout)
@@ -330,7 +331,8 @@ namespace voro
 		void minkowski_edge(double x0, double r1, double s1, double r2, double s2, double r, double &ar, double &vo);
 		void minkowski_formula(double x0, double y0, double z0, double r, double &ar, double &vo);
 		inline bool plane_intersects_track(double x, double y, double z, double rs, double g);
-		inline void normals_search(std::vector<double> &v, int i, int j, int k);
+		inline void normals_search(std::vector<double>& v, int i, int j, int k);
+		inline void normals_search(std::vector<FVec3> &v, int i, int j, int k);
 		inline bool search_edge(int l, int &m, int &k);
 		inline unsigned int m_test(int n, double &ans);
 		inline unsigned int m_testx(int n, double &ans);

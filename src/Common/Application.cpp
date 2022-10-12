@@ -165,7 +165,8 @@ bool Application::Init()
     Logger::Debug("Application","¼ÓÔØÍê³É!");
 
     FActor* actor=new FActor();
-    char name[] = "box";
+    char name[] = "box"; 
+
     actor->OnEnterScene(m_pScene);
     actor->Init(name);
 
