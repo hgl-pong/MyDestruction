@@ -45,7 +45,7 @@ bool FPhysics::Init()
 	m_pPhysxCPUDispatcher = PxDefaultCpuDispatcherCreate(uNumTreads);
 	FASSERT(m_pPhysxCPUDispatcher);
 
-	STONE = *CreateMaterial(0.6, 0.6, 0.1, 2000, 0.7);
+	STONE = *CreateMaterial(0.5, 0.5, 0.1, 2000, 0.7);
 	PLASTIC = *CreateMaterial(0.4, 0.4, 0.3, 500, 0.2);
 	GLASS = *CreateMaterial(0.1, 0.1, 0.1, 1000, 0.7);
 

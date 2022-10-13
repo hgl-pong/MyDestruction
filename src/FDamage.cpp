@@ -43,7 +43,7 @@ void FSphereDamage::Damage(FChunk* chunk) {
 
 	dir.normalize();
 	dir = dir * m_Damage / (dis * dis);
-	//dir = dir * 1000;
+	//dir = dir * 50;
 	chunk->GetPhysicsActor()->addForce(dir, PxForceMode::eIMPULSE);
 
 }
