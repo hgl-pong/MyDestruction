@@ -1,5 +1,6 @@
 #include "FVoronoi3D.h"
 #include "Utils.h"
+#include "FSiteGenerator.h"
 FVoronoi3D::FVoronoi3D(BBox& boundingBox, float SquaredDistSkipPtThreshold /*= 0.0f*/)
 	:NumSites(0),
 	Container(nullptr)
@@ -35,7 +36,7 @@ void FVoronoi3D::AddSites(const std::vector< FVec3>& Sites, float SquaredDistSki
 	}
 	else
 	{
-		_PutSites(Container, Sites, OrigSitesNum,transform);
+		_PutSites(Container, Sites, OrigSitesNum, transform);
 	}
 	NumSites += Sites.size();
 }
@@ -43,7 +44,7 @@ void FVoronoi3D::AddSites(const std::vector< FVec3>& Sites, float SquaredDistSki
 void FVoronoi3D::AddSites(int count, float SquaredDistSkipPtThreshold /*= 0.0f*/)
 {
 	for (int i = 0; i < count; i++) {
-		FVec3 p(RandomNumber(Bounds.Min.X, Bounds.Max.X), RandomNumber(Bounds.Min.Y, Bounds.Max.Y), RandomNumber(Bounds.Min.Z, Bounds.Max.Z));
+		FVec3 p(FSiteGenerator::RandomNumber(Bounds.Min.X, Bounds.Max.X), FSiteGenerator::RandomNumber(Bounds.Min.Y, Bounds.Max.Y), FSiteGenerator::RandomNumber(Bounds.Min.Z, Bounds.Max.Z));
 		AddSite(p, SquaredDistSkipPtThreshold);
 	}
 }
@@ -62,7 +63,7 @@ void FVoronoi3D::ComputeAllCells()
 	{
 		do
 		{
-			bool bCouldComputeCell = Container->compute_cell(cell, CellIterator,VoroCompute);
+			bool bCouldComputeCell = Container->compute_cell(cell, CellIterator, VoroCompute);
 			if (bCouldComputeCell)
 			{
 				int32_t id = CellIterator.pid();
@@ -75,7 +76,7 @@ void FVoronoi3D::ComputeAllCells()
 				//FVec3 pos(x * 2, y * 2, z * 2);
 				std::vector<FVec3>normals;
 				//cell.normals(normals);
-				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, Cell.Neighbors,Cell.Normals);
+				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, Cell.Neighbors, Cell.Normals);
 				Cell.Position = pos;
 
 				Cell.Edges.clear();
@@ -98,6 +99,12 @@ void FVoronoi3D::ComputeAllCells()
 				cell.indices(Cell.Indices);
 				cell.face_areas(Cell.Areas);
 				Cell.Volume = cell.volume();
+				DirectX::BoundingBox::CreateFromPoints(Cell.Box, Cell.Vertices.size(),
+					(DirectX::XMFLOAT3*)Cell.Vertices.data(), sizeof(DirectX::XMFLOAT3));
+
+				_CalculateNormals(Cell);
+				_CalculateUVs(Cell);
+
 				/*cell.neighbors(Cell.Neighbors);*/
 
 				cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
@@ -132,9 +139,9 @@ void FVoronoi3D::ComputeCellEdgesSerial()
 
 				VoroCellInfo& Cell = Cells[id];
 				//FVec3 pos(x * 2, y * 2, z * 2);
-				FVec3 pos(x , y , z );
+				FVec3 pos(x, y, z);
 				std::vector<FVec3>normals;
-				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces,true);
+				cell.extractCellInfo(pos, Cell.Vertices, Cell.Faces, true);
 
 				Cell.Position = { (float)x,(float)y,(float)z };
 				Cell.Edges.clear();
@@ -193,11 +200,11 @@ void FVoronoi3D::ComputeCellEdges()
 
 				Cell.Position = { (float)x,(float)y,(float)z };
 				Cell.Edges.clear();
-				for (int i = 0; i<Cell.Faces.size()/3;  i++)
+				for (int i = 0; i < Cell.Faces.size() / 3; i++)
 				{
-					Cell.Edges.push_back({ Cell.Faces[3 * i],Cell.Faces[3 * i+1] });
-					Cell.Edges.push_back({ Cell.Faces[3 * i],Cell.Faces[3 * i+2] });
-					Cell.Edges.push_back({ Cell.Faces[3 * i+1],Cell.Faces[3 * i+2] });
+					Cell.Edges.push_back({ Cell.Faces[3 * i],Cell.Faces[3 * i + 1] });
+					Cell.Edges.push_back({ Cell.Faces[3 * i],Cell.Faces[3 * i + 2] });
+					Cell.Edges.push_back({ Cell.Faces[3 * i + 1],Cell.Faces[3 * i + 2] });
 				}
 
 				//cell.neighbors(Cell.Neighbors);
@@ -281,7 +288,7 @@ bool FVoronoi3D::_OutOfBox(const FVec3& p)
 		return true;
 }
 
-void FVoronoi3D::_PutSites(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, FVec3 &transform)
+void FVoronoi3D::_PutSites(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, FVec3& transform)
 {
 	for (int i = 0; i < Sites.size(); i++)
 	{
@@ -298,7 +305,7 @@ void FVoronoi3D::_PutSites(voro::container* Container, const std::vector< FVec3>
 	}
 }
 
-int32_t FVoronoi3D::_PutSitesWithDistanceCheck(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, FVec3 &transform, float SquaredDistThreshold /*= 1e-4*/)
+int32_t FVoronoi3D::_PutSitesWithDistanceCheck(voro::container* Container, const std::vector< FVec3>& Sites, int32_t Offset, FVec3& transform, float SquaredDistThreshold /*= 1e-4*/)
 {
 	int32_t SkippedPts = 0;
 	for (int i = 0; i < Sites.size(); i++)
@@ -316,16 +323,16 @@ int32_t FVoronoi3D::_PutSitesWithDistanceCheck(voro::container* Container, const
 			int ExistingPtID;
 			if (Container->find_voronoi_cell(V.X, V.Y, V.Z, EX, EY, EZ, ExistingPtID))
 			{
-				float dx = V.X- EX;
-				float dy =  V.Y- EY;
-				float dz =  V.Z- EZ;
+				float dx = V.X - EX;
+				float dy = V.Y - EY;
+				float dz = V.Z - EZ;
 				if (dx * dx + dy * dy + dz * dz < SquaredDistThreshold)
 				{
 					SkippedPts++;
 					continue;
 				}
 			}
-			Container->put(Offset + i, V.X , V.Y, V.Z);
+			Container->put(Offset + i, V.X, V.Y, V.Z);
 		}
 	}
 	return SkippedPts;
@@ -368,4 +375,63 @@ void FVoronoi3D::AddSite(const FVec3& Site, float SquaredDistSkipPtThreshold /*=
 		Container->put(NumSites, Site.X, Site.Y, Site.Z);
 		NumSites++;
 	}
+}
+FVec3 CalculateUV(FVec3& pos,FVec3& normal, FVec3& dir) {
+	normal.Normalize();
+	float cos = normal.Dot(dir);
+	float sin = std::sqrt(1 - cos * cos);
+	FVec3 uv = pos * cos;
+	uv.Normalize();
+	if (cos > 0)
+		return FVec3(uv.X, uv.Y,uv.Z);
+	else
+		 FVec3(1 - uv.X,1-uv.Y, 1 - uv.Z);
+
+}
+
+void FVoronoi3D::_CalculateUVs(VoroCellInfo& cell) {
+	cell.UVs.resize(cell.Vertices.size());	
+	FVec3 up = FVec3(0, 1, 0);
+	FVec3 right = FVec3(1, 0, 0);
+	FVec3 forward = FVec3(0, 0, 1);
+	for (int i = 0; i < cell.Vertices.size(); i++) {
+		FVec3 normal = cell.Normals[i];
+		normal.Normalize();
+		float cos = normal.Dot(up);
+		FVec3 uv = cell.Vertices[i];
+		uv.Normalize();
+/*		if (cos > 0)
+			cell.UVs[i] = FVec2(uv.X, uv.Z);
+		else
+			cell.UVs[i] = FVec2(1 - uv.X, 1 - uv.Z);	*/	
+		
+		if (cos > 0)
+			cell.UVs[i] = FVec2(((cell.Vertices[i].X-cell.Position.X) / (2*cell.Box.Extents.x)),((cell.Vertices[i].Z - cell.Position.Z) / (2 * cell.Box.Extents.z)));
+		else
+			cell.UVs[i] = FVec2((1-(cell.Vertices[i].X - cell.Position.X) / (2 * cell.Box.Extents.x)),(1-(cell.Vertices[i].Z - cell.Position.Z) / (2 * cell.Box.Extents.z)));
+
+		
+		//cell.UVs[i] = FVec2(cell.Vertices[i].X / (Bounds.Max.X - Bounds.Min.X), cell.Vertices[i].Z / (Bounds.Max.Z - Bounds.Min.Z));
+	} 
+	
+	
+
+}
+void FVoronoi3D::_CalculateNormals(VoroCellInfo& cell) {
+	cell.Normals = std::vector<FVec3>(cell.Vertices.size(), FVec3(0, 0, 0));
+	for (int i = 0; i < cell.Indices.size() / 3 ; i++) {
+		uint32_t p0, p1, p2; 
+		p0 = cell.Indices[3 * i];
+		p1 = cell.Indices[3 * i + 1];
+		p2 = cell.Indices[3 * i + 2];
+		FVec3 v01 = cell.Vertices[p1] - cell.Vertices[p0];
+		FVec3 v02 = cell.Vertices[p2] - cell.Vertices[p0];
+		FVec3 normal = v01.Cross(v02);
+
+		cell.Normals[p0] = cell.Normals[p0] + normal;
+		cell.Normals[p1] = cell.Normals[p1] + normal;
+		cell.Normals[p2] = cell.Normals[p2] + normal;
+	}
+	for (int i = 0; i < cell.Normals.size(); i++)
+		cell.Normals[i].Normalize();
 }

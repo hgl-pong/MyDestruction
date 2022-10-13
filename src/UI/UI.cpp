@@ -5,10 +5,17 @@
 #include <DirectXColors.h>
 #include "../FScene.h"
 using namespace DirectX;
+
+namespace {
+	UIDrawer* m_Instance = nullptr;
+}
 UIDrawer::UIDrawer(Application*application)
 {
 	name = "UI Drawer";
 	app = application;
+	if (m_Instance)
+		throw std::exception("Renderer is a singleton!");
+	m_Instance = this;
 }
 
 UIDrawer::~UIDrawer() {
@@ -69,10 +76,17 @@ void UIDrawer::Move(float dt) {
 		app->m_pViewerCamera->Pitch(io.MouseDelta.y * 0.01f);
 		app->m_pViewerCamera->RotateY(io.MouseDelta.x * 0.01f);
 	}
-	if (io.MouseWheel)
+	if (io.MouseWheel&&m_DamageRadius>=0)
 		m_DamageRadius -= io.MouseWheel*0.2;
+	if (m_DamageRadius < 0)
+		m_DamageRadius = 0;
 }
 
+UIDrawer* UIDrawer::Get() {
+	if (!m_Instance)
+		throw std::exception("Renderer needs an instance!");
+	return m_Instance;
+}
 
 void UIDrawer::newFrame() {
 	ImGui_ImplDX11_NewFrame();
@@ -93,7 +107,9 @@ void UIDrawer::drawRendererControlPanel()
 {
 	ImGui::Begin("Control Panel",0, ImGuiWindowFlags_NoCollapse);
 	ImGui::SliderInt("Camera Speed", &speed, 1, 10);
-
+	ImGui::SliderInt("Max Site Count", &m_MaxSiteCount, 1, 500);
+	ImGui::SliderFloat("Damage", &m_Damage, 1, 100);
+	ImGui::Text("Damage Radius:%f", m_DamageRadius);
 	if (ImGui::Button("OK")) {
 
 	}

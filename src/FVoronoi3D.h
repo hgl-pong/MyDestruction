@@ -7,6 +7,7 @@
 #include <voro++.hh>
 #include "vec.h"
 #include "PxPhysicsAPI.h"
+#include "DirectXCollision.h"
 struct Edge
 {
 	uint32_t s;
@@ -25,8 +26,9 @@ struct VoroCellInfo
 	std::vector<int> Neighbors;
 	std::vector<FVec3> Normals;
 	std::vector<float> Areas;
-	//std::vector<vec2> Uvs;
+	std::vector<FVec2> UVs;
 	physx::PxRigidDynamic* rigidDynamic;
+	DirectX::BoundingBox Box;
 };
 
 
@@ -77,7 +79,8 @@ public:
 
 	VoroCellInfo* GetAllCells()const;
 private:
-
+	void _CalculateUVs(VoroCellInfo& cell);
+	void _CalculateNormals(VoroCellInfo& cell);
 	bool _OutOfBox(const FVec3& p);
 
 	// Add sites to Voronoi container, with contiguous ids, ignoring NaNs
@@ -90,10 +93,6 @@ private:
 
 };
 
-inline float RandomNumber(float min, float max)
-{
-	return min + double(rand()) / RAND_MAX * (max - min);
-}
 #endif//VORONOI3D_DIAGRAM_H
 
 

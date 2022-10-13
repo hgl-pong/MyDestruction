@@ -70,12 +70,18 @@ float4 ForwardPS(VertexOut input) : SV_Target
     };
     // 类似环境光的照明
     float lighting = saturate(dot(lightDir[0], input.normalW)) * 0.05f +
-                     saturate(dot(lightDir[1], input.normalW)) * 0.05f +
-                     saturate(dot(lightDir[2], input.normalW)) * 0.05f +
-                     saturate(dot(lightDir[3], input.normalW)) * 0.05f;
+        saturate(dot(lightDir[1], input.normalW)) * 0.05f +
+        saturate(dot(lightDir[2], input.normalW)) * 0.05f +
+        saturate(dot(lightDir[3], input.normalW)) * 0.05f;    
     
+    //float lighting = saturate(dot(lightDir[0], normalize(input.normalW))) * 0.05f +
+    //    saturate(dot(lightDir[1], normalize(input.normalW))) * 0.05f +
+    //    saturate(dot(lightDir[2], normalize(input.normalW))) * 0.05f +
+    //    saturate(dot(lightDir[3], normalize(input.normalW))) * 0.05f;
+    //
     float shadowLighting = lighting * 0.5f;
     lighting += saturate(dot(-g_LightDir, input.normalW));
+    //lighting += saturate(dot(-g_LightDir, normalize(input.normalW)));
     lighting = lerp(shadowLighting, lighting, percentLit);
     return lighting * visualizeCascadeColor * diffuse;
 }

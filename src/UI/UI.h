@@ -25,13 +25,17 @@ public:
 	void RenderUI();
 	void UpdateUI();
 	void drawMenuBar();
+	static UIDrawer* Get();
 	void pick();
 	LRESULT UIHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 private:
 	void drawRendererControlPanel();
 private:
 	int speed = 1;
-	float m_DamageRadius=0;
+public:
+	float m_DamageRadius=1;
+	float m_Damage = 10;
+	int m_MaxSiteCount = 200;
 };
 
 #endif //UI_H

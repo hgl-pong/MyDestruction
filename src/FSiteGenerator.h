@@ -14,12 +14,12 @@ public:
 	static void ImpactAABBoxDamage(DirectX::BoundingBox&box, int num, std::vector<FVec3>&sites,RandomType type=NORMAL,FVec3 transform= FVec3(0, 0, 0));
 	static void ImpactSphereDamage(FVec3& pos, float radius, int num, std::vector<FVec3>& sites, RandomType type = NORMAL,FVec3 transform=FVec3(0, 0, 0));
 	static void ImpactPlaneDamage(DirectX::BoundingBox& box,FVec3& pos, FVec3& normals, int num, std::vector<FVec3>& sites,FVec3 transform= FVec3(0, 0, 0));
-private:
-	static double _RandomNumber(float min, float max)
+
+	static double RandomNumber(float min, float max)
 	{
 		return min + double(rand()) / RAND_MAX * (max - min);
 	}
-	static double _GaussianRandom(double mu, double sigma)
+	static double GaussianRandom(double mu, double sigma)
 	{
 		const double epsilon = (std::numeric_limits<double>::min)();
 		const double two_pi = 2.0 * 3.14159265358979323846;

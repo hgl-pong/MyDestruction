@@ -5,6 +5,8 @@
 #include "FDamage.h"
 #include "FChunkManager.h"
 #include "FDamage.h"
+#include "UI/UI.h"
+#include "FChunkCluster.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Overlap
@@ -26,6 +28,8 @@ PxAgain FOverlapCallback::processTouches(const PxOverlapHit* buffer, PxU32 nbHit
 				if (chunkCluster != nullptr)
 				{
 					m_Damage->m_DamagingChunkClusters.emplace(chunkCluster);
+					FChunk* hitChunk = m_ChunkManager->GetFChunk(buffer[i].shape);
+					chunkCluster->AddHitChunk(hitChunk);
 				}
 			}
 		}
@@ -128,7 +132,7 @@ bool FScene::Intersection(Ray& ray)
 		FVec3 HitPoint(hit.block.position.x,
 			hit.block.position.y,
 			hit.block.position.z);
-		FSphereDamage damage(HitPoint, 1, 10);
+		FSphereDamage damage(HitPoint, UIDrawer::Get()->m_DamageRadius, UIDrawer::Get()->m_Damage);
 		damage.GenerateSites(m_Material, NORMAL);
 		for (auto actor : m_Actors)
 			actor->Intersection(&damage, this);

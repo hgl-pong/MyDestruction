@@ -111,7 +111,7 @@ static bool Hit(const Ray& ray,BoundingBox&box,FVec3& intersectionPoint)
 		T = O - vertices[indices[3 * i]];
 		P = D.Cross(E2);
 		Q = T.Cross(E1);
-		check = FVec3(Q * E2, P * T, Q * D)*(1 / (P * E1)) ;
+		check = FVec3(Q.Dot(E2), P.Dot(T), Q.Dot(D))*(1 / (P.Dot(E1))) ;
 		if (check.Y >= 0 && check.Z >= 0 && check.Y + check.Z <= 1)
 		{
 			if (check.X < minTValue) minTValue = check.X;

@@ -15,6 +15,7 @@ public:
 	virtual ~FDamage(){};
 	virtual void Intersection(FChunk* chunk) = 0;
 	virtual void Intersection(FChunkCluster* chunkCluster) = 0;
+	virtual void Damage(FChunk* chunk) = 0;
 	virtual void ResetSites()
 	{
 		m_Sites.clear();
@@ -41,6 +42,8 @@ public:
 	~FSphereDamage();
 	void Intersection(FChunk *chunk) override;
 	void Intersection(FChunkCluster* chunkCluster)override;
+	 void Damage(FChunk* chunk) override;
+
 	void GenerateSites(FMaterial &material, RandomType type) override;
 
 public:

@@ -64,6 +64,14 @@ FChunk* FChunkManager::GetFChunk(PxRigidDynamic* actor) {
 	return nullptr;
 }
 
+FChunk* FChunkManager::GetFChunk(PxShape* shape) {
+	auto it = m_ChunkShapesMap.find(shape);
+	if (it != m_ChunkShapesMap.end())
+		return it->second;
+	return nullptr;
+}
+
+
 FChunkCluster* FChunkManager::GetFChunkCluster(PxRigidDynamic* actor){
 	auto it = m_ChunkClustersMap.find(actor);
 	if (it != m_ChunkClustersMap.end())

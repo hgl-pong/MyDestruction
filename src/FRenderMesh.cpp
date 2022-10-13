@@ -45,6 +45,9 @@ void FRenderMesh::UpdateMeshData() {
 			m_Normals.resize(vpos + vsize);
 			memcpy_s(m_Normals.data() + vpos, sizeof(FVec3) * vsize, chunk.second->m_Normals.data(), sizeof(FVec3) * vsize);
 
+			m_UVs.resize(vpos + vsize);
+			memcpy_s(m_UVs.data() + vpos, sizeof(FVec2) * vsize, chunk.second->m_UVs.data(), sizeof(FVec2) * vsize);
+
 			m_Indices.resize(ipos + isize);
 			memcpy_s(m_Indices.data() + ipos, sizeof(uint32_t) * isize, chunk.second->m_Indices.data(), sizeof(uint32_t) * isize);
 
@@ -65,6 +68,9 @@ void FRenderMesh::UpdateMeshData() {
 				m_Normals.resize(vpos + vsize);
 				memcpy_s(m_Normals.data() + vpos, sizeof(FVec3) * vsize, chunk->m_Normals.data(), sizeof(FVec3) * vsize);
 
+				m_UVs.resize(vpos + vsize);
+				memcpy_s(m_UVs.data() + vpos, sizeof(FVec2) * vsize, chunk->m_UVs.data(), sizeof(FVec2) * vsize);
+
 				m_Indices.resize(ipos + isize);
 				memcpy_s(m_Indices.data() + ipos, sizeof(uint32_t) * isize, chunk->m_Indices.data(), sizeof(uint32_t) * isize);
 				std::for_each(m_Indices.begin() + ipos, m_Indices.end(),
@@ -75,7 +81,7 @@ void FRenderMesh::UpdateMeshData() {
 				ipos += isize;
 			}
 		}
-		m_UVs = std::vector<FVec2>(vpos, FVec2(0, 1));
+	
 		if(vpos)
 		CreateRenderData();
 		m_pActor->m_RebuildRenderMesh = FALSE;
@@ -84,13 +90,13 @@ void FRenderMesh::UpdateMeshData() {
 		for (auto chunk : m_pActor->m_pChunkManager->m_ChunksMap) {
 			int vsize = chunk.second->m_Vertices.size();
 
-			/*if (!chunk.second->m_IsSleeping)*/ {
+			if (!chunk.second->m_IsSleeping) {
 				memcpy_s(m_Vertices.data() + chunk.second->m_VBStartPos, sizeof(FVec3) * vsize, chunk.second->m_Vertices.data(), sizeof(FVec3) * vsize);
 			}
 
 		}
 		for (auto chunkCluster : m_pActor->m_pChunkManager->m_ChunkClustersMap) {
-			/*if(!chunkCluster.second->m_IsSleeping)*/
+			if(!chunkCluster.second->m_IsSleeping)
 			for (auto chunk : chunkCluster.second->m_Chunks) {
 				int vsize = chunk->m_Vertices.size();
 				memcpy_s(m_Vertices.data() + +chunk->m_VBStartPos, sizeof(FVec3) * vsize, chunk->m_Vertices.data(), sizeof(FVec3) * vsize);

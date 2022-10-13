@@ -40,7 +40,7 @@ public:
 	 FVec3 operator - (const FVec3& v);					// -v1
 	 FVec3 operator + (const FVec3&v);	// v1 + v2
 	 FVec3 operator * ( const float d);	// v1 * 3.0
-	 float operator * (const FVec3&v); // dot product
+	 FVec3 operator * (const FVec3&v); // dot product
 	 FVec3 operator / (const float d);	// v1 / 3.0
 	 FVec3 operator ^ (const FVec3&v);	// cross product
 	 int operator == (const FVec3&v);	// v1 == v2 ?

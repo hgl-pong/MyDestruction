@@ -43,8 +43,7 @@ public:
 	BoundingBox GetBoundingBox() {
 		return m_BoundingBox;
 	}
-private:
-	void _CalculateNormals();
+
 
 private:
 	friend class FChunkCluster;
@@ -72,6 +71,7 @@ public:
 	std::vector<FVec3> m_Vertices;
 	std::vector<FVec3> m_Vertices2;
 	std::vector<FVec3> m_Normals;
+	std::vector<FVec3> m_Normals2;
 	std::vector<uint32_t> m_Diffuse;
 	std::vector<FVec4> m_Tangents;
 	std::vector<FVec2> m_UVs;

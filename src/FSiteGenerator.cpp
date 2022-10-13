@@ -9,7 +9,15 @@ void FSiteGenerator::ImpactAABBoxDamage(DirectX::BoundingBox& box, int num, std:
 	FVec3 newSite;
 	for (int i = 0; i < num; i++) {
 
-		newSite = FVec3(_RandomNumber(min.X, max.X), _RandomNumber(min.Y, max.Y), _RandomNumber(min.Z, max.Z));
+		switch (type)
+		{
+		case NORMAL:
+			newSite = FVec3(RandomNumber(min.X, max.X), RandomNumber(min.Y, max.Y), RandomNumber(min.Z, max.Z));
+		case GAUSSION:
+			newSite = FVec3(GaussianRandom(box.Center.x, box.Extents.x / 4), GaussianRandom(box.Center.y, box.Extents.y / 4), GaussianRandom(box.Center.z, box.Extents.z / 4));
+		default:
+			break;
+		}
 		sites.push_back(newSite+transform);
 	}
 }
@@ -24,9 +32,11 @@ void FSiteGenerator::ImpactSphereDamage(FVec3& pos,float radius, int num, std::v
 		switch (type)
 		{
 		case NORMAL:
-			newSite=FVec3(_RandomNumber(min.X, max.X), _RandomNumber(min.Y, max.Y), _RandomNumber(min.Z, max.Z));
+			newSite=FVec3(RandomNumber(min.X, max.X), RandomNumber(min.Y, max.Y), RandomNumber(min.Z, max.Z));
 		case GAUSSION:
-			newSite=FVec3(_GaussianRandom(pos.X, radius / 4), _GaussianRandom(pos.Y, radius / 4), _GaussianRandom(pos.Z, radius / 4));
+			newSite=FVec3(GaussianRandom(pos.X, radius / 4), GaussianRandom(pos.Y, radius / 4), GaussianRandom(pos.Z, radius / 4));
+		default:
+			break;
 		}
 		
 		
@@ -47,7 +57,7 @@ void FSiteGenerator::ImpactPlaneDamage(DirectX::BoundingBox&box,FVec3& pos, FVec
 	FVec3 newSite;
 	for (int i = 0; i < num; ) {
 
-		newSite = FVec3(_RandomNumber(min.X, max.X), _RandomNumber(min.Y, max.Y), _RandomNumber(min.Z, max.Z));
+		newSite = FVec3(RandomNumber(min.X, max.X), RandomNumber(min.Y, max.Y), RandomNumber(min.Z, max.Z));
 
 		FVec3 temp = newSite - pos + transform;
 		double dot = normals.Dot(temp);

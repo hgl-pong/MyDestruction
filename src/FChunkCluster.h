@@ -18,7 +18,7 @@ struct GraphEdge {
 template<typename T>
 inline size_t ChunkHash(const T& valA, const T& valB)
 {
-	return std::hash<T>()(valA) ^ std::hash<T>()(valB);
+	return std::hash<T>()(valA) ^ std::hash<T>()(valB) ^ 0x9e3779b9 ;
 };
 namespace std
 {
@@ -37,11 +37,9 @@ namespace std
 			bool operator()(const GraphEdge& e1, const GraphEdge& e2) const
 			{
 				return (e1.chunkA == e2.chunkA &&
-					e1.chunkB == e2.chunkB &&
-					e1.connectHealth == e2.connectHealth)||
+					e1.chunkB == e2.chunkB )||
 					(e1.chunkA == e2.chunkB &&
-						e1.chunkB == e2.chunkA &&
-						e1.connectHealth == e2.connectHealth);
+						e1.chunkB == e2.chunkA);
 			}
 		};
 }
@@ -71,7 +69,7 @@ private:
 
 	int m_ChunkCount;
 	std::set<FChunk*> m_Chunks;
-	std::unordered_set<GraphEdge> m_Edges;
+	std::unordered_set<GraphEdge*> m_Edges;
 	std::vector<FChunk*> m_HitChunks;
 };
 

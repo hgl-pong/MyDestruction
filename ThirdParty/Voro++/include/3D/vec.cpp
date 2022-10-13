@@ -89,9 +89,9 @@ FVec3 FVec3:: operator * (const float d)
 }
 
 
-float FVec3::operator * (const FVec3& a)
+FVec3 FVec3::operator * (const FVec3& a)
 {
-	return Dot(a);
+	return FVec3(a.X * X, a.Y * Y, a.Z * Z);
 }
 
 FVec3 FVec3::operator / (const float d)

@@ -18,6 +18,7 @@ public:
 	bool RemoveChunk(FChunk* chunk);
 	bool RemoveChunkCluster(FChunkCluster* chunkCluster);
 	FChunk* GetFChunk(PxRigidDynamic* actor);
+	FChunk* GetFChunk(PxShape* shape);
 	FChunkCluster* GetFChunkCluster(PxRigidDynamic* actor);
 	bool UpdateChunks();
 	bool ApplyDamage(FDamage* damage);

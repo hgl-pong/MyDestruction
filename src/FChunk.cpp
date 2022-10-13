@@ -14,17 +14,18 @@ FChunk::FChunk(VoroCellInfo& cellInfo, FActor* actor)
 	m_Center = cellInfo.Position;
 	m_Volume = cellInfo.Volume;
 	m_Vertices = cellInfo.Vertices;
-	//m_Normals = cellInfo.Normals;
+	m_Normals = cellInfo.Normals;
 	m_Indices = cellInfo.Indices;
 	m_Neighbors = cellInfo.Neighbors;
 	m_Faces = cellInfo.Faces;
 	m_Areas = cellInfo.Areas;
+	m_UVs = cellInfo.UVs;
 	m_Id = cellInfo.Id;
 	m_Life = 1000;
 	m_ChunkHealth = actor->m_Material.hardness / m_Volume;	
+	m_Normals2 = m_Normals;
 	m_Vertices2 = m_Vertices;
 	Update();
-	_CalculateNormals();
 	InitPhyiscShape();
 	InitBoundingBox();
 
@@ -41,10 +42,12 @@ FChunk::FChunk(Geometry::MeshData& meshData, FActor* actor)
 
 	m_Vertices.resize(meshData.vertices.size());
 	m_Normals.resize(meshData.normals.size());
+	m_UVs.resize(meshData.texcoords.size());
 	m_Indices.resize(meshData.indices32.size());
 
 	memcpy_s(m_Vertices.data(), sizeof(XMFLOAT3) * meshData.vertices.size(), meshData.vertices.data(), sizeof(XMFLOAT3) * meshData.vertices.size());
 	memcpy_s(m_Normals.data(), sizeof(XMFLOAT3) * meshData.vertices.size(), meshData.normals.data(), sizeof(XMFLOAT3) * meshData.vertices.size());
+	memcpy_s(m_UVs.data(), sizeof(XMFLOAT2) * meshData.vertices.size(), meshData.texcoords.data(), sizeof(XMFLOAT2) * meshData.vertices.size());
 	memcpy_s(m_Indices.data(), sizeof(uint32_t) * meshData.indices32.size(), meshData.indices32.data(), sizeof(uint32_t) * meshData.indices32.size());
 
 	InitBoundingBox();
@@ -52,6 +55,7 @@ FChunk::FChunk(Geometry::MeshData& meshData, FActor* actor)
 	m_Life = 1000;
 	m_ChunkHealth = actor->m_Material.hardness / (m_Volume * m_Volume);
 	m_Vertices2 = m_Vertices;
+	m_Normals2 = m_Normals;
 
 	InitPhyiscShape();
 }
@@ -76,7 +80,7 @@ bool FChunk::InitUniquePhysicsActor()
 
 	m_pRigidActor->setAngularDamping(0.1f);
 
-	m_pRigidActor->setSleepThreshold((1 - m_pActor->m_Material.material->getRestitution()) / 3);
+	//m_pRigidActor->setSleepThreshold((1 - m_pActor->m_Material.material->getRestitution()) / 3);
 	m_pRigidActor->setLinearVelocity(m_Volocity);
 
 	PxFilterData simulationFilterData;
@@ -110,6 +114,12 @@ bool FChunk::Update()
 		
 		m_Vertices[i] = FVec3(temp.x, temp.y, temp.z);
 	}
+	for (int i = 0; i < m_Normals.size(); i++) {
+		PxVec3 temp(m_Normals2[i].X, m_Normals2[i].Y, m_Normals2[i].Z);
+		temp = m_pRigidActor->getGlobalPose().rotate(temp);
+
+		m_Normals[i] = FVec3(temp.x, temp.y, temp.z);
+	}
 	if (!m_IsDestructable)
 		return false;
 	//if (m_Life==0) {
@@ -129,6 +139,8 @@ bool FChunk::IsDestructable()
 
 bool FChunk::VoronoiFracture(std::vector<FVec3>& sites, FChunkCluster*& chunkCluster)
 {
+	if (m_Volume < 0.5)
+		return false;
 	if (!m_IsDestructable)
 		return false;
 	FVoronoi3D::BBox bbox;
@@ -226,19 +238,3 @@ bool FChunk::InitBoundingBox()
 	return true;
 }
 
-void FChunk::_CalculateNormals() {
-	m_Normals = std::vector<FVec3>(m_Vertices.size(), FVec3(0, 0, 0));
-	for (int i = 0; i < m_Indices.size() / 3-1; i++) {
-		uint32_t p0, p1, p2;
-		p0 = m_Indices[3 * i];
-		p1 = m_Indices[3 * i+1];
-		p2 = m_Indices[3 * i+2];
-		FVec3 v01 = m_Vertices[p1] - m_Vertices[p0];
-		FVec3 v02 = m_Vertices[p2] - m_Vertices[p0];
-		FVec3 normal = v01.Cross(v02);
-		normal/*.Normalize()*/;
-		m_Normals[p0] = m_Normals[p0] + normal;
-		m_Normals[p1] = m_Normals[p1] + normal;
-		m_Normals[p2] = m_Normals[p2] + normal;
-	}
-}

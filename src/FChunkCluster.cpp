@@ -26,24 +26,29 @@ bool FChunkCluster::Release()
 
 bool FChunkCluster::Intersection(FDamage* damage)
 {	
+	for (auto chunk : m_HitChunks) {
+		damage->Damage(chunk);
+	}
+	m_HitChunks.clear();
+
 	for (auto chunk : m_Chunks) {
 		damage->Intersection(chunk);
 		chunk->m_IsDestructable = true;
 	}
 
-	for (std::unordered_set<GraphEdge>::iterator edge = m_Edges.begin(); edge != m_Edges.end();) {
-		if (edge->chunkA->m_Damage.X == 0 && edge->chunkB->m_Damage.X == 0) {
+	for (std::unordered_set<GraphEdge*>::iterator edge = m_Edges.begin(); edge != m_Edges.end();) {
+		if ((* edge)->chunkA->m_Damage.X == 0 && (*edge)->chunkB->m_Damage.X == 0) {
 			edge++;
 			continue;
 		}
-		float dam  = edge->connectHealth - (edge->chunkA->m_Damage.X + edge->chunkB->m_Damage.X);
+		float dam  = (*edge)->connectHealth - ((*edge)->chunkA->m_Damage.X + (*edge)->chunkB->m_Damage.X);
 		if (dam< 0) {
-			edge->chunkA->m_Damage.Y += dam / 2;
-			edge->chunkB->m_Damage.Y += dam / 2;
+			(*edge)->chunkA->m_Damage.Y += dam / 2;
+			(*edge)->chunkB->m_Damage.Y += dam / 2;
 			m_Edges.erase(edge++);
 		}
 		else {
-			m_Edges.insert(*edge);
+			(*edge)->connectHealth = dam;
 			edge++;
 		}
 	}
@@ -53,8 +58,8 @@ bool FChunkCluster::Intersection(FDamage* damage)
 	}
 
 	for (auto edge : m_Edges) {
-		edge.chunkA->m_IsDestructable = false;
-		edge.chunkB->m_IsDestructable = false;
+		(*edge).chunkA->m_IsDestructable = false;
+		(*edge).chunkB->m_IsDestructable = false;
 	}
 
 	for (auto chunk = m_Chunks.begin(); chunk != m_Chunks.end();) {
@@ -100,7 +105,7 @@ bool FChunkCluster::InitSharedPhysicsActor()
 	m_pRigidActor->setAngularDamping(0.1f);
 
 	//m_pRigidActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-	m_pRigidActor->setSleepThreshold((1 - m_pActor->m_Material.material->getRestitution()) / 3);
+	//m_pRigidActor->setSleepThreshold((1 - m_pActor->m_Material.material->getRestitution()) / 3);
 	return true;
 Exit0:
 	return false;
@@ -115,11 +120,18 @@ bool FChunkCluster::Update()
 {
 	FASSERT(m_pRigidActor);
 	m_IsSleeping = m_pRigidActor->isSleeping();
-	for(auto chunk:m_Chunks)
-	for (int i = 0; i < chunk->m_Vertices.size(); i++) {
-		PxVec3 temp(chunk->m_Vertices2[i].X, chunk->m_Vertices2[i].Y, chunk->m_Vertices2[i].Z);
-		temp = m_pRigidActor->getGlobalPose().transform(temp);
-		chunk->m_Vertices[i] = FVec3(temp.x, temp.y, temp.z);
+	for (auto chunk : m_Chunks) {
+		for (int i = 0; i < chunk->m_Vertices.size(); i++) {
+			PxVec3 temp(chunk->m_Vertices2[i].X, chunk->m_Vertices2[i].Y, chunk->m_Vertices2[i].Z);
+			temp = m_pRigidActor->getGlobalPose().transform(temp);
+			chunk->m_Vertices[i] = FVec3(temp.x, temp.y, temp.z);
+		}
+		for (int i = 0; i < chunk->m_Normals.size(); i++) {
+			PxVec3 temp(chunk->m_Normals2[i].X, chunk->m_Normals2[i].Y, chunk->m_Normals2[i].Z);
+			temp = m_pRigidActor->getGlobalPose().rotate(temp);
+
+			chunk->m_Normals[i] = FVec3(temp.x, temp.y, temp.z);
+		}
 	}
 	return true;
 Exit0:
@@ -138,10 +150,10 @@ bool FChunkCluster::Init(std::unordered_map<int,FChunk*>& chunks, FActor* actor,
 		{
 			if (chunk.second->m_Neighbors[i] < 0)
 				continue;
-			GraphEdge newEdge;
-			newEdge.chunkA = chunk.second;
-			newEdge.chunkB = chunks[chunk.second->m_Neighbors[i]];
-			newEdge.connectHealth = chunk.second->m_Areas[i] * actor->m_Material.hardness;
+			GraphEdge* newEdge=new GraphEdge();
+			newEdge->chunkA = chunk.second;
+			newEdge->chunkB = chunks[chunk.second->m_Neighbors[i]];
+			newEdge->connectHealth = chunk.second->m_Areas[i] * actor->m_Material.hardness;
 			m_Edges.emplace(newEdge);
 		}
 		chunk.second->m_pRigidActor = m_pRigidActor;

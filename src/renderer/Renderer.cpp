@@ -883,8 +883,8 @@ namespace Graphics {
 		std::vector<UINT> indices;
 			XMFLOAT3 center(pos.X,pos.Y,pos.Z);
 			XMFLOAT4 color = XMFLOAT4(0.5f, 0.5f, 0.9f, 1.0f);
-			int vertsPerRow = 18;
-			int nRows = 17;
+			int vertsPerRow = 18*(1+radius/2);
+			int nRows = 17*(1+radius/2);
 
 			int nVerts = vertsPerRow * nRows + 2;
 
@@ -945,17 +945,17 @@ namespace Graphics {
 			{
 				for (int j = 0; j < vertsPerRow; j++)
 				{
-					indices.push_back(i * vertsPerRow+i + j);
-					indices.push_back((i + 1) * vertsPerRow + i + j + 1);
+					//indices.push_back(i * vertsPerRow+i + j);
+					//indices.push_back((i + 1) * vertsPerRow + i + j + 1);
 					indices.push_back((i + 1) * vertsPerRow + i + j + 1);
 					indices.push_back((i + 1) * vertsPerRow + i + j);
-					indices.push_back((i + 1) * vertsPerRow + i + j);
-					indices.push_back(i * vertsPerRow + i + j);
+					//indices.push_back((i + 1) * vertsPerRow + i + j);
+					//indices.push_back(i * vertsPerRow + i + j);
 
 					indices.push_back(i * vertsPerRow + i + j);
 					indices.push_back(i * vertsPerRow + i + j + 1);
-					indices.push_back(i * vertsPerRow + i + j + 1);
-					indices.push_back((i + 1) * vertsPerRow + i + j + 1);
+					//indices.push_back(i * vertsPerRow + i + j + 1);
+					//indices.push_back((i + 1) * vertsPerRow + i + j + 1);
 					indices.push_back((i + 1) * vertsPerRow + i + j + 1);
 					indices.push_back(i * vertsPerRow + i + j);
 
