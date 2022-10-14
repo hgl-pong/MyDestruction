@@ -57,8 +57,7 @@ bool FActor::Init(char *name)
 		Graphics::Renderer::Get()->AddVoroMesh(m_pVoroMeshData);
 	}
 	m_Material = FPhysics::Get()->STONE;
-	FChunk *chunk = new FChunk(box, this);
-	chunk->m_Transform = PxTransform(PxVec3(m_pMeshData->m_Transform.GetPosition().x, m_pMeshData->m_Transform.GetPosition().y, m_pMeshData->m_Transform.GetPosition().z));
+	FChunk *chunk = new FChunk(box,PxTransform(PxVec3(m_pMeshData->m_Transform.GetPosition().x, m_pMeshData->m_Transform.GetPosition().y, m_pMeshData->m_Transform.GetPosition().z)), this);
 	std::unordered_map<int, FChunk *> chunks;
 	chunks.emplace(chunk->m_Id, chunk);
 	FChunkCluster *chunkCluster = new FChunkCluster(this);

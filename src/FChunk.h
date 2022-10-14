@@ -20,7 +20,7 @@ class FChunk
 public:
 	FChunk() = default;
 	FChunk(VoroCellInfo& cellInfo, FActor* actor);
-	FChunk(Geometry::MeshData & meshData, FActor* actor);
+	FChunk(Geometry::MeshData & meshData,PxTransform transform, FActor* actor);
 
 	~FChunk();
 	bool Release();
@@ -28,18 +28,15 @@ public:
 	bool Attach(PxRigidDynamic *actor);
 	bool Update();
 	bool IsDestructable();
-	bool VoronoiFracture(std::vector<FVec3>& sites,FChunkCluster*& chunkCluster);
-
-	bool Intersection(Ray &ray);
+	bool VoronoiFracture(FDamage*damage);
 	bool InitPhyiscShape();
 	bool InitBoundingBox();
-	bool Intersection(FDamage* damage);
 	FVec3 GetPosition() {
 		return m_Center;
 	}
 	PxRigidDynamic* GetPhysicsActor();
 	PxShape *GetPhysicsShape();
-	bool CostChunkHealth(float damage);
+	bool CalculateChunkHealth(FDamage*damage);
 	BoundingBox GetBoundingBox() {
 		return m_BoundingBox;
 	}

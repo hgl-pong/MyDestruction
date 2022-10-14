@@ -31,20 +31,18 @@ FChunk::FChunk(VoroCellInfo& cellInfo, FActor* actor)
 
 }
 
-FChunk::FChunk(Geometry::MeshData& meshData, FActor* actor)
+FChunk::FChunk(Geometry::MeshData& meshData, PxTransform transform, FActor* actor)
 	:m_IsSleeping(true),
 	m_IsDestructable(false),
 	m_pActor(actor),
 	m_Damage(0, 0),
 	m_Id(0)
 {
-
-
 	m_Vertices.resize(meshData.vertices.size());
 	m_Normals.resize(meshData.normals.size());
 	m_UVs.resize(meshData.texcoords.size());
 	m_Indices.resize(meshData.indices32.size());
-
+	m_Transform = transform;
 	memcpy_s(m_Vertices.data(), sizeof(XMFLOAT3) * meshData.vertices.size(), meshData.vertices.data(), sizeof(XMFLOAT3) * meshData.vertices.size());
 	memcpy_s(m_Normals.data(), sizeof(XMFLOAT3) * meshData.vertices.size(), meshData.normals.data(), sizeof(XMFLOAT3) * meshData.vertices.size());
 	memcpy_s(m_UVs.data(), sizeof(XMFLOAT2) * meshData.vertices.size(), meshData.texcoords.data(), sizeof(XMFLOAT2) * meshData.vertices.size());
@@ -56,6 +54,7 @@ FChunk::FChunk(Geometry::MeshData& meshData, FActor* actor)
 	m_ChunkHealth = actor->m_Material.hardness / (m_Volume * m_Volume);
 	m_Vertices2 = m_Vertices;
 	m_Normals2 = m_Normals;
+	m_Center = FVec3(m_Transform.p.x, m_Transform.p.y, m_Transform.p.z);
 
 	InitPhyiscShape();
 }
@@ -86,8 +85,11 @@ bool FChunk::InitUniquePhysicsActor()
 	PxFilterData simulationFilterData;
 	//simulationFilterData.word3 = ChunkType::UNIQUE;
 	//m_pConvexMeshShape->setSimulationFilterData(simulationFilterData);
+	FASSERT(m_pConvexMeshShape);
 	m_pRigidActor->attachShape(*m_pConvexMeshShape);
 	PxRigidBodyExt::updateMassAndInertia(*m_pRigidActor, m_pActor->m_Material.identity);
+	return true;
+Exit0:
 	return false;
 }
 
@@ -104,22 +106,24 @@ Exit0:
 }
 
 bool FChunk::Update()
-{
+{	
 	FASSERT(m_pRigidActor);
 	m_IsSleeping = m_pRigidActor->isSleeping();
 	FASSERT(!m_IsSleeping);
+	m_Transform = m_pRigidActor->getGlobalPose();
 	for (int i = 0; i < m_Vertices.size();i++) {
 		PxVec3 temp(m_Vertices2[i].X, m_Vertices2[i].Y, m_Vertices2[i].Z);
-		temp = m_pRigidActor->getGlobalPose().transform(temp);
+		temp = m_Transform.transform(temp);
 		
 		m_Vertices[i] = FVec3(temp.x, temp.y, temp.z);
 	}
 	for (int i = 0; i < m_Normals.size(); i++) {
 		PxVec3 temp(m_Normals2[i].X, m_Normals2[i].Y, m_Normals2[i].Z);
-		temp = m_pRigidActor->getGlobalPose().rotate(temp);
+		temp = m_Transform.rotate(temp);
 
 		m_Normals[i] = FVec3(temp.x, temp.y, temp.z);
 	}
+
 	if (!m_IsDestructable)
 		return false;
 	//if (m_Life==0) {
@@ -137,7 +141,7 @@ bool FChunk::IsDestructable()
 	return m_IsDestructable;
 }
 
-bool FChunk::VoronoiFracture(std::vector<FVec3>& sites, FChunkCluster*& chunkCluster)
+bool FChunk::VoronoiFracture(FDamage *damage)
 {
 	if (m_Volume < 0.5)
 		return false;
@@ -150,9 +154,8 @@ bool FChunk::VoronoiFracture(std::vector<FVec3>& sites, FChunkCluster*& chunkClu
 	VoroCellInfo* cellInfo = nullptr;
 	std::unordered_map<int, FChunk*> chunks;
 	FChunkCluster* newChunkCluster;
-	FASSERT(m_ChunkHealth < 0);
-	FASSERT(!sites.empty());
-	diagram.AddSites(sites, 0, FVec3(-m_Transform.p.x, -m_Transform.p.y, -m_Transform.p.z));
+	FASSERT(!damage->m_Sites.empty());
+	diagram.AddSites(damage->m_Sites, 0, FVec3(-m_Transform.p.x, -m_Transform.p.y, -m_Transform.p.z));
 	diagram.ComputeAllCells();
 	cellInfo = diagram.GetAllCells();
 	for (int i = 0; i < diagram.Size(); i++) {
@@ -160,6 +163,7 @@ bool FChunk::VoronoiFracture(std::vector<FVec3>& sites, FChunkCluster*& chunkClu
 			continue;
 		FChunk* newChunk = new FChunk(cellInfo[i], m_pActor);
 		newChunk->m_Transform = m_Transform;
+
 		chunks.emplace(i, newChunk);
 	}
 	if (chunks.size() < 2)
@@ -169,31 +173,11 @@ bool FChunk::VoronoiFracture(std::vector<FVec3>& sites, FChunkCluster*& chunkClu
 	m_pActor->RemoveChunk(this);
 	m_pActor->m_pChunkManager->Insert(newChunkCluster);
 	m_pActor->AddPhysicsActorToScene(newChunkCluster->GetPhysicsActor());
-	chunkCluster = newChunkCluster;
+	for(auto chunk: const_cast<FConnectGraph<FChunk*>*>(newChunkCluster->GetConnectGraph())->GetNodes())
+		damage->Damage(chunk);
+	newChunkCluster->UpdateClusterHealth(damage);
 	return true;
 Exit0:
-	return false;
-}
-
-bool FChunk::Intersection(Ray& ray)
-{
-	return false;
-}
-
-bool FChunk::Intersection(FDamage* damage)
-{
-	BoundingSphere sphere;
-	sphere.Center = XMFLOAT3();
-	sphere.Radius = 10;
-
-	m_BoundingBox.Intersects(sphere);
-
-	std::vector<FVec3>sites;
-
-	//FSiteGenerator::ImpactDamage(damage.center, transform, damage.radius, 100, sites, RandomType::GAUSSION);
-	m_pActor->RemoveChunk(this);
-	FChunkCluster* newChunkCluster = nullptr;
-	VoronoiFracture(sites, newChunkCluster);
 	return false;
 }
 
@@ -207,17 +191,17 @@ physx::PxShape* FChunk::GetPhysicsShape()
 	return m_pConvexMeshShape;
 }
 
-bool FChunk::CostChunkHealth(float damage)
+bool FChunk::CalculateChunkHealth(FDamage* damage)
 {
-	m_ChunkHealth -= damage;
-	if (m_ChunkHealth >= 0)
+	m_ChunkHealth -= m_Damage.X;
+	
+	if (m_ChunkHealth >= 0) {
+		m_Damage.X = 0;
+		m_Damage.Y = 0;
 		return true;
-	//std::vector<FVec3>sites;
-
-	////FSiteGenerator::ImpactDamage(damage.center, transform, damage.radius, 100, sites, RandomType::GAUSSION);
-	//m_pActor->RemoveChunk(this);
-	//VoronoiFracture(sites);
-
+	}
+	m_Damage.X = -m_ChunkHealth;
+	VoronoiFracture(damage);
 	return true;
 }
 

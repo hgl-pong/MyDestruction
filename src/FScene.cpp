@@ -28,10 +28,9 @@ PxAgain FOverlapCallback::processTouches(const PxOverlapHit* buffer, PxU32 nbHit
 				if (chunkCluster != nullptr)
 				{
 					m_Damage->m_DamagingChunkClusters.emplace(chunkCluster);
-					FChunk* hitChunk = m_ChunkManager->GetFChunk(buffer[i].shape);
-					chunkCluster->AddHitChunk(hitChunk);
 				}
 			}
+
 		}
 	}
 	return true;

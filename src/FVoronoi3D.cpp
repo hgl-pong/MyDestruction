@@ -53,7 +53,7 @@ void FVoronoi3D::ComputeAllCells()
 {
 	voro::voro_compute<voro::container> VoroCompute = Container->make_compute();
 
-	FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
+	//FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
 	Cells.resize(NumSites);
 
 	voro::c_loop_all CellIterator(*Container);
@@ -107,20 +107,20 @@ void FVoronoi3D::ComputeAllCells()
 
 				/*cell.neighbors(Cell.Neighbors);*/
 
-				cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
+				//cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
 			}
 		} while (CellIterator.inc());
 	}
 
-	fclose(f1);
-	Container->draw_cells_gnuplot("random_points_v.gnu");
+	//fclose(f1);
+	//Container->draw_cells_gnuplot("random_points_v.gnu");
 }
 
 void FVoronoi3D::ComputeCellEdgesSerial()
 {
 	voro::voro_compute<voro::container> VoroCompute = Container->make_compute();
 
-	FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
+	//FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
 	Cells.resize(NumSites);
 
 	voro::c_loop_all CellIterator(*Container);
@@ -162,21 +162,21 @@ void FVoronoi3D::ComputeCellEdgesSerial()
 
 				//cell.neighbors(Cell.Neighbors);
 
-				cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
+				//cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
 
 			}
 		} while (CellIterator.inc());
 	}
 
-	fclose(f1);
-	Container->draw_cells_gnuplot("random_points_v.gnu");
+	//fclose(f1);
+	//Container->draw_cells_gnuplot("random_points_v.gnu");
 }
 
 void FVoronoi3D::ComputeCellEdges()
 {
 	voro::voro_compute<voro::container> VoroCompute = Container->make_compute();
 
-	FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
+	//FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
 	Cells.resize(NumSites);
 
 	voro::c_loop_all CellIterator(*Container);
@@ -209,14 +209,14 @@ void FVoronoi3D::ComputeCellEdges()
 
 				//cell.neighbors(Cell.Neighbors);
 
-				cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
+				//cell.draw_pov_mesh(x * 2, y * 2, z * 2, f1);
 
 			}
 		} while (CellIterator.inc());
 	}
 
-	fclose(f1);
-	Container->draw_cells_gnuplot("random_points_v.gnu");
+	//fclose(f1);
+	//Container->draw_cells_gnuplot("random_points_v.gnu");
 }
 
 bool FVoronoi3D::VoronoiNeighbors(std::vector<std::vector<int>>& Neighbors, bool bExcludeBounds /*= true*/, float SquaredDistSkipPtThreshold /*= KINDA_SMALL_NUMBER*/)
@@ -224,7 +224,7 @@ bool FVoronoi3D::VoronoiNeighbors(std::vector<std::vector<int>>& Neighbors, bool
 	Neighbors.clear();
 	Neighbors.resize(NumSites);
 
-	FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
+	//FILE* f1 = voro::safe_fopen("neighbors_m.pov", "w");
 
 	voro::c_loop_all CellIterator(*Container);
 	voro::voronoicell_neighbor cell;
@@ -244,12 +244,12 @@ bool FVoronoi3D::VoronoiNeighbors(std::vector<std::vector<int>>& Neighbors, bool
 
 				double X, Y, Z;
 				CellIterator.pos(X, Y, Z);
-				cell.draw_pov_mesh(X * 2, Y * 2, Z * 2, f1);
+				//cell.draw_pov_mesh(X * 2, Y * 2, Z * 2, f1);
 			}
 		} while (CellIterator.inc());
 	}
-	fclose(f1);
-	Container->draw_cells_gnuplot("random_points_v.gnu");
+	//fclose(f1);
+	//Container->draw_cells_gnuplot("random_points_v.gnu");
 	return true;
 }
 

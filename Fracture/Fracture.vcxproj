@@ -225,6 +225,7 @@
     <ClInclude Include="..\src\FAttack.h" />
     <ClInclude Include="..\src\FChunk.h" />
     <ClInclude Include="..\src\FChunkManager.h" />
+    <ClInclude Include="..\src\FConnectGraph.h" />
     <ClInclude Include="..\src\FDamage.h" />
     <ClInclude Include="..\src\FDamageManager.h" />
     <ClInclude Include="..\src\FChunkCluster.h" />

@@ -59,7 +59,7 @@ void FRenderMesh::UpdateMeshData() {
 			ipos += isize;
 		}
 		for (auto chunkCluster : m_pActor->m_pChunkManager->m_ChunkClustersMap) {
-			for (auto chunk : chunkCluster.second->m_Chunks) {
+			for (auto chunk : chunkCluster.second->m_ConnectGraph.GetNodes()) {
 				int vsize = chunk->m_Vertices.size();
 				int isize = chunk->m_Indices.size();
 				m_Vertices.resize(vpos + vsize);
@@ -97,7 +97,7 @@ void FRenderMesh::UpdateMeshData() {
 		}
 		for (auto chunkCluster : m_pActor->m_pChunkManager->m_ChunkClustersMap) {
 			if(!chunkCluster.second->m_IsSleeping)
-			for (auto chunk : chunkCluster.second->m_Chunks) {
+			for (auto chunk : chunkCluster.second->m_ConnectGraph.GetNodes()) {
 				int vsize = chunk->m_Vertices.size();
 				memcpy_s(m_Vertices.data() + +chunk->m_VBStartPos, sizeof(FVec3) * vsize, chunk->m_Vertices.data(), sizeof(FVec3) * vsize);
 			}

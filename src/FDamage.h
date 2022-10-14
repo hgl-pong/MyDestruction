@@ -13,9 +13,8 @@ class FDamage
 public:
 	FDamage() = default;
 	virtual ~FDamage(){};
-	virtual void Intersection(FChunk* chunk) = 0;
-	virtual void Intersection(FChunkCluster* chunkCluster) = 0;
-	virtual void Damage(FChunk* chunk) = 0;
+	virtual void Damage(FChunkCluster* chunkCluster) = 0;
+	virtual void Damage(FChunk* chunk,bool cmpdis = false) = 0;
 	virtual void ResetSites()
 	{
 		m_Sites.clear();
@@ -40,9 +39,8 @@ class FSphereDamage : public FDamage
 public:
 	FSphereDamage(FVec3 &pos, float radius, float damage);
 	~FSphereDamage();
-	void Intersection(FChunk *chunk) override;
-	void Intersection(FChunkCluster* chunkCluster)override;
-	 void Damage(FChunk* chunk) override;
+	void Damage(FChunkCluster* chunkCluster)override;
+	 void Damage(FChunk* chunk, bool cmpdis=false) override;
 
 	void GenerateSites(FMaterial &material, RandomType type) override;
 

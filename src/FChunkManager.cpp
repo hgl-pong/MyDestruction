@@ -22,10 +22,9 @@ bool FChunkManager::Release() {
 }
 
 bool FChunkManager::Insert(FChunk* chunk) {
-	auto s1= m_ChunksMap.emplace(chunk->GetPhysicsActor(), chunk).second;
-	auto s2= m_ChunkShapesMap.emplace(chunk->GetPhysicsShape(), chunk).second;
+	auto result= m_ChunksMap.emplace(chunk->GetPhysicsActor(), chunk).second;
 	m_pActor->m_RebuildRenderMesh = true;
-	return s1 && s2;
+	return result;
 }
 
 bool FChunkManager::Insert(FChunkCluster* chunkCluster) {
@@ -34,11 +33,9 @@ bool FChunkManager::Insert(FChunkCluster* chunkCluster) {
 }
 
 bool FChunkManager::RemoveChunk(FChunk* chunk) {
-	auto it1 = find_if(m_ChunksMap.begin(), m_ChunksMap.end(), [&](const std::pair<PxRigidDynamic*, FChunk*>& pair) {return pair.second == chunk; });
-	auto it2 = find_if(m_ChunkShapesMap.begin(), m_ChunkShapesMap.end(), [&](const std::pair<PxShape*, FChunk*>& pair) {return pair.second == chunk; });
-	if (it1 != m_ChunksMap.end()&&it2 != m_ChunkShapesMap.end()) {
-		m_ChunksMap.erase(it1);
-		m_ChunkShapesMap.erase(it2);
+	auto it = find_if(m_ChunksMap.begin(), m_ChunksMap.end(), [&](const std::pair<PxRigidDynamic*, FChunk*>& pair) {return pair.second == chunk; });
+	if (it != m_ChunksMap.end()) {
+		m_ChunksMap.erase(it);
 		m_pActor->m_RebuildRenderMesh = true;
 		FRELEASE(chunk);
 		return true;
@@ -64,14 +61,6 @@ FChunk* FChunkManager::GetFChunk(PxRigidDynamic* actor) {
 	return nullptr;
 }
 
-FChunk* FChunkManager::GetFChunk(PxShape* shape) {
-	auto it = m_ChunkShapesMap.find(shape);
-	if (it != m_ChunkShapesMap.end())
-		return it->second;
-	return nullptr;
-}
-
-
 FChunkCluster* FChunkManager::GetFChunkCluster(PxRigidDynamic* actor){
 	auto it = m_ChunkClustersMap.find(actor);
 	if (it != m_ChunkClustersMap.end())
@@ -81,22 +70,19 @@ FChunkCluster* FChunkManager::GetFChunkCluster(PxRigidDynamic* actor){
 
 bool FChunkManager::ApplyDamage(FDamage* damage) {
 
-	for (auto it = damage->m_DamagingChunkClusters.begin(); it != damage->m_DamagingChunkClusters.end();) {
-		(*it)->Intersection(damage);
-		if ((*it)->Size() == 0) {
-			m_pActor->RemoveChunkCluser(*it++);
-			continue;
-		}
-		it++;
+	for (auto chunk = damage->m_DamagingChunks.begin(); chunk != damage->m_DamagingChunks.end();) {
+		damage->Damage(*chunk);
+		(*chunk)->CalculateChunkHealth(damage);
+		chunk++;
 	}
 
-	for (auto chunk : damage->m_DamagingChunks) {
-		FChunkCluster* newChunkCluster = nullptr;
-		if (chunk->VoronoiFracture(damage->m_Sites, newChunkCluster)) {
-			newChunkCluster->Intersection(damage);
-			m_pActor->RemoveChunk(chunk);
-		}
+	for (auto chunkCluster = damage->m_DamagingChunkClusters.begin(); chunkCluster != damage->m_DamagingChunkClusters.end();) {
+		damage->Damage(*chunkCluster);
+		(* chunkCluster)->UpdateClusterHealth(damage);
+		chunkCluster++;
 	}
+
+
 	return true;
 }
 
