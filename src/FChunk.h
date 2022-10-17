@@ -15,6 +15,7 @@ using namespace DirectX;
 
 class FActor;
 class FChunkCluster;
+class FMeshBoolean;
 class FChunk
 {
 public:
@@ -52,7 +53,7 @@ private:
 	PxShape *m_pConvexMeshShape;
 	PxRigidDynamic *m_pRigidActor;
 	BoundingBox m_BoundingBox;
-
+	FMeshBoolean* m_pMeshBoolean;
 	float m_Life;
 	bool m_IsSleeping;
 	bool m_IsDestructable;

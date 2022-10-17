@@ -75,6 +75,8 @@ bool FChunkCluster::Seperate(FChunk* chunk)
 
 	m_pActor->AddPhysicsActorToScene(chunk->GetPhysicsActor());
 	m_ChunkCount--;
+	PxRigidBodyExt::updateMassAndInertia(*m_pRigidActor, m_pActor->m_Material.identity);
+
 	return false;
 }
 
@@ -94,6 +96,7 @@ bool FChunkCluster::Seperate(FChunkCluster* chunkCluster)
 	chunkCluster->m_pActor = m_pActor;
 	m_pActor->AddPhysicsActorToScene(chunkCluster->GetPhysicsActor());
 	m_ChunkCount-= buffer.size();
+	PxRigidBodyExt::updateMassAndInertia(*m_pRigidActor, m_pActor->m_Material.identity);
 	return false;
 }
 

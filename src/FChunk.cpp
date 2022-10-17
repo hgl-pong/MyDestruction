@@ -5,6 +5,7 @@
 #include "FSiteGenerator.h"
 #include "FChunkCluster.h"
 #include "FChunkManager.h"
+#include "FMeshBoolean.h"
 FChunk::FChunk(VoroCellInfo& cellInfo, FActor* actor)
 	:m_IsSleeping(true),
 	m_IsDestructable(false),
@@ -29,6 +30,7 @@ FChunk::FChunk(VoroCellInfo& cellInfo, FActor* actor)
 	InitPhyiscShape();
 	InitBoundingBox();
 
+	m_pMeshBoolean = new FMeshBoolean(this);
 }
 
 FChunk::FChunk(Geometry::MeshData& meshData, PxTransform transform, FActor* actor)
@@ -57,6 +59,8 @@ FChunk::FChunk(Geometry::MeshData& meshData, PxTransform transform, FActor* acto
 	m_Center = FVec3(m_Transform.p.x, m_Transform.p.y, m_Transform.p.z);
 
 	InitPhyiscShape();
+
+	m_pMeshBoolean = new FMeshBoolean(this);
 }
 
 FChunk::~FChunk()
@@ -161,7 +165,12 @@ bool FChunk::VoronoiFracture(FDamage *damage)
 	for (int i = 0; i < diagram.Size(); i++) {
 		if (cellInfo[i].Vertices.empty())
 			continue;
-		FChunk* newChunk = new FChunk(cellInfo[i], m_pActor);
+		VoroCellInfo cell;
+		m_pMeshBoolean->FetchBooleanResult(cellInfo[i], cell, INTERSEECTION);
+		if (cell.Vertices.empty())
+			continue;
+		FChunk* newChunk = new FChunk(cell, m_pActor);
+		//FChunk* newChunk = new FChunk(cellInfo[i], m_pActor);
 		newChunk->m_Transform = m_Transform;
 
 		chunks.emplace(i, newChunk);

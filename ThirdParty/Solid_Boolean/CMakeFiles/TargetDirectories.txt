@@ -1,0 +1,3 @@
+C:/Users/Administrator/Desktop/FractureDemo/solidboolean/CMakeFiles/test-solidboolean.dir
+C:/Users/Administrator/Desktop/FractureDemo/solidboolean/CMakeFiles/ALL_BUILD.dir
+C:/Users/Administrator/Desktop/FractureDemo/solidboolean/CMakeFiles/ZERO_CHECK.dir

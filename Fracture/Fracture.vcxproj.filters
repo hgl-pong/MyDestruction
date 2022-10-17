@@ -28,6 +28,9 @@
     <Filter Include="头文件\Common">
       <UniqueIdentifier>{576f377a-b1f0-4a0b-9100-088b80a3fcff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\MeshBoolean">
+      <UniqueIdentifier>{49022b67-f95f-4a1f-afe7-1540dadd2833}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\FActor.cpp">
@@ -55,9 +58,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FWireMesh.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MeshBoolean.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FAttack.cpp">
@@ -167,9 +167,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Resources.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -198,9 +195,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FWireMesh.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MeshBoolean.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FAttack.h">
