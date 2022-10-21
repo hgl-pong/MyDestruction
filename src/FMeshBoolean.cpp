@@ -92,17 +92,43 @@ void FMeshBoolean::_Union(SolidMesh& mesh, VoroCellInfo& result) {
 
 void FMeshBoolean::_Merge(const std::vector<Vector3>& vertices,
 	const std::vector<std::vector<size_t>>& triangles, VoroCellInfo& result) {
-
+	std::map<int, FVec3> vbuff;
+	std::map<int, int>ibuff;
 	for (const auto& it : triangles) {
-		result.Indices.push_back(it[0]);
-		result.Indices.push_back(it[1]);
-		result.Indices.push_back(it[2]);
+		vbuff.emplace(it[0], FVec3(vertices[it[0]][0], vertices[it[0]][1], vertices[it[0]][2]));
+		vbuff.emplace(it[1], FVec3(vertices[it[1]][0], vertices[it[1]][1], vertices[it[1]][2]));
+		vbuff.emplace(it[2], FVec3(vertices[it[2]][0], vertices[it[2]][1], vertices[it[2]][2]));
 	}
-	for (const auto& it : vertices) {
-		result.Vertices.push_back(FVec3(it[0],it[1],it[2]));
+	int i = 0;
+	for (auto v : vbuff) {
+		ibuff.emplace(v.first, i);
+		i++;
+	}
+	for (const auto& it : triangles) {
+		result.Indices.push_back(ibuff[it[0]]);
+		result.Indices.push_back(ibuff[it[1]]);
+		result.Indices.push_back(ibuff[it[2]]);
+	}
+	for (const auto& it : vbuff) {
+		result.Vertices.push_back(it.second);
 	}
 
-	result.Normals = std::vector<FVec3>(vertices.size(), FVec3(0, 1, 0));
+	result.Normals = std::vector<FVec3>(result.Vertices.size(), FVec3(0, 0, 0));
+	for (int i = 0; i < result.Indices.size() / 3; i++) {
+		uint32_t p0, p1, p2;
+		p0 = result.Indices[3 * i];
+		p1 = result.Indices[3 * i + 1];
+		p2 = result.Indices[3 * i + 2];
+		FVec3 v01 = result.Vertices[p1] - result.Vertices[p0];
+		FVec3 v02 = result.Vertices[p2] - result.Vertices[p0];
+		FVec3 normal = v01.Cross(v02);
+
+		result.Normals[p0] = result.Normals[p0] + normal;
+		result.Normals[p1] = result.Normals[p1] + normal;
+		result.Normals[p2] = result.Normals[p2] + normal;
+	}
+	for (int i = 0; i < result.Normals.size(); i++)
+		result.Normals[i].Normalize();
 	result.UVs = std::vector<FVec2>(vertices.size(), FVec2(0, 0));
 
 }
