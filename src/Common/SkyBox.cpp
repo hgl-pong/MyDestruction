@@ -35,7 +35,7 @@ void SkyBox::Draw(ID3D11DeviceContext * deviceContext, IEffect * effect)
 
         effect->Apply(deviceContext);
 
-        MeshDataInput input = pEffectMeshData->GetInputData(m_pModel->meshData);
+        MeshDataInput input = pEffectMeshData->GetInputData(m_pModel->meshDatas[0]);
         {
             deviceContext->IASetVertexBuffers(0, (uint32_t)input.pVertexBuffers.size(), 
                 input.pVertexBuffers.data(), input.strides.data(), input.offsets.data());

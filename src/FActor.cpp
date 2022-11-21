@@ -31,10 +31,14 @@ FActor::~FActor()
 bool FActor::Init(char *name)
 {
 	m_Name = name;
-	Geometry::MeshData box = /*Geometry::CreateBox(2.5, 2.5, 2.5)*/Geometry::CreateCylinder(1.25);
+	Geometry::MeshData box = Geometry::CreateBox(2.5, 2.5, 2.5)/*Geometry::CreateCylinder(1.25)*/;
 	m_pMeshData = new Graphics::MeshData();
-	;
-	*m_pMeshData = MeshImporter::Get().CreateFromGeometry("box", box)->meshData;
+
+
+	//const Model* model = MeshImporter::Get().CreateFromFile("C:\\Users\\Administrator\\Desktop\\FractureDemo\\fracture-tool\\Model\\Rock\\RockFlatLong_A.obj");
+	//*m_pMeshData = model->meshDatas[0];
+	//box = model->meshdata;
+	*m_pMeshData = MeshImporter::Get().CreateFromGeometry("box", box)->meshDatas[0];
 	m_pMeshData->m_Transform.SetPosition(0, 1.3, 0);
 	m_Transform = m_pMeshData->m_Transform;
 	BoundingBox::CreateFromPoints(m_pMeshData->m_BoundingBox, box.vertices.size(),

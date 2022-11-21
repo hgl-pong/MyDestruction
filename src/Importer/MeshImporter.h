@@ -14,8 +14,9 @@ namespace KG3D_Destruction {
 struct Model
 {
     std::vector<Material*> materials;
-    Graphics::MeshData meshData;
+    std::vector<Graphics::MeshData> meshDatas;
     DirectX::BoundingBox boundingbox;
+    Geometry::MeshData meshdata;;
 };
 
 

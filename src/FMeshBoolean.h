@@ -1,8 +1,12 @@
 #ifndef FMESH_BOOLEAN_H
 #define FMESH_BOOLEAN_H
-#include "vector3.h"
-#include "solidboolean.h"
+#include "MeshOperations/MeshSetOperation.h"
+#include "MeshOperations/MeshMergeOperation.h"
+#include "Mesh.h"
+#include "Vector.h"
 #include "FVoronoi3D.h"
+using namespace MeshWarrior;
+
 enum BooleanType
 {
 	DIFFEREN=1,
@@ -19,39 +23,38 @@ public:
 	void FetchBooleanResult(VoroCellInfo& cell, VoroCellInfo& result, BooleanType type);
 
 private:
-	void _Difference(SolidMesh& mesh, VoroCellInfo& result);
-	void _Intersection(SolidMesh& mesh, VoroCellInfo& result);
-	void _Union(SolidMesh& mesh, VoroCellInfo& result);
+	void _Difference(Mesh& mesh, VoroCellInfo& result);
+	void _Intersection(Mesh& mesh, VoroCellInfo& result);
+	void _Union(Mesh& mesh, VoroCellInfo& result);
 
-	void _Merge(const std::vector<Vector3>& vertices,
-		const std::vector<std::vector<size_t>>& triangle, VoroCellInfo& result);
+	void _Merge(const Mesh*mesh, VoroCellInfo& result);
 	void _Reset();
 private:
 
-	std::vector<Vector3> m_Vertices;
+	std::vector<Mesh::Vertex> m_Vertices;
 	std::vector<std::vector<size_t>> m_Triangles;
-	SolidMesh m_SourceMesh;
+	Mesh m_SourceMesh;
 };
 
-static void exportObject(const char* filename, const std::vector<Vector3>& vertices, const std::vector<std::vector<size_t>>& faces)
-{
-    FILE* fp = fopen(filename, "wb");
-    for (const auto& it : vertices) {
-        fprintf(fp, "v %f %f %f\n", it.x(), it.y(), it.z());
-    }
-    for (const auto& it : faces) {
-        if (it.size() == 2) {
-            fprintf(fp, "l");
-            for (const auto& v : it)
-                fprintf(fp, " %zu", v + 1);
-            fprintf(fp, "\n");
-            continue;
-        }
-        fprintf(fp, "f");
-        for (const auto& v : it)
-            fprintf(fp, " %zu", v + 1);
-        fprintf(fp, "\n");
-    }
-    fclose(fp);
-}
+//static void exportObject(const char* filename, const std::vector<Mesh::Vertex>& vertices, const std::vector<std::vector<size_t>>& faces)
+//{
+//    FILE* fp = fopen(filename, "wb");
+//    for (const auto& it : vertices) {
+//        fprintf(fp, "v %f %f %f\n", it.x, it.y, it.z);
+//    }
+//    for (const auto& it : faces) {
+//        if (it.size() == 2) {
+//            fprintf(fp, "l");
+//            for (const auto& v : it)
+//                fprintf(fp, " %zu", v + 1);
+//            fprintf(fp, "\n");
+//            continue;
+//        }
+//        fprintf(fp, "f");
+//        for (const auto& v : it)
+//            fprintf(fp, " %zu", v + 1);
+//        fprintf(fp, "\n");
+//    }
+//    fclose(fp);
+//}
 #endif // FMESH_BOOLEAN_H

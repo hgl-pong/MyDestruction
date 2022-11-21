@@ -159,7 +159,7 @@ bool FChunkCluster::Init(std::unordered_map<int, FChunk*>& chunks, FActor* actor
 
 			FChunk* chunkA = chunk.second;
 			FChunk* chunkB = chunks[chunk.second->m_Neighbors[i]];
-			float connectHealth = chunk.second->m_Areas[i] * actor->m_Material.hardness;
+			float connectHealth = 0/*chunk.second->m_Areas[i] * actor->m_Material.hardness*/;
 			m_ConnectGraph.AddEdge(chunkA, chunkB, connectHealth);
 		}
 		chunk.second->m_pRigidActor = m_pRigidActor;

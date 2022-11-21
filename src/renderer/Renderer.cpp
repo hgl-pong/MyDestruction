@@ -327,7 +327,7 @@ namespace Graphics {
 
 		Geometry::MeshData groundData = Geometry::CreatePlane(60, 60, 25, 25);
 		Graphics::MeshData* ground = new Graphics::MeshData();;
-		*ground = app->m_pMeshImporter->CreateFromGeometry("ground", groundData)->meshData;
+		*ground = app->m_pMeshImporter->CreateFromGeometry("ground", groundData)->meshDatas[0];
 		ground->m_pMaterial = app->m_pMaterialManager->createMaterial("..\\Texture\\floor.dds");
 		ground->m_Transform.SetPosition(0, 0, 0);
 		BoundingBox::CreateFromPoints(ground->m_BoundingBox, 4,

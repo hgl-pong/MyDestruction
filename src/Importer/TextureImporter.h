@@ -20,6 +20,7 @@ public:
     static TextureImporter& Get();
     bool Init(ID3D11Device* device);
     ID3D11ShaderResourceView* CreateTexture(std::string_view filename, bool enableMips = false, bool forceSRGB = false);
+    ID3D11ShaderResourceView* CreateFromMemory(std::string_view name, void* data, size_t byteWidth, bool enableMips, bool forceSRGB);
     bool AddTexture(std::string_view name, ID3D11ShaderResourceView* texture);
     ID3D11ShaderResourceView* GetTexture(std::string_view filename);
 

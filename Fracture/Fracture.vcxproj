@@ -117,7 +117,7 @@
       <PreprocessorDefinitions>_DEBUG;USE_LOGGER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\ThirdParty\PhysX/Include;..\ThirdParty\PhysX/Include/foundation;..\ThirdParty\PhysX/Include/pxtask;..\ThirdParty\PhysX/Include/geometry;..\ThirdParty\PhysX/Include/extensions;..\ThirdParty\PhysX/source/fastxml/include;..\ThirdParty\PhysX/source/foundation/include;..\ThirdParty\PhysX/Include/pvd;..\ThirdParty\Voro++\include\3D;..\ThirdParty\Solid_Boolean\src;..\ThirdParty\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ThirdParty\PhysX/Include;..\ThirdParty\PhysX/Include/foundation;..\ThirdParty\PhysX/Include/pxtask;..\ThirdParty\PhysX/Include/geometry;..\ThirdParty\PhysX/Include/extensions;..\ThirdParty\PhysX/source/fastxml/include;..\ThirdParty\PhysX/source/foundation/include;..\ThirdParty\PhysX/Include/pvd;..\ThirdParty\Voro++\include\3D;..\ThirdParty\Solid_Boolean\src;..\ThirdParty\ImGui;..\ThirdParty\MeshWarrior\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -249,6 +249,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\ImGui\ImGui.vcxproj">
       <Project>{2b0863f6-dff1-48d5-8016-8eee63859162}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\MeshWarrior\MeshWarrior.vcxproj">
+      <Project>{c7792f0f-974a-4628-a562-fee1ebac2c19}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\Voro++\include\3D\voro++.vcxproj">
       <Project>{e95662bb-4f22-34ee-bed9-06613752364b}</Project>
