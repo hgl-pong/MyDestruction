@@ -166,7 +166,7 @@ bool FChunk::VoronoiFracture(FDamage *damage)
 		if (cellInfo[i].Vertices.empty())
 			continue;
 		VoroCellInfo cell;
-		m_pMeshBoolean->FetchBooleanResult(cellInfo[i], cell, INTERSEECTION);
+		m_pMeshBoolean->FetchBooleanResult(cellInfo[i], cell, CollectionType::INTERSECT);
 		if (cell.Vertices.empty())
 			continue;
 		FChunk* newChunk = new FChunk(cell, m_pActor);

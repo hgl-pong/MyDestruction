@@ -1,175 +1,65 @@
 #include "FMeshBoolean.h"
 #include "FChunk.h"
-
-FMeshBoolean::FMeshBoolean(FChunk* chunk) {
-
-	m_Vertices.resize(chunk->m_Vertices2.size());
-	m_Triangles.resize(chunk->m_Indices.size() / 3);
+#include <unordered_map>
+FMeshBoolean::FMeshBoolean(FChunk* chunk)
+:m_SouceMesh(nullptr){
+	FMeshData meshdata;
+	meshdata.m_Vertices.resize(chunk->m_Vertices2.size());
+	meshdata.m_Triangles.resize(chunk->m_Indices.size() / 3);
 	for (int i = 0; i < chunk->m_Vertices2.size(); i++) {
-		m_Vertices[i].point = Vector(chunk->m_Vertices2[i].X, chunk->m_Vertices2[i].Y, chunk->m_Vertices2[i].Z);
-		m_Vertices[i].normal = Vector(chunk->m_Normals2[i].X, chunk->m_Normals2[i].Y, chunk->m_Normals2[i].Z);
-		m_Vertices[i].texCoords = Vector(chunk->m_UVs[i].X, chunk->m_UVs[i].Y,0);
+		meshdata.m_Vertices[i].position = chunk->m_Vertices2[i];
+		meshdata.m_Vertices[i].normals = chunk->m_Normals2[i];
+		meshdata.m_Vertices[i].uv = chunk->m_UVs[i];
 	}
-	for (int i = 0; i < m_Triangles.size(); i++) {
-		m_Triangles[i] = {chunk->m_Indices[3*i],chunk->m_Indices[3 * i+1] ,chunk->m_Indices[3 * i+2] };
+	for (int i = 0; i < meshdata.m_Triangles.size(); i++) {
+		meshdata.m_Triangles[i] = { meshdata.m_Vertices[chunk->m_Indices[3*i]],meshdata.m_Vertices[chunk->m_Indices[3 * i+1]] ,meshdata.m_Vertices[chunk->m_Indices[3 * i+2]] };
 	}
-
-	std::vector<Mesh::Vertex> *Vertices=new std::vector<Mesh::Vertex>(m_Vertices);
-	std::vector<std::vector<size_t>> *Triangles=new std::vector<std::vector<size_t>>(m_Triangles);
-	for (int i = 0; i < Vertices->size(); i++)
-		m_SourceMesh.AddVertex(( * Vertices)[i]);
-	for (int i = 0; i < Triangles->size(); i++) {
-		Mesh::Face face;
-		face.vertexArray.push_back(( * Triangles)[i][0]);
-		face.vertexArray.push_back(( * Triangles)[i][1]);
-		face.vertexArray.push_back(( * Triangles)[i][2]);
-		m_SourceMesh.AddFace( face);
-	}
+	FBoundingBox boxA(meshdata.m_Vertices);
+	m_SouceMesh = new FBoxAccelerator(boxA, meshdata);
 }
 
 FMeshBoolean::~FMeshBoolean() {
-
+	FDELETE(m_SouceMesh);
 }
 
-void FMeshBoolean::FetchBooleanResult(VoroCellInfo& cell, VoroCellInfo& result, BooleanType type) 
+void FMeshBoolean::FetchBooleanResult(VoroCellInfo& cell, VoroCellInfo& result, CollectionType type) 
 {
-	//_Reset();
-	std::vector<Mesh::Vertex> Vertices;
-	std::vector<std::vector<size_t>> Triangles;
-
-	Vertices.resize(cell.Vertices.size());
-	Triangles.resize(cell.Indices.size() / 3);
+	FMeshData meshB;
+	meshB.m_Vertices.resize(cell.Vertices.size());
+	meshB.m_Triangles.resize(cell.Indices.size() / 3);
 	for (int i = 0; i < cell.Vertices.size(); i++) {
-		Vertices[i].point = Vector(cell.Vertices[i].X, cell.Vertices[i].Y, cell.Vertices[i].Z);
-		Vertices[i].normal = Vector(cell.Normals[i].X, cell.Normals[i].Y, cell.Normals[i].Z);
-		Vertices[i].texCoords = Vector(cell.UVs[i].X, cell.UVs[i].Y, 0);
+		meshB.m_Vertices[i].position = cell.Vertices[i];
+		meshB.m_Vertices[i].normals = cell.Normals[i];
+		meshB.m_Vertices[i].uv = cell.UVs[i];
 	}
-	for (int i = 0; i < Triangles.size(); i++) {
-		Triangles[i] = { cell.Indices[3 * i],cell.Indices[3 * i + 1] ,cell.Indices[3 * i + 2] };
+	for (int i = 0; i < meshB.m_Triangles.size(); i++) {
+		meshB.m_Triangles[i] = { meshB.m_Vertices[cell.Indices[ 3 * i]],meshB.m_Vertices[cell.Indices[3 * i + 1]] ,meshB.m_Vertices[cell.Indices[3 * i + 2]] };
 	}
+	FBoundingBox boxB(meshB.m_Vertices);
+	FMeshData mesh = m_SouceMesh->CollecteTriangles(boxB);
+	FGeometryCollection collection(boxB, meshB);
 
-	Mesh mesh;
-	for(int i=0;i<Vertices.size(); i++)
-		mesh.AddVertex(Vertices[i]);
-	for (int i = 0; i < Triangles.size() ; i++) {
-		Mesh::Face face;
-		face.vertexArray.push_back(Triangles[i][0]);
-		face.vertexArray.push_back(Triangles[i][1]);
-		face.vertexArray.push_back(Triangles[i][2]);
-		mesh.AddFace(face);
-	}
+	FMeshData 	output = collection.FetchResult(type);
 
-	switch (type)
-	{
-	case DIFFERENCE:
-		_Difference(mesh, result);
-		break;
-	case INTERSEECTION:
-		_Intersection(mesh, result);
-		break;
-	case UNION:
-		_Union(mesh, result);
-		break;
-	default:
-		break;
-	}
-	
-}
-
-void FMeshBoolean::_Difference(Mesh& mesh, VoroCellInfo& result) {
-	std::vector<Mesh*> inputMeshArray;
-	inputMeshArray.push_back(&m_SourceMesh);
-	inputMeshArray.push_back(&mesh);
-	std::vector<Mesh*> outputMeshArray;
-	
-	MeshSetOperation meshOp(MW_FLAG_A_MINUS_B_SET_OP);
-	(static_cast<MeshOperation*>(&meshOp))->Calculate(inputMeshArray, outputMeshArray);
-
-	std::vector<FileObject*> fileObjectArray;
-	for (Mesh* mesh : outputMeshArray)
-		fileObjectArray.push_back(mesh);
-
-
-	for (const FileObject* fileObject : fileObjectArray)
-	{
-		const Mesh* mesh = dynamic_cast<const Mesh*>(fileObject);
-
-		_Merge(mesh,result);
-	}
-}
-
-void FMeshBoolean::_Intersection(Mesh& mesh, VoroCellInfo& result) {
-	std::vector<Mesh*> inputMeshArray;
-	inputMeshArray.push_back(&m_SourceMesh);
-	inputMeshArray.push_back(&mesh);
-	std::vector<Mesh*> outputMeshArray;
-
-	MeshSetOperation meshOp(MW_FLAG_INTERSECTION_SETP_OP);
-	(static_cast<MeshOperation*>(&meshOp))->Calculate(inputMeshArray, outputMeshArray);
-
-	std::vector<FileObject*> fileObjectArray;
-	for (Mesh* mesh : outputMeshArray)
-		fileObjectArray.push_back(mesh);
-
-	for (const FileObject* fileObject : fileObjectArray)
-	{
-		const Mesh* mesh = dynamic_cast<const Mesh*>(fileObject);
-
-		_Merge(mesh, result);
-	}
-}
-
-void FMeshBoolean::_Union(Mesh& mesh, VoroCellInfo& result) {
-	std::vector<Mesh*> inputMeshArray;
-	inputMeshArray.push_back(&m_SourceMesh);
-	inputMeshArray.push_back(&mesh);
-	std::vector<Mesh*> outputMeshArray;
-
-	MeshSetOperation meshOp(MW_FLAG_UNION_SET_OP);
-	(static_cast<MeshOperation*>(&meshOp))->Calculate(inputMeshArray, outputMeshArray);
-
-	std::vector<FileObject*> fileObjectArray;
-	for (Mesh* mesh : outputMeshArray)
-		fileObjectArray.push_back(mesh);
-
-	for (const FileObject* fileObject : fileObjectArray)
-	{
-		const Mesh* mesh = dynamic_cast<const Mesh*>(fileObject);
-
-		_Merge(mesh, result);
-	}
-}
-
-void FMeshBoolean::_Merge(const Mesh*mesh, VoroCellInfo& result) {
-	int totalVertices = mesh->GetNumVertices();
-	int totalFaces = mesh->GetNumFaces();
-
-	for (int i = 0; i < totalVertices; i++) {
-		const Mesh::Vertex* v = mesh->GetVertex(i);
-		result.Vertices.push_back(FVec3(v->point.x, v->point.y, v->point.z));
-		result.Normals.push_back(FVec3(v->normal.x, v->normal.y, v->normal.z));
-		result.UVs.push_back(FVec2(v->texCoords.x, v->texCoords.y));
+	std::unordered_map<FVertex, int> indexMap;
+	result.Vertices.clear();
+	result.Normals.clear();
+	result.UVs.clear();
+	result.Indices.clear();
+	for (FIndex i = 0; i < output.m_Vertices.size(); i++) {
+		result.Vertices.push_back(output.m_Vertices[i].position);
+		result.Normals.push_back(output.m_Vertices[i].normals);
+		result.UVs.push_back(output.m_Vertices[i].uv);
+		indexMap.emplace(std::make_pair(output.m_Vertices[i], i));
 	}
 
-	for (int i = 0; i < totalFaces; i++) {
-		const Mesh::Face* face = mesh->GetFace(i);
-		result.Indices.push_back(face->vertexArray[2]);
-		result.Indices.push_back(face->vertexArray[1]);
-		result.Indices.push_back(face->vertexArray[0]);
-	}
+	for (FIndex i = 0; i < output.m_Triangles.size(); i++) {
+		result.Indices.push_back(indexMap[output.m_Triangles[i].i()]);
+		result.Indices.push_back(indexMap[output.m_Triangles[i].j()]);
+		result.Indices.push_back(indexMap[output.m_Triangles[i].k()]);
 
-}
-
-void FMeshBoolean::_Reset() {
-	std::vector<Mesh::Vertex>* Vertices = new std::vector<Mesh::Vertex>(m_Vertices);
-	std::vector<std::vector<size_t>>* Triangles = new std::vector<std::vector<size_t>>(m_Triangles);
-	for (int i = 0; i < Vertices->size(); i++)
-		m_SourceMesh.SetVertex(i, (*Vertices)[i]);
-	for (int i = 0; i < Triangles->size(); i++) {
-		Mesh::Face face;
-		face.vertexArray.push_back((*Triangles)[i][0]);
-		face.vertexArray.push_back((*Triangles)[i][1]);
-		face.vertexArray.push_back((*Triangles)[i][2]);
-		m_SourceMesh.SetFace(i, face);
 	}
+	result.Neighbors = cell.Neighbors;
+	result.Areas = cell.Areas;
+	result.Volume = CalCulateVolume(output);
 }

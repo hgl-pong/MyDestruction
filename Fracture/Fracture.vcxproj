@@ -117,14 +117,14 @@
       <PreprocessorDefinitions>_DEBUG;USE_LOGGER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\ThirdParty\PhysX/Include;..\ThirdParty\PhysX/Include/foundation;..\ThirdParty\PhysX/Include/pxtask;..\ThirdParty\PhysX/Include/geometry;..\ThirdParty\PhysX/Include/extensions;..\ThirdParty\PhysX/source/fastxml/include;..\ThirdParty\PhysX/source/foundation/include;..\ThirdParty\PhysX/Include/pvd;..\ThirdParty\Voro++\include\3D;..\ThirdParty\Solid_Boolean\src;..\ThirdParty\ImGui;..\ThirdParty\MeshWarrior\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ThirdParty\PhysX/Include;..\ThirdParty\PhysX/Include/foundation;..\ThirdParty\PhysX/Include/pxtask;..\ThirdParty\PhysX/Include/geometry;..\ThirdParty\PhysX/Include/extensions;..\ThirdParty\PhysX/source/fastxml/include;..\ThirdParty\PhysX/source/foundation/include;..\ThirdParty\PhysX/Include/pvd;..\ThirdParty\Voro++\include\3D;..\ThirdParty\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\ThirdParty\PhysX/lib/debug/;..\ThirdParty\Voro++\lib\Debug;..\ThirdParty\Solid_Boolean\lib\Debug;..\ThirdParty\ImGui\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Voro++3D.lib;SolidBooleanX64DEBUG.lib;PhysXCooking_64.lib;PhysXCommon_64.lib;PhysXCharacterKinematic_static_64.lib;PhysX_64.lib;LowLevelDynamics_static_64.lib;LowLevelAABB_static_64.lib;LowLevel_static_64.lib;PhysXVehicle_static_64.lib;PhysXTask_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;SimulationController_static_64.lib;SceneQuery_static_64.lib;ImGuid.lib;dxguid.lib;d3d11.lib;dxgi.lib;winmm.lib;d3dcompiler.lib;d2d1.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\ThirdParty\PhysX/lib/debug/;..\ThirdParty\Voro++\lib\Debug;..\ThirdParty\ImGui\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Voro++3D.lib;PhysXCooking_64.lib;PhysXCommon_64.lib;PhysXCharacterKinematic_static_64.lib;PhysX_64.lib;LowLevelDynamics_static_64.lib;LowLevelAABB_static_64.lib;LowLevel_static_64.lib;PhysXVehicle_static_64.lib;PhysXTask_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;SimulationController_static_64.lib;SceneQuery_static_64.lib;ImGuid.lib;dxguid.lib;d3d11.lib;dxgi.lib;winmm.lib;d3dcompiler.lib;d2d1.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,6 +144,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Boolean\FAccelerator.cpp" />
+    <ClCompile Include="..\src\Boolean\FBoundingbox.cpp" />
+    <ClCompile Include="..\src\Boolean\FGeometryCollection.cpp" />
+    <ClCompile Include="..\src\Boolean\FPositionKey.cpp" />
+    <ClCompile Include="..\src\Boolean\FTriangulator.cpp" />
+    <ClCompile Include="..\src\Boolean\tri_tri_intersect.c" />
     <ClCompile Include="..\src\Common\Application.cpp" />
     <ClCompile Include="..\src\Common\BoudingBoxEffect.cpp" />
     <ClCompile Include="..\src\Common\Camera.cpp" />
@@ -190,6 +196,14 @@
     <ClCompile Include="..\src\UI\UI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Boolean\earcut.hpp" />
+    <ClInclude Include="..\src\Boolean\FAccelerator.h" />
+    <ClInclude Include="..\src\Boolean\FBoundingBox.h" />
+    <ClInclude Include="..\src\Boolean\FGeometryCollection.h" />
+    <ClInclude Include="..\src\Boolean\FPositionKey.h" />
+    <ClInclude Include="..\src\Boolean\FTriangulator.h" />
+    <ClInclude Include="..\src\Boolean\IntersectUtils.h" />
+    <ClInclude Include="..\src\Boolean\tri_tri_intersect.h" />
     <ClInclude Include="..\src\Common\Application.h" />
     <ClInclude Include="..\src\Common\Base.h" />
     <ClInclude Include="..\src\Common\Buffer.h" />
@@ -249,9 +263,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\ImGui\ImGui.vcxproj">
       <Project>{2b0863f6-dff1-48d5-8016-8eee63859162}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\MeshWarrior\MeshWarrior.vcxproj">
-      <Project>{c7792f0f-974a-4628-a562-fee1ebac2c19}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\Voro++\include\3D\voro++.vcxproj">
       <Project>{e95662bb-4f22-34ee-bed9-06613752364b}</Project>

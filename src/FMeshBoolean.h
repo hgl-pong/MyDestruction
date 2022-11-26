@@ -1,18 +1,9 @@
 #ifndef FMESH_BOOLEAN_H
 #define FMESH_BOOLEAN_H
-#include "MeshOperations/MeshSetOperation.h"
-#include "MeshOperations/MeshMergeOperation.h"
-#include "Mesh.h"
-#include "Vector.h"
+#include "Boolean/FAccelerator.h"
+#include "Boolean/FGeometryCollection.h"
 #include "FVoronoi3D.h"
-using namespace MeshWarrior;
 
-enum BooleanType
-{
-	DIFFEREN=1,
-	INTERSEECTION=2,
-	UNION=3
-};
 class FChunk;
 class FMeshBoolean
 {
@@ -20,21 +11,12 @@ class FMeshBoolean
 public:
 	FMeshBoolean(FChunk*);
 	~FMeshBoolean();
-	void FetchBooleanResult(VoroCellInfo& cell, VoroCellInfo& result, BooleanType type);
+	void FetchBooleanResult(VoroCellInfo& cell, VoroCellInfo& result, CollectionType type);
 
 private:
-	void _Difference(Mesh& mesh, VoroCellInfo& result);
-	void _Intersection(Mesh& mesh, VoroCellInfo& result);
-	void _Union(Mesh& mesh, VoroCellInfo& result);
-
-	void _Merge(const Mesh*mesh, VoroCellInfo& result);
-	void _Reset();
-private:
-
-	std::vector<Mesh::Vertex> m_Vertices;
-	std::vector<std::vector<size_t>> m_Triangles;
-	Mesh m_SourceMesh;
+	FBoxAccelerator* m_SouceMesh;
 };
+
 
 //static void exportObject(const char* filename, const std::vector<Mesh::Vertex>& vertices, const std::vector<std::vector<size_t>>& faces)
 //{

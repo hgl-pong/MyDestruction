@@ -31,7 +31,7 @@ FActor::~FActor()
 bool FActor::Init(char *name)
 {
 	m_Name = name;
-	Geometry::MeshData box = Geometry::CreateBox(2.5, 2.5, 2.5)/*Geometry::CreateCylinder(1.25)*/;
+	Geometry::MeshData box =/* Geometry::CreateBox(2.5, 2.5, 2.5)*/Geometry::CreateCylinder(1.25);
 	m_pMeshData = new Graphics::MeshData();
 
 

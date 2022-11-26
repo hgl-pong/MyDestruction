@@ -165,6 +165,24 @@
     <ClCompile Include="..\src\FChunkManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Boolean\FAccelerator.cpp">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Boolean\FBoundingbox.cpp">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Boolean\FGeometryCollection.cpp">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Boolean\FPositionKey.cpp">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Boolean\FTriangulator.cpp">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Boolean\tri_tri_intersect.c">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Utils.h">
@@ -331,6 +349,30 @@
     </ClInclude>
     <ClInclude Include="..\src\FConnectGraph.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\earcut.hpp">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\FAccelerator.h">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\FBoundingBox.h">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\FGeometryCollection.h">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\FPositionKey.h">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\FTriangulator.h">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\IntersectUtils.h">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\tri_tri_intersect.h">
+      <Filter>头文件\MeshBoolean</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
