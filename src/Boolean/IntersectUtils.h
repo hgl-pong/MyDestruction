@@ -1,17 +1,16 @@
 #ifndef INTERSECT_UTILS_H
 #define INTERSECT_UTILS_H
 #include "FBoundingBox.h"
-#include "FPositionKey.h"
 #include <unordered_set>
 #include <unordered_map>
 #include "tri_tri_intersect.h"
-typedef std::pair<FPositionKey, int> DetectPair;
+typedef std::pair<FVec3, int> DetectPair;
 namespace std {
 
 	template<>
 	struct hash<DetectPair> {
 		size_t operator ()(const DetectPair& x) const {
-			return hash<FPositionKey>()(x.first) ^ hash<int>()(x.second);
+			return hash<FVec3>()(x.first) ^ hash<int>()(x.second);
 		}
 	};
 }
@@ -80,11 +79,11 @@ public:
 		FVec3 w = pointOnPlane - segmentPoint0;
 		float d = planeNormal.Dot(u);
 		float n = planeNormal.Dot(w);
-		if (std::abs(d) < FLOAT_EPSILON)
+		//if (std::abs(d) <= FLOAT_EPSILON)
+		if (Float::isZero(d))
 			return false;
 		auto s = n / d;
-		if (s < 0 || s> 1 || std::isnan(s) || std::isinf(s))
-		//if (s < -1 || s> 1  || std::isnan(s) || std::isinf(s))
+		if (s < -1 || s> 1 || std::isnan(s) || std::isinf(s))
 			return false;
 		if (intersection!=nullptr)
 			*intersection = segmentPoint0 + u * s;
@@ -92,54 +91,7 @@ public:
 
 	}
 
-	static bool IntersectSegmentAndTriangle(FVec3& segmentPoint0, FVec3& segmentPoint1,
-		FVec3* triangle)
-	{
-		FVec3 P1, P2;
-		P1 = segmentPoint0;
-		P2 = segmentPoint1;
-
-		FVec3 p1, p2, p3;
-		p1 = triangle[0];
-		p2 = triangle[0];
-		p3 = triangle[0];
-
-		FVec3 v1 = p1 - p2;
-		FVec3 v2 = p3 - p2;
-
-		float a, b, c, d;
-
-		a = v1.Y * v2.Z - v1.Z * v2.Y;
-		b = -(v1.X * v2.Z - v1.Z * v2.X);
-		c = v1.X * v2.Y - v1.Y * v2.X;
-		d = -(a * p1.X + b * p1.Y + c * p1.Z);
-
-		FVec3 O = P1;
-		FVec3 V = P2 - P1;
-
-		float t;
-
-		t = -(a * O.X + b * O.Y + c * O.Z + d) / (a * V.X + b * V.Y + c * V.Z);
-
-		FVec3 p = O + V * t;
-
-		float xmin = std::min(P1.X, P2.X);
-		float ymin = std::min(P1.Y, P2.Y);
-		float zmin = std::min(P1.Z, P2.Z);
-
-		float xmax = std::max(P1.X, P2.X);
-		float ymax = std::max(P1.Y, P2.Y);
-		float zmax = std::max(P1.Z, P2.Z);
-
-
-		if (p.X >= xmin && p.X <= xmax && p.Y >= ymin && p.Y <= ymax && p.Z >= zmin && p.Z <= zmax) {
-			//*result = p.Length();
-			return true;
-		}
-		return false;
-	}
-
-	static bool IsInMesh(/*FMeshData&meshdata, */std::unordered_set<FTriangle>& triangles,FVec3 &point, const FVec3& testAxis)
+	static bool IsInMesh(/*FMeshData&meshdata, */std::unordered_set<FTriangle>& triangles,FVec3& point, const FVec3& testAxis)
 	{
 		//std::vector<FTriangle>& triangles = meshdata.m_Triangles;
 		FVec3 testEnd = point + testAxis;
@@ -148,8 +100,9 @@ public:
 		box.Include(point);
 		box.Include(testEnd);
 		std::unordered_set<DetectPair> hits;
-		int count = 0;
+		int time = 0;
 		for (const auto& triangle : triangles) {
+			//FBoundingBox triBox = triangle.box ;
 			if (!WeakBoundingBoxIntersection(box, triangle.box))
 				continue;
 			std::vector<FVec3> trianglePositions = {
@@ -169,27 +122,13 @@ public:
 				&intersection)) {
 				if (IsInTriangle(intersection, trianglePositions.data())) {
 					float dir = normal.Dot((testAxis/FLOAT_MAX).Normalize());
-					hits.emplace(std::make_pair(FPositionKey(intersection), Float::isEqual(dir,1)));
+					bool sameDir = dir > 0;
+					if (hits.emplace(std::make_pair(intersection,sameDir)).second&&sameDir)
+						time++;
 				}
 			}
-
-			//if (IntersectUtils::IntersectSegmentAndTriangle(point, testEnd,
-			//	trianglePositions.data())) {
-			//		float dir = normal.Dot(testAxis);
-			//		auto it=hits.emplace(std::make_pair(FPositionKey(intersection), dir));
-			//		if (it.second)
-			//			count++;
-			//}
-
-		}
-		int time = 0;
-		for (auto hit : hits) {
-			if (hit.second>0)
-				time++;
 		}
 		inside = (2*time > hits.size());
-		//inside = (hits.size() % 2!=0);
-		//inside = (count % 2 != 0);
 		return inside;
 	}
 };

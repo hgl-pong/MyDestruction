@@ -63,8 +63,7 @@ public:
 	void Clean(CollectionType type);
 	void Triangulate();
 private:
-	//bool _BuildPolygonsFromEdges(const std::unordered_map<int, std::unordered_set<int>>& edges,
-	//	std::vector<std::vector<int>>& polygons);
+	void _GetMeshAInMeshB(std::unordered_set<FTriangle>& meshA, std::unordered_set<FTriangle>& meshB);
 private:
 	std::unordered_set<FTriangle> m_MeshASet;
 	std::unordered_set<FTriangle> m_MeshBSet;

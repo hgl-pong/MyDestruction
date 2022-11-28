@@ -7,13 +7,13 @@
 #define FLOAT_MAX std::numeric_limits<float>::max()
 #define FLOAT_MIN std::numeric_limits<float>::lowest()
 
-#define EPSILON 1e7
+#define SCALE 1e10
 namespace Float
 {
 
 	inline bool isZero(float number)
 	{
-		return std::abs(number) <= FLOAT_EPSILON;
+		return std::abs(number*number) <= FLOAT_EPSILON;
 	}
 
 	inline bool isEqual(float a, float b)
@@ -63,6 +63,10 @@ public:
 		return FVec2(X - v.X, Y - v.Y);
 	}
 
+	FVec2 operator / (const float & d) {
+		return FVec2(X /d, Y/d);
+	}
+
 	bool IsInPolygon(const std::vector<FVec2>& polygon);
 
 	bool IsInPolygon(const std::vector<FVec2>& polygonVertices, const std::vector<uint32_t>& polygonIndices);
@@ -71,11 +75,11 @@ public:
 
 	bool IsOnLine(FVec2& a, FVec2& b);
 
-	float Distance() {
-		return sqrt(DistanceSqr());
+	float Length() {
+		return sqrt(LengthSqr());
 	}
 
-	float DistanceSqr() {
+	float LengthSqr() {
 		return Dot(*this);
 	}
 };
@@ -104,12 +108,12 @@ public:
 
 
 	 float Length() const;				
-	 float SqrLength() const;			
+	 float LengthSqr() const;			
 	 FVec3& Normalize();			
 	 FVec3 Cross(const FVec3& v) const;			
 
 	 FVec3 operator - (const FVec3& v);					
-	 FVec3 operator + (const FVec3& v);	
+	 FVec3 operator + (const FVec3& v)const ;	
 	 FVec3 operator * (const float d);
 	 FVec3 operator * (const float d)const ;
 	  FVec3 operator * (const FVec3& v); 
@@ -125,7 +129,7 @@ public:
 	 FVec3 Ceiling(const FVec3& v);
 	 FVec3 Floor(const FVec3& v);
 
-	 bool IsOnLine(FVec3& a, FVec3& b);
+	 bool IsOnSegment(FVec3& a, FVec3& b);
 
 	 bool operator<(const FVec3& v)const {
 		 if (X < v.X)
@@ -172,7 +176,7 @@ static bool IsInTriangle(FVec3& intersection,FVec3* trianglePositions) {
 	for (size_t i = 0; i < 3; ++i) {
 		size_t j = (i + 1) % 3;
 
-		if (intersection == trianglePositions[i] || intersection.IsOnLine(trianglePositions[i], trianglePositions[j]))
+		if (intersection == trianglePositions[i] || intersection.IsOnSegment(trianglePositions[i], trianglePositions[j]))
 			return true;
 		normals.push_back(Normal(intersection, trianglePositions[i], trianglePositions[j]));
 	}
@@ -180,7 +184,7 @@ static bool IsInTriangle(FVec3& intersection,FVec3* trianglePositions) {
 	float d2 = normals[0].Dot(normals[2]);
 	float d3 = normals[1].Dot(normals[2]);
 	//在三角形内或三角形边上时
-	return (d1 > 0 && d2 > 0 && d3 > 0);
+	return (d1+FLOAT_EPSILON >= 0 && d2 + FLOAT_EPSILON >= 0 && d3+FLOAT_EPSILON >= 0);
 		/*(d1 < 0 && d2 < 0 && d3 < 0 && std::abs(d1 + 1) <= FLOAT_EPSILON && std::abs(d2 + 1) <= FLOAT_EPSILON && std::abs(d3 + 1) <= FLOAT_EPSILON) || 
 		(d1 >0 && d2 > 0&&d3>0&&std::abs(d1-1)<=FLOAT_EPSILON&& std::abs(d2-1) <= FLOAT_EPSILON&& std::abs(d3 - 1) <= FLOAT_EPSILON) ||
 		(Float::isZero(d1) || Float::isZero(d2)|| Float::isZero(d2));*/
@@ -190,9 +194,9 @@ namespace std {
 	template<>
 	struct hash<FVec3> {
 		size_t operator ()(const FVec3& x) const {
-			long vx = x.X * EPSILON;
-			long vy = x.Y * EPSILON;
-			long vz = x.Z * EPSILON;
+			long vx = x.X * SCALE;
+			long vy = x.Y * SCALE;
+			long vz = x.Z * SCALE;
 			return hash<long>()(vx) ^ hash<long>()(vy) ^ hash<long>()(vz) ;
 		}
 	};
@@ -200,8 +204,8 @@ namespace std {
 	template<>
 	struct hash<FVec2> {
 		size_t operator ()(const FVec2& x) const {
-			long vx = x.X * EPSILON;
-			long vy = x.Y * EPSILON;
+			long vx = x.X * SCALE;
+			long vy = x.Y * SCALE;
 			return hash<long>()(vx) ^ hash<long>()(vy);
 		}
 	};

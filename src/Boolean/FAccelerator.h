@@ -1,7 +1,6 @@
 #ifndef FACCELLERATOR_H
 #define FACCELLERATOR_H
 #include "FBoundingBox.h"
-#include "FPositionKey.h"
 #include <unordered_set>
 class FBoxAccelerator
 {

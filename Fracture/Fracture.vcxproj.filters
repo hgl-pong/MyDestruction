@@ -174,9 +174,6 @@
     <ClCompile Include="..\src\Boolean\FGeometryCollection.cpp">
       <Filter>头文件\MeshBoolean</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Boolean\FPositionKey.cpp">
-      <Filter>头文件\MeshBoolean</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Boolean\FTriangulator.cpp">
       <Filter>头文件\MeshBoolean</Filter>
     </ClCompile>
@@ -360,9 +357,6 @@
       <Filter>头文件\MeshBoolean</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Boolean\FGeometryCollection.h">
-      <Filter>头文件\MeshBoolean</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Boolean\FPositionKey.h">
       <Filter>头文件\MeshBoolean</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Boolean\FTriangulator.h">

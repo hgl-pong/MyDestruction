@@ -1,7 +1,6 @@
 #include "FGeometryCollection.h"
 #include "FTriangulator.h"
 #include "IntersectUtils.h"
-#include "FPositionKey.h"
 #include <queue>
 #include <unordered_map>
 FGeometryCollection::FGeometryCollection(FBoundingBox& box,FMeshData& meshdata)
@@ -70,6 +69,13 @@ void Emplace(std::unordered_set<T>& set, std::vector<T>& array) {
 	}
 }
 
+template <typename T>
+void Erase(std::unordered_set<T>& set, std::unordered_set<T>& array) {
+	for (auto& data : array) {
+		set.erase(data);
+	}
+}
+
 
 
 bool FGeometryCollection::CalculateIntersect()
@@ -131,72 +137,21 @@ bool FGeometryCollection::CalculateIntersect()
 	return anyIntersect;
 }
 
-void FGeometryCollection::Clean(CollectionType type)
-{
-	bool deleteInA = false;
-	bool deleteInB = false;
-	switch (type)
-	{
-	case DIFF: 
-	{
-		deleteInA = false;
-		deleteInB = true;
-	}
-	case INTERSECT:
-	{
-		deleteInA = false;
-		deleteInB = false;
-	}
-	case UNION:
-	{
-		deleteInA = true;
-		deleteInB = false;
-	}
-	default:
-		break;
-	}
-	std::unordered_set<FPositionKey> pointsOutOfMeshA;
-	std::unordered_set<FPositionKey> pointsInMeshA;
+void FGeometryCollection::_GetMeshAInMeshB(std::unordered_set<FTriangle>& meshA, std::unordered_set<FTriangle>& meshB) {
+	std::unordered_set<FVec3> pointsOutOfMeshB;
+	std::unordered_set<FVec3> pointsInMeshB;
 	std::unordered_set<FTriangle> triangleToDelete;
 
-	for (auto triangleB : m_MeshBSet) {
-		for (auto point : triangleB.v) {
-			auto it = pointsOutOfMeshA.find(FPositionKey(point.position));
-			if (it != pointsOutOfMeshA.end()) {
-				triangleToDelete.emplace(triangleB);
-				break;
-			}
-			else {
-				bool isIn = false;
-				for (auto test : g_testAxisList) {
-					if (pointsInMeshA.find(FPositionKey(point.position)) != pointsInMeshA.end()) {
-						isIn = true;
-						break;
-					}
-					else
-						if (IntersectUtils::IsInMesh(m_MeshASet, point.position, test)) {
-							pointsInMeshA.emplace(FPositionKey(point.position));
-							isIn = true;
-							break;
-						}
-				}
-				if (!isIn) {
-					pointsOutOfMeshA.emplace(FPositionKey(point.position));
-					triangleToDelete.emplace(triangleB);
-				}
-			}
-		}
-	}
-	
-	for (auto triangle : triangleToDelete)
-		m_MeshBSet.erase(triangle);
-	triangleToDelete.clear();
-
-	std::unordered_set<FPositionKey> pointsOutOfMeshB;
-	std::unordered_set<FPositionKey> pointsInMeshB;
-	for (auto& triangleA : m_MeshASet) {
-		for (auto point : triangleA.v) {
-			auto it = pointsOutOfMeshB.find(FPositionKey(point.position));
+	for (auto& triangleA : meshA) {
+		auto center = (triangleA.i().position + triangleA.j().position + triangleA.k().position) / 3;
+		std::vector<FVec3>points = {
+			triangleA.i().position,
+			triangleA.j().position,
+			triangleA.k().position,
+			center
+		};
+		for (auto& point : points) {
+			auto it = pointsOutOfMeshB.find(point);
 			if (it != pointsOutOfMeshB.end()) {
 				triangleToDelete.emplace(triangleA);
 				break;
@@ -204,27 +159,58 @@ void FGeometryCollection::Clean(CollectionType type)
 			else {
 				bool isIn = false;
 				for (auto test : g_testAxisList) {
-					if (pointsInMeshB.find(FPositionKey(point.position)) != pointsInMeshB.end()) {
-						isIn = true;
-						break;
-					}else
-					if (IntersectUtils::IsInMesh(m_MeshBSet, point.position, test)) {
-						pointsInMeshB.emplace(FPositionKey(point.position));
+					if (pointsInMeshB.find(point) != pointsInMeshB.end() || IntersectUtils::IsInMesh(meshB, point, test)) {
 						isIn = true;
 						break;
 					}
 				}
 				if (!isIn) {
-						pointsOutOfMeshB.emplace(FPositionKey(point.position));
-						triangleToDelete.emplace(triangleA);
+					pointsOutOfMeshB.emplace(point);
+					triangleToDelete.emplace(triangleA);
+					break;
 				}
+				else
+					pointsInMeshB.emplace(point);
 			}
 		}
 	}
 
 	for (auto triangle : triangleToDelete)
-		m_MeshASet.erase(triangle);
+		meshA.erase(triangle);
 	triangleToDelete.clear();
+}
+
+void FGeometryCollection::Clean(CollectionType type)
+{
+	std::unordered_set<FTriangle>meshA = m_MeshASet;
+	std::unordered_set<FTriangle>meshB = m_MeshBSet;
+	_GetMeshAInMeshB(meshA, m_MeshBSet);
+	_GetMeshAInMeshB(meshB, m_MeshASet);
+
+	
+	switch (type)
+	{
+	case DIFF: 
+	{
+		Erase(m_MeshASet, meshA);
+		m_MeshBSet = meshB;
+		break;
+	}
+	case INTERSECT:
+	{
+		m_MeshASet = meshA;
+		m_MeshBSet = meshB;
+		break;
+	}
+	case UNION:
+	{
+		Erase(m_MeshASet, meshA);
+		Erase(m_MeshBSet, meshB);
+		break;
+	}
+	default:
+		break;
+	}	
 }
 
 

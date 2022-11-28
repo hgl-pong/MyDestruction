@@ -30,9 +30,6 @@
     <ClCompile Include="..\src\Boolean\FGeometryCollection.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Boolean\FPositionKey.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Boolean\FTriangulator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -60,9 +57,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Boolean\FBoundingBox.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Boolean\FPositionKey.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Boolean\FGeometryCollection.h">

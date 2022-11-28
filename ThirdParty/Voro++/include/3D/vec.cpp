@@ -116,10 +116,10 @@ FVec3& FVec3::operator = (const FVec3& v)
 
  float FVec3::Length() const
 {
-	return sqrt(SqrLength());
+	return sqrt(LengthSqr());
 }
 
- float FVec3::SqrLength() const
+ float FVec3::LengthSqr() const
 {
 	return X * X + Y * Y + Z * Z;
 }
@@ -221,7 +221,7 @@ FVec3& FVec3::operator = (const FVec3& v)
 	return FVec3(std::min(X, v.X), std::min(Y, v.Y), std::min(Z, v.Z));
 }
 
- bool FVec3::IsOnLine(FVec3& p1, FVec3& p2)
+ bool FVec3::IsOnSegment(FVec3& p1, FVec3& p2)
  {
 	 return std::abs(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))<= FLOAT_EPSILON 
 		 && (X >= std::min(p1.X, p2.X) && X <= std::max(p1.X, p2.X))

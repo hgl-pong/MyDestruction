@@ -56,9 +56,6 @@ int readTri(ifstream& is, FMeshData& mesh,float scale=1) {
                 cout << "maxSize=" << points.size() << endl;
                 exit(-1);
             }
-            if (tricount == 18429) {
-                cout << endl;
-            }
             triangle = FTriangle(points[x - 1], points[y - 1], points[z - 1]);
             triangles.push_back(triangle);
             tricount++;

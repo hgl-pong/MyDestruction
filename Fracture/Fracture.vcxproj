@@ -147,7 +147,6 @@
     <ClCompile Include="..\src\Boolean\FAccelerator.cpp" />
     <ClCompile Include="..\src\Boolean\FBoundingbox.cpp" />
     <ClCompile Include="..\src\Boolean\FGeometryCollection.cpp" />
-    <ClCompile Include="..\src\Boolean\FPositionKey.cpp" />
     <ClCompile Include="..\src\Boolean\FTriangulator.cpp" />
     <ClCompile Include="..\src\Boolean\tri_tri_intersect.c" />
     <ClCompile Include="..\src\Common\Application.cpp" />
@@ -200,7 +199,6 @@
     <ClInclude Include="..\src\Boolean\FAccelerator.h" />
     <ClInclude Include="..\src\Boolean\FBoundingBox.h" />
     <ClInclude Include="..\src\Boolean\FGeometryCollection.h" />
-    <ClInclude Include="..\src\Boolean\FPositionKey.h" />
     <ClInclude Include="..\src\Boolean\FTriangulator.h" />
     <ClInclude Include="..\src\Boolean\IntersectUtils.h" />
     <ClInclude Include="..\src\Boolean\tri_tri_intersect.h" />

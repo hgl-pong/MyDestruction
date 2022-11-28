@@ -169,14 +169,14 @@ bool FTriangulator::BuildPolygons()
             polyline.back(),
             polylineIndex,
             false,
-            (m_points[polyline.front()] - m_points[frontEdge]).DistanceSqr()
+            (m_points[polyline.front()] - m_points[frontEdge]).LengthSqr()
             });
         edgePoints[backEdge].push_back({
             polyline.back(),
             polyline.front(),
             polylineIndex,
             true,
-            (m_points[polyline.back()] - m_points[backEdge]).DistanceSqr()
+            (m_points[polyline.back()] - m_points[backEdge]).LengthSqr()
             });
     }
     for (auto& it : edgePoints) {

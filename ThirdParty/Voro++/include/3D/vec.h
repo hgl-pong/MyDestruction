@@ -7,7 +7,7 @@
 #define FLOAT_MAX std::numeric_limits<float>::max()
 #define FLOAT_MIN std::numeric_limits<float>::lowest()
 
-#define EPSILON 1e7
+#define SCALE 1e7
 namespace Float
 {
 
@@ -71,11 +71,11 @@ public:
 
 	bool IsOnLine(FVec2& a, FVec2& b);
 
-	float Distance() {
-		return sqrt(DistanceSqr());
+	float Length() {
+		return sqrt(LengthSqr());
 	}
 
-	float DistanceSqr() {
+	float LengthSqr() {
 		return Dot(*this);
 	}
 };
@@ -104,7 +104,7 @@ public:
 
 
 	 float Length() const;				
-	 float SqrLength() const;			
+	 float LengthSqr() const;			
 	 FVec3& Normalize();			
 	 FVec3 Cross(const FVec3& v) const;			
 
@@ -125,7 +125,7 @@ public:
 	 FVec3 Ceiling(const FVec3& v);
 	 FVec3 Floor(const FVec3& v);
 
-	 bool IsOnLine(FVec3& a, FVec3& b);
+	 bool IsOnSegment(FVec3& a, FVec3& b);
 
 	 bool operator<(const FVec3& v)const {
 		 if (X < v.X)
@@ -172,7 +172,7 @@ static bool IsInTriangle(FVec3& intersection,FVec3* trianglePositions) {
 	for (size_t i = 0; i < 3; ++i) {
 		size_t j = (i + 1) % 3;
 
-		if (intersection == trianglePositions[i] || intersection.IsOnLine(trianglePositions[i], trianglePositions[j]))
+		if (intersection == trianglePositions[i] || intersection.IsOnSegment(trianglePositions[i], trianglePositions[j]))
 			return true;
 		normals.push_back(Normal(intersection, trianglePositions[i], trianglePositions[j]));
 	}
@@ -190,9 +190,9 @@ namespace std {
 	template<>
 	struct hash<FVec3> {
 		size_t operator ()(const FVec3& x) const {
-			long vx = x.X * EPSILON;
-			long vy = x.Y * EPSILON;
-			long vz = x.Z * EPSILON;
+			long vx = x.X * SCALE;
+			long vy = x.Y * SCALE;
+			long vz = x.Z * SCALE;
 			return hash<long>()(vx) ^ hash<long>()(vy) ^ hash<long>()(vz) ;
 		}
 	};
@@ -200,8 +200,8 @@ namespace std {
 	template<>
 	struct hash<FVec2> {
 		size_t operator ()(const FVec2& x) const {
-			long vx = x.X * EPSILON;
-			long vy = x.Y * EPSILON;
+			long vx = x.X * SCALE;
+			long vy = x.Y * SCALE;
 			return hash<long>()(vx) ^ hash<long>()(vy);
 		}
 	};

@@ -10,16 +10,18 @@ using namespace std;
 
 int main() {
 
-	string path = "mesh.vtk";
+	string file = "bunny";
+	string outputDir = file+".vtk";
+	string input = file+".obj";
 	ifstream is;
 	FMeshData meshA;
 	FMeshData meshB;
-	is.open("zhuzi.obj");
+	is.open(input);
 	if (!is.is_open()) {
 		cout << "fail to open the file" << endl;
 		return -1;
 	}
-	readTri(is, meshA, 4);
+	readTri(is, meshA, 3);
 	is.close();
 	is.open("BoxA.obj");
 	if (!is.is_open()) {
@@ -40,10 +42,9 @@ int main() {
 
 	collection.SetMeshB(mesh);
 	FMeshData output;
-	//for(int i=0;i<500;i++)
 		output = collection.FetchResult(CollectionType::INTERSECT);
 
-	if (writeVtk(path, output.m_Vertices, output.m_Triangles))
+	if (writeVtk(outputDir, output.m_Vertices, output.m_Triangles))
 		printf("write success!-----------------\n");
 
 

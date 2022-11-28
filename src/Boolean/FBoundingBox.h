@@ -57,6 +57,13 @@ public:
     bool Intersection(FBoundingBox& box);
     void Merge(FBoundingBox& box);
     void Include(FVec3& v);
+
+    FBoundingBox operator* (const float& d){
+        m_Min *= d;
+        m_Max *= d;
+        m_Size *= d;
+        return *this;
+    }
 public:
     FVec3 m_Min;
     FVec3 m_Max;
@@ -68,13 +75,8 @@ struct FTriangle
     FVertex v[3];
     FBoundingBox box;
 
-    FVertex& i() { return v[0]; }
     const FVertex& i() const { return v[0]; }
-
-    FVertex& j() { return v[1]; }
     const FVertex& j() const { return v[1]; }
-
-    FVertex& k() { return v[2]; }
     const FVertex& k() const { return v[2]; }
 
     FTriangle() = default;
@@ -101,9 +103,9 @@ struct FTriangle
 	}
 
     bool IsOnEdge(FVec3& p) {
-		bool a = p.IsOnLine(v[0].position, v[1].position);
-		bool b = p.IsOnLine(v[0].position, v[2].position);
-		bool c = p.IsOnLine(v[1].position, v[2].position);
+		bool a = p.IsOnSegment(v[0].position, v[1].position);
+		bool b = p.IsOnSegment(v[0].position, v[2].position);
+		bool c = p.IsOnSegment(v[1].position, v[2].position);
         return a || b || c;
     }
 };
@@ -133,9 +135,9 @@ static float CalCulateVolume(FMeshData& meshdata) {
     float volume = 0;
     for (auto& tri : meshdata.m_Triangles)
     {
-        FVec3& a = tri.i().position;
-        FVec3& b = tri.j().position;
-        FVec3& c = tri.k().position;
+        const FVec3& a = tri.i().position;
+        const FVec3& b = tri.j().position;
+        const FVec3& c = tri.k().position;
 
         volume += (a.X * b.Y * c.Z - a.X * b.Z * c.Y - a.Y * b.X * c.Z + a.Y * b.Z * c.X + a.Z * b.X * c.Y - a.Z * b.Y * c.X);
     }
