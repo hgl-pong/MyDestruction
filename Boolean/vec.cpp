@@ -188,7 +188,9 @@ FVec3& FVec3::operator = (const FVec3& v)
 
  int FVec3::operator == (const FVec3& a)const
 {
-	return Float::isEqual(a.X,X) && Float::isEqual(a.Y,Y) && Float::isEqual(a.Z ,Z);
+	 return Float::isWeakEqual(a.X, X) && Float::isWeakEqual(a.Y, Y) && Float::isWeakEqual(a.Z, Z);
+	 //return Float::isEqual(a.X, X) && Float::isEqual(a.Y, Y) && Float::isEqual(a.Z, Z);
+
 }
 
 
@@ -231,7 +233,7 @@ FVec3& FVec3::operator = (const FVec3& v)
 	 p1.Normalize();
 	 p2.Normalize();
 	 float cos = p1.Dot(p2);
-	 return Float::isZero(cos);
+	 return Float::isWeakZero(cos);
 
 	 //return std::abs(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))<= FLOAT_EPSILON
 		// && (X >= std::min(p1.X, p2.X) +FLOAT_EPSILON&& X <= std::max(p1.X, p2.X)) + FLOAT_EPSILON

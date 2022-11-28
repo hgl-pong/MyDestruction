@@ -4,10 +4,11 @@
 #include <cmath>
 #include <limits>
 #define FLOAT_EPSILON std::numeric_limits<float>::epsilon()
+#define FLOAT_WEAK_EPSILON 1e-5f
 #define FLOAT_MAX std::numeric_limits<float>::max()
 #define FLOAT_MIN std::numeric_limits<float>::lowest()
 
-#define SCALE 1e10
+#define SCALE 1e30
 namespace Float
 {
 
@@ -16,11 +17,21 @@ namespace Float
 		return std::abs(number*number) <= FLOAT_EPSILON;
 	}
 
+	inline bool isWeakZero(float number)
+	{
+		return std::abs(number) <= FLOAT_WEAK_EPSILON;
+	}
+
 	inline bool isEqual(float a, float b)
 	{
 		return isZero(a - b);
 	}
 
+
+	inline bool isWeakEqual(float a, float b)
+	{
+		return isWeakZero(a - b);
+	}
 } //namespace Double
 class FVec2
 {
@@ -35,7 +46,7 @@ public:
 	}
 
 	bool operator==(const FVec2& v)const {
-		return Float::isEqual( X,v.X) && Float::isEqual(Y ,v.Y);
+		return Float::isWeakEqual( X,v.X) && Float::isWeakEqual(Y ,v.Y);
 	}
 
 
@@ -197,7 +208,7 @@ namespace std {
 			long vx = x.X * SCALE;
 			long vy = x.Y * SCALE;
 			long vz = x.Z * SCALE;
-			return hash<long>()(vx) ^ hash<long>()(vy) ^ hash<long>()(vz) ;
+			return hash<long>()(vx) <<32+ hash<long>()(vy)<<32+ hash<long>()(vz) ;
 		}
 	};
 
@@ -206,7 +217,7 @@ namespace std {
 		size_t operator ()(const FVec2& x) const {
 			long vx = x.X * SCALE;
 			long vy = x.Y * SCALE;
-			return hash<long>()(vx) ^ hash<long>()(vy);
+			return hash<long>()(vx) << 32 + hash<long>()(vy);
 		}
 	};
 }

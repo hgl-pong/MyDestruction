@@ -145,10 +145,11 @@ void FGeometryCollection::_GetMeshAInMeshB(std::unordered_set<FTriangle>& meshA,
 	for (auto& triangleA : meshA) {
 		auto center = (triangleA.i().position + triangleA.j().position + triangleA.k().position) / 3;
 		std::vector<FVec3>points = {
+			center,
 			triangleA.i().position,
 			triangleA.j().position,
 			triangleA.k().position,
-			center
+
 		};
 		for (auto& point : points) {
 			auto it = pointsOutOfMeshB.find(point);

@@ -14,7 +14,7 @@
 *  Journal of Graphics Tools, 8(1), 2003
 *
 *  Several geometric predicates are defined.  Their parameters are all
-*  points.  Each point is an array of two or three double precision
+*  points.  Each point is an array of two or three float precision
 *  floating point numbers. The geometric predicates implemented in
 *  this file are:
 *
@@ -43,10 +43,10 @@
 extern "C" {
 #endif
 
-int tri_tri_intersection_test_3d(double p1[3], double q1[3], double r1[3],
-								 double p2[3], double q2[3], double r2[3],
+int tri_tri_intersection_test_3d(float p1[3], float q1[3], float r1[3],
+								 float p2[3], float q2[3], float r2[3],
 								 int * coplanar,
-								 double source[3],double target[3]);
+								 float source[3],float target[3]);
 
 #ifdef __cplusplus
 }

@@ -223,7 +223,7 @@ FVec3& FVec3::operator = (const FVec3& v)
 
  bool FVec3::IsOnSegment(FVec3& p1, FVec3& p2)
  {
-	 return std::abs(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))<= FLOAT_EPSILON 
+	 return Float::isWeakZero(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))
 		 && (X >= std::min(p1.X, p2.X) && X <= std::max(p1.X, p2.X))
 		 && ((Y >= std::min(p1.Y, p2.Y)) && (Y <= std::max(p1.Y, p2.Y)));
  }
