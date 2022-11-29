@@ -50,6 +50,10 @@ static const std::vector<FVec3> g_testAxisList = {
 {FLOAT_MAX, 0, 0},
 {0, FLOAT_MAX, 0},
 {0, 0, FLOAT_MAX},
+
+{FLOAT_MIN, 0, 0},
+{0, FLOAT_MAX, 0},
+{0, 0, FLOAT_MIN},
 };
 class FGeometryCollection
 {

@@ -52,15 +52,15 @@ public:
 
 private:
     struct Node {
-        Node(N index, double x_, double y_) : i(index), x(x_), y(y_) {}
+        Node(N index, float x_, float y_) : i(index), x(x_), y(y_) {}
         Node(const Node&) = delete;
         Node& operator=(const Node&) = delete;
         Node(Node&&) = delete;
         Node& operator=(Node&&) = delete;
 
         const N i;
-        const double x;
-        const double y;
+        const float x;
+        const float y;
 
         // previous and next vertice nodes in a polygon ring
         Node* prev = nullptr;
@@ -90,15 +90,15 @@ private:
     bool sectorContainsSector(const Node* m, const Node* p);
     void indexCurve(Node* start);
     Node* sortLinked(Node* list);
-    int32_t zOrder(const double x_, const double y_);
+    int32_t zOrder(const float x_, const float y_);
     Node* getLeftmost(Node* start);
-    bool pointInTriangle(double ax, double ay, double bx, double by, double cx, double cy, double px, double py) const;
+    bool pointInTriangle(float ax, float ay, float bx, float by, float cx, float cy, float px, float py) const;
     bool isValidDiagonal(Node* a, Node* b);
-    double area(const Node* p, const Node* q, const Node* r) const;
+    float area(const Node* p, const Node* q, const Node* r) const;
     bool equals(const Node* p1, const Node* p2);
     bool intersects(const Node* p1, const Node* q1, const Node* p2, const Node* q2);
     bool onSegment(const Node* p, const Node* q, const Node* r);
-    int sign(double val);
+    int sign(float val);
     bool intersectsPolygon(const Node* a, const Node* b);
     bool locallyInside(const Node* a, const Node* b);
     bool middleInside(const Node* a, const Node* b);
@@ -107,9 +107,9 @@ private:
     void removeNode(Node* p);
 
     bool hashing;
-    double minX, maxX;
-    double minY, maxY;
-    double inv_size = 0;
+    float minX, maxX;
+    float minY, maxY;
+    float inv_size = 0;
 
     template <typename T, typename Alloc = std::allocator<T>>
     class ObjectPool {
@@ -161,8 +161,8 @@ void Earcut<N>::operator()(const Polygon& points) {
 
     if (points.empty()) return;
 
-    double x;
-    double y;
+    float x;
+    float y;
     int threshold = 80;
     std::size_t len = 0;
 
@@ -189,15 +189,15 @@ void Earcut<N>::operator()(const Polygon& points) {
         do {
             x = p->x;
             y = p->y;
-            minX = std::min<double>(minX, x);
-            minY = std::min<double>(minY, y);
-            maxX = std::max<double>(maxX, x);
-            maxY = std::max<double>(maxY, y);
+            minX = std::min<float>(minX, x);
+            minY = std::min<float>(minY, y);
+            maxX = std::max<float>(maxX, x);
+            maxY = std::max<float>(maxY, y);
             p = p->next;
         } while (p != outerNode);
 
         // minX, minY and size are later used to transform coords into integers for z-order calculation
-        inv_size = std::max<double>(maxX - minX, maxY - minY);
+        inv_size = std::max<float>(maxX - minX, maxY - minY);
         inv_size = inv_size != .0 ? (1. / inv_size) : .0;
     }
 
@@ -211,7 +211,7 @@ template <typename N> template <typename Ring>
 typename Earcut<N>::Node*
 Earcut<N>::linkedList(const Ring& points, const bool clockwise) {
     using Point = typename Ring::value_type;
-    double sum = 0;
+    float sum = 0;
     const std::size_t len = points.size();
     std::size_t i, j;
     Node* last = nullptr;
@@ -220,10 +220,10 @@ Earcut<N>::linkedList(const Ring& points, const bool clockwise) {
     for (i = 0, j = len > 0 ? len - 1 : 0; i < len; j = i++) {
         const auto& p1 = points[i];
         const auto& p2 = points[j];
-        const double p20 = util::nth<0, Point>::get(p2);
-        const double p10 = util::nth<0, Point>::get(p1);
-        const double p11 = util::nth<1, Point>::get(p1);
-        const double p21 = util::nth<1, Point>::get(p2);
+        const float p20 = util::nth<0, Point>::get(p2);
+        const float p10 = util::nth<0, Point>::get(p1);
+        const float p11 = util::nth<1, Point>::get(p1);
+        const float p21 = util::nth<1, Point>::get(p2);
         sum += (p20 - p10) * (p11 + p21);
     }
 
@@ -355,10 +355,10 @@ bool Earcut<N>::isEarHashed(Node* ear) {
     if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
 
     // triangle bbox; min & max are calculated like this for speed
-    const double minTX = std::min<double>(a->x, std::min<double>(b->x, c->x));
-    const double minTY = std::min<double>(a->y, std::min<double>(b->y, c->y));
-    const double maxTX = std::max<double>(a->x, std::max<double>(b->x, c->x));
-    const double maxTY = std::max<double>(a->y, std::max<double>(b->y, c->y));
+    const float minTX = std::min<float>(a->x, std::min<float>(b->x, c->x));
+    const float minTY = std::min<float>(a->y, std::min<float>(b->y, c->y));
+    const float maxTX = std::max<float>(a->x, std::max<float>(b->x, c->x));
+    const float maxTY = std::max<float>(a->y, std::max<float>(b->y, c->y));
 
     // z-order range for the current triangle bbox;
     const int32_t minZ = zOrder(minTX, minTY);
@@ -486,16 +486,16 @@ template <typename N>
 typename Earcut<N>::Node*
 Earcut<N>::findHoleBridge(Node* hole, Node* outerNode) {
     Node* p = outerNode;
-    double hx = hole->x;
-    double hy = hole->y;
-    double qx = -std::numeric_limits<double>::infinity();
+    float hx = hole->x;
+    float hy = hole->y;
+    float qx = -std::numeric_limits<float>::infinity();
     Node* m = nullptr;
 
     // find a segment intersected by a ray from the hole's leftmost Vertex to the left;
     // segment's endpoint with lesser x will be potential connection Vertex
     do {
         if (hy <= p->y && hy >= p->next->y && p->next->y != p->y) {
-          double x = p->x + (hy - p->y) * (p->next->x - p->x) / (p->next->y - p->y);
+          float x = p->x + (hy - p->y) * (p->next->x - p->x) / (p->next->y - p->y);
           if (x <= hx && x > qx) {
             qx = x;
             if (x == hx) {
@@ -517,12 +517,12 @@ Earcut<N>::findHoleBridge(Node* hole, Node* outerNode) {
     // otherwise choose the Vertex of the minimum angle with the ray as connection Vertex
 
     const Node* stop = m;
-    double tanMin = std::numeric_limits<double>::infinity();
-    double tanCur = 0;
+    float tanMin = std::numeric_limits<float>::infinity();
+    float tanCur = 0;
 
     p = m;
-    double mx = m->x;
-    double my = m->y;
+    float mx = m->x;
+    float my = m->y;
 
     do {
         if (hx >= p->x && p->x >= mx && hx != p->x &&
@@ -639,7 +639,7 @@ Earcut<N>::sortLinked(Node* list) {
 
 // z-order of a Vertex given coords and size of the data bounding box
 template <typename N>
-int32_t Earcut<N>::zOrder(const double x_, const double y_) {
+int32_t Earcut<N>::zOrder(const float x_, const float y_) {
     // coords are transformed into non-negative 15-bit integer range
     int32_t x = static_cast<int32_t>(32767.0 * (x_ - minX) * inv_size);
     int32_t y = static_cast<int32_t>(32767.0 * (y_ - minY) * inv_size);
@@ -674,7 +674,7 @@ Earcut<N>::getLeftmost(Node* start) {
 
 // check if a point lies within a convex triangle
 template <typename N>
-bool Earcut<N>::pointInTriangle(double ax, double ay, double bx, double by, double cx, double cy, double px, double py) const {
+bool Earcut<N>::pointInTriangle(float ax, float ay, float bx, float by, float cx, float cy, float px, float py) const {
     return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 &&
            (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 &&
            (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
@@ -691,9 +691,9 @@ bool Earcut<N>::isValidDiagonal(Node* a, Node* b) {
 
 // signed area of a triangle
 template <typename N>
-double Earcut<N>::area(const Node* p, const Node* q, const Node* r) const {
-    double value = (q->y - p->y) * (r->x - q->x) - (q->x - p->x) * (r->y - q->y);
-    if (std::abs(value) <= std::numeric_limits<double>::epsilon())
+float Earcut<N>::area(const Node* p, const Node* q, const Node* r) const {
+    float value = (q->y - p->y) * (r->x - q->x) - (q->x - p->x) * (r->y - q->y);
+    if (std::abs(value) <= std::numeric_limits<float>::epsilon())
         value = 0.0;
     return value;
 }
@@ -725,14 +725,14 @@ bool Earcut<N>::intersects(const Node* p1, const Node* q1, const Node* p2, const
 // for collinear points p, q, r, check if point q lies on segment pr
 template <typename N>
 bool Earcut<N>::onSegment(const Node* p, const Node* q, const Node* r) {
-    return q->x <= std::max<double>(p->x, r->x) &&
-        q->x >= std::min<double>(p->x, r->x) &&
-        q->y <= std::max<double>(p->y, r->y) &&
-        q->y >= std::min<double>(p->y, r->y);
+    return q->x <= std::max<float>(p->x, r->x) &&
+        q->x >= std::min<float>(p->x, r->x) &&
+        q->y <= std::max<float>(p->y, r->y) &&
+        q->y >= std::min<float>(p->y, r->y);
 }
 
 template <typename N>
-int Earcut<N>::sign(double val) {
+int Earcut<N>::sign(float val) {
     return (0.0 < val) - (val < 0.0);
 }
 
@@ -762,8 +762,8 @@ template <typename N>
 bool Earcut<N>::middleInside(const Node* a, const Node* b) {
     const Node* p = a;
     bool inside = false;
-    double px = (a->x + b->x) / 2;
-    double py = (a->y + b->y) / 2;
+    float px = (a->x + b->x) / 2;
+    float py = (a->y + b->y) / 2;
     do {
         if (((p->y > py) != (p->next->y > py)) && p->next->y != p->y &&
                 (px < (p->next->x - p->x) * (py - p->y) / (p->next->y - p->y) + p->x))

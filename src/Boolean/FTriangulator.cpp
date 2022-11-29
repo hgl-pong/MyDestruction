@@ -152,7 +152,7 @@ bool FTriangulator::BuildPolygons()
         FIndex linkToPointIndex = 0;
         int polylineIndex = -1;
         bool reversed = false;
-        double squaredDistance = 0.0;
+        float squaredDistance = 0.0;
         int linkTo = -1;
     };
     std::vector<std::vector<EdgePoint>> edgePoints(3);
@@ -257,25 +257,25 @@ void FTriangulator::Triangulate()
     for (FIndex polygonIndex = 0; polygonIndex < m_polygons.size(); ++polygonIndex) {
         const auto& polygon = m_polygons[polygonIndex];
 
-        std::vector<std::vector<std::array<double, 2>>> polygonAndHoles;
+        std::vector<std::vector<std::array<float, 2>>> polygonAndHoles;
         std::vector<FIndex> pointIndices;
 
-        std::vector<std::array<double, 2>> border;
+        std::vector<std::array<float, 2>> border;
         for (const auto& it : polygon) {
             pointIndices.push_back(it);
             const auto& v = m_points[it];
-            border.push_back(std::array<double, 2> {v.X, v.Y});
+            border.push_back(std::array<float, 2> {v.X, v.Y});
         }
         polygonAndHoles.push_back(border);
 
         auto findHoles = m_polygonHoles.find(polygonIndex);
         if (findHoles != m_polygonHoles.end()) {
             for (const auto& h : findHoles->second) {
-                std::vector<std::array<double, 2>> hole;
+                std::vector<std::array<float, 2>> hole;
                 for (const auto& it : m_innerPolygons[h]) {
                     pointIndices.push_back(it);
                     const auto& v = m_points[it];
-                    hole.push_back(std::array<double, 2> {v.X, v.Y});
+                    hole.push_back(std::array<float, 2> {v.X, v.Y});
                 }
                 polygonAndHoles.push_back(hole);
             }
@@ -295,14 +295,14 @@ void FTriangulator::Triangulate()
     for (FIndex polygonIndex = 0; polygonIndex < m_innerPolygons.size(); ++polygonIndex) {
         const auto& polygon = m_innerPolygons[polygonIndex];
 
-        std::vector<std::vector<std::array<double, 2>>> polygonAndHoles;
+        std::vector<std::vector<std::array<float, 2>>> polygonAndHoles;
         std::vector<FIndex> pointIndices;
 
-        std::vector<std::array<double, 2>> border;
+        std::vector<std::array<float, 2>> border;
         for (const auto& it : polygon) {
             pointIndices.push_back(it);
             const auto& v = m_points[it];
-            border.push_back(std::array<double, 2> {v.X, v.Y});
+            border.push_back(std::array<float, 2> {v.X, v.Y});
         }
         polygonAndHoles.push_back(border);
 
@@ -319,11 +319,11 @@ void FTriangulator::Triangulate()
                 }
             }
             for (const auto& child : children) {
-                std::vector<std::array<double, 2>> hole;
+                std::vector<std::array<float, 2>> hole;
                 for (const auto& it : m_innerPolygons[child]) {
                     pointIndices.push_back(it);
                     const auto& v = m_points[it];
-                    hole.push_back(std::array<double, 2> {v.X, v.Y});
+                    hole.push_back(std::array<float, 2> {v.X, v.Y});
                 }
                 polygonAndHoles.push_back(hole);
             }

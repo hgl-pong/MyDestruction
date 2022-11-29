@@ -110,7 +110,7 @@ bool FScene::Update()
 	FASSERT(m_Simulating);
 	for (auto actor : m_Actors)
 		actor->Update();
-	m_pScene->simulate(1.0f / 60.0f);
+	m_pScene->simulate(1.0f / 10.0f);
 	m_pScene->fetchResults(true);
 Exit0:
 	return false;

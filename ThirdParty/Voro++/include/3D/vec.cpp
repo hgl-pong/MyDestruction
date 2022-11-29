@@ -27,7 +27,7 @@ bool FVec2::IsInPolygon(const std::vector<FVec2>& polygonVertices, const std::ve
 	return inside;
 }
 
-FVec2 BarycentricCoordinates( FVec2& a,  FVec2& b,  FVec2& c,  FVec2& point)
+FVec2 BarycentricCoordinates(FVec2& a, FVec2& b, FVec2& c, FVec2& point)
 {
 	auto v0 = c - a;
 	auto v1 = b - a;
@@ -56,15 +56,18 @@ bool FVec2::IsInTriangle(FVec2& a, FVec2& b, FVec2& c) {
 		return false;
 	return true;
 }
-bool FVec2::IsOnLine( FVec2& a, FVec2& b)
+bool FVec2::IsOnLine(FVec2& a, FVec2& b)
 {
 	//FVec2 p1 = a - *this;
 	//FVec2 p2 = b - *this;
-	//float l1 = p1.Distance();
-	//float l2 = p2.Distance();
-	//return std::abs(p1.Dot(p2)+l1*l2)<= FLOAT_EPSILON*2;
-
-	return std::abs((Y - a.Y) * (b.X - a.X) - (X - a.X) * (b.Y - a.Y))<= FLOAT_EPSILON;
+	//float l1 = p1.Length();
+	//float l2 = p2.Length();
+	//p1 = p1 / l1;
+	//p2 = p2 / l2;
+	//float cos = p1.Dot(p2);
+	//return float::isEqual(cos * cos, 1);
+	float d = (Y - a.Y) * (b.X - a.X) - (X - a.X) * (b.Y - a.Y);
+	return Float::isZero(d);
 }
 
 // CONSTRUCTORS
@@ -86,27 +89,27 @@ FVec3& FVec3::operator = (const FVec3& v)
 	X = v.X; Y = v.Y; Z = v.Z; return *this;
 }
 
- FVec3& FVec3::operator += (const FVec3& v)
+FVec3& FVec3::operator += (const FVec3& v)
 {
 	X += v.X; Y += v.Y; Z += v.Z; return *this;
 }
 
- FVec3& FVec3::operator -= (const FVec3& v)
+FVec3& FVec3::operator -= (const FVec3& v)
 {
 	X -= v.X; Y -= v.Y; Z -= v.Z; return *this;
 }
 
- FVec3& FVec3::operator *= (const float d)
+FVec3& FVec3::operator *= (const float d)
 {
 	X *= d; Y *= d; Z *= d; return *this;
 }
 
- FVec3 FVec3::operator*(const float d) const
- {
-	 return FVec3(X*d,Y*d,Z*d);
- }
+FVec3 FVec3::operator*(const float d) const
+{
+	return FVec3(X * d, Y * d, Z * d);
+}
 
- FVec3& FVec3::operator /= (const float d)
+FVec3& FVec3::operator /= (const float d)
 {
 	float d_inv = 1.0f / d; X *= d_inv; Y *= d_inv; Z *= d_inv;
 	return *this;
@@ -114,116 +117,125 @@ FVec3& FVec3::operator = (const FVec3& v)
 
 // SPECIAL FUNCTIONS
 
- float FVec3::Length() const
+float FVec3::Length() const
 {
 	return sqrt(LengthSqr());
 }
 
- float FVec3::LengthSqr() const
+float FVec3::LengthSqr() const
 {
 	return X * X + Y * Y + Z * Z;
 }
 
- FVec3& FVec3::Normalize() // it is up to caller to avoid divide-by-zero
+FVec3& FVec3::Normalize() // it is up to caller to avoid divide-by-zero
 {
 	float len = Length();
 	if (len > FLOAT_EPSILON) *this /= Length();
 	return *this;
 }
 
- FVec3 FVec3::Cross(const FVec3& v) const
+FVec3 FVec3::Cross(const FVec3& v) const
 {
 	FVec3 tmp;
-	tmp.X = Y * v.Z - Z* v.Y;
-	tmp.Y = Z * v.X - X* v.Z;
-	tmp.Z = X * v.Y - Y* v.X;
+	tmp.X = Y * v.Z - Z * v.Y;
+	tmp.Y = Z * v.X - X * v.Z;
+	tmp.Z = X * v.Y - Y * v.X;
 	return tmp;
 }
 
 
 // FRIENDS
 
- FVec3  FVec3::operator - (const FVec3& a)
+FVec3  FVec3::operator - (const FVec3& a)const
 {
-	return FVec3(X-a.X, Y-a.Y, Z-a.Z);
+	return FVec3(X - a.X, Y - a.Y, Z - a.Z);
 }
 
- FVec3 FVec3::operator + (const FVec3& a)
+FVec3 FVec3::operator + (const FVec3& a)const
 {
 	return FVec3(a.X + X, a.Y + Y, a.Z + Z);
 }
 
 
- FVec3 FVec3:: operator * (const float d)
+FVec3 FVec3:: operator * (const float d)
 {
 	return FVec3(d * X, d * Y, d * Z);
 }
 
 
- FVec3 FVec3::operator * (const FVec3& a)
+FVec3 FVec3::operator * (const FVec3& a)
 {
 	return FVec3(a.X * X, a.Y * Y, a.Z * Z);
 }
 
- FVec3 FVec3::operator / (const float d)const 
+FVec3 FVec3::operator / (const float d)const
 {
 	float d_inv = 1.0f / d;
 	return FVec3(X * d_inv, Y * d_inv, Z * d_inv);
 }
 
- FVec3 FVec3::operator/(const FVec3& a)
- {
-	 return FVec3(X / a.X, Y / a.Y, Z / a.Z);
- }
+FVec3 FVec3::operator/(const FVec3& a)
+{
+	return FVec3(X / a.X, Y / a.Y, Z / a.Z);
+}
 
- FVec3 FVec3::operator ^ (const FVec3& a)
+FVec3 FVec3::operator ^ (const FVec3& a)
 {
 	return FVec3(Y * a.Z - Z * a.Y,
 		Z * a.X - X * a.Z,
-		X *a. Y - Y * a.X);
+		X * a.Y - Y * a.X);
 }
 
- int FVec3::operator == (const FVec3& a)const
+int FVec3::operator == (const FVec3& v)const
 {
-	return Float::isEqual(a.X,X) && Float::isEqual(a.Y,Y) && Float::isEqual(a.Z ,Z);
+	//return Float::isWeakZero(Distance(v));
+	return Float::isWeakEqual(v.X, X) && Float::isWeakEqual(v.Y, Y) && Float::isWeakEqual(v.Z, Z);
 }
 
 
 
- FVec3 FVec3::Prod(const FVec3& a)
+FVec3 FVec3::Prod(const FVec3& a)
 {
 	return FVec3(a.X * X, a.Y * Y, a.Z * Z);
 }
 
- float FVec3::Dot(const FVec3& a)
+float FVec3::Dot(const FVec3& a)
 {
 	return a.X * X + a.Y * Y + a.Z * Z;
 }
 
 
- float FVec3::Distance(const FVec3& a)  // distance
+float FVec3::Distance(const FVec3& a) const // distance
 {
 	return std::sqrt(DistanceSqr(a));
 }
 
- float FVec3::DistanceSqr(const FVec3& a)  // distance
+float FVec3::DistanceSqr(const FVec3& a) const // distance
 {
 	return ((X - a.X) * (X - a.X) +
 		(Y - a.Y) * (Y - a.Y) +
 		(Z - a.Z) * (Z - a.Z));
 }
 
- FVec3 FVec3::Ceiling(const FVec3& v) {
+FVec3 FVec3::Ceiling(const FVec3& v) {
 	return FVec3(std::max(X, v.X), std::max(Y, v.Y), std::max(Z, v.Z));
 }
 
- FVec3 FVec3::Floor(const FVec3& v) {
+FVec3 FVec3::Floor(const FVec3& v) {
 	return FVec3(std::min(X, v.X), std::min(Y, v.Y), std::min(Z, v.Z));
 }
 
- bool FVec3::IsOnSegment(FVec3& p1, FVec3& p2)
- {
-	 return std::abs(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))<= FLOAT_EPSILON 
-		 && (X >= std::min(p1.X, p2.X) && X <= std::max(p1.X, p2.X))
-		 && ((Y >= std::min(p1.Y, p2.Y)) && (Y <= std::max(p1.Y, p2.Y)));
- }
+bool FVec3::IsOnSegment(FVec3& a, FVec3& b)
+{
+	FVec3 p1 = a - *this;
+	FVec3 p2 = b - *this;
+	p1.Normalize();
+	p2.Normalize();
+	float cos = p1.Dot(p2);
+	return Float::isWeakZero(cos);
+
+	//return std::abs(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))<= FLOAT_EPSILON
+	   // && (X >= std::min(p1.X, p2.X) +FLOAT_EPSILON&& X <= std::max(p1.X, p2.X)) + FLOAT_EPSILON
+	   // && ((Y >= std::min(p1.Y, p2.Y) + FLOAT_EPSILON) && (Y <= std::max(p1.Y, p2.Y) + FLOAT_EPSILON))
+	   // && ((Z >= std::min(p1.Z, p2.Z) + FLOAT_EPSILON) && (Z <= std::max(p1.Z, p2.Z) + FLOAT_EPSILON));
+}

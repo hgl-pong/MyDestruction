@@ -3,6 +3,7 @@
 #include "IntersectUtils.h"
 #include <queue>
 #include <unordered_map>
+
 FGeometryCollection::FGeometryCollection(FBoundingBox& box,FMeshData& meshdata)
 	:m_Box(box),
 	m_MeshA(meshdata)
@@ -81,6 +82,8 @@ void Erase(std::unordered_set<T>& set, std::unordered_set<T>& array) {
 bool FGeometryCollection::CalculateIntersect()
 {
 	bool anyIntersect = false;
+	if (m_MeshA.m_Triangles.empty() || m_MeshB.m_Triangles.empty())
+		return anyIntersect;
 	for (auto  triA:m_MeshA.m_Triangles) {
 		for (auto triB:m_MeshB.m_Triangles) {
 			if (!WeakBoundingBoxIntersection(triA.box, triB.box)) {

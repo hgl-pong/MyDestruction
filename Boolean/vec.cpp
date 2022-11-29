@@ -65,7 +65,7 @@ bool FVec2::IsOnLine( FVec2& a, FVec2& b)
 	//p1 = p1 / l1;
 	//p2 = p2 / l2;
 	//float cos = p1.Dot(p2);
-	//return Float::isEqual(cos * cos, 1);
+	//return float::isEqual(cos * cos, 1);
 	float d = (Y - a.Y) * (b.X - a.X) - (X - a.X) * (b.Y - a.Y);
 	return Float::isZero(d);
 }
@@ -146,7 +146,7 @@ FVec3& FVec3::operator = (const FVec3& v)
 
 // FRIENDS
 
- FVec3  FVec3::operator - (const FVec3& a)
+ FVec3  FVec3::operator - (const FVec3& a)const
 {
 	return FVec3(X-a.X, Y-a.Y, Z-a.Z);
 }
@@ -186,10 +186,11 @@ FVec3& FVec3::operator = (const FVec3& v)
 		X *a. Y - Y * a.X);
 }
 
- int FVec3::operator == (const FVec3& a)const
-{
-	return Float::isEqual(a.X,X) && Float::isEqual(a.Y,Y) && Float::isEqual(a.Z ,Z);
-}
+ int FVec3::operator == (const FVec3& v)const
+ {
+	 //return Float::isWeakZero(Distance(v));
+	 return Float::isWeakEqual(v.X, X) && Float::isWeakEqual(v.Y, Y) && Float::isWeakEqual(v.Z, Z);
+ }
 
 
 
@@ -204,12 +205,12 @@ FVec3& FVec3::operator = (const FVec3& v)
 }
 
 
- float FVec3::Distance(const FVec3& a)  // distance
+ float FVec3::Distance(const FVec3& a) const // distance
 {
 	return std::sqrt(DistanceSqr(a));
 }
 
- float FVec3::DistanceSqr(const FVec3& a)  // distance
+ float FVec3::DistanceSqr(const FVec3& a) const // distance
 {
 	return ((X - a.X) * (X - a.X) +
 		(Y - a.Y) * (Y - a.Y) +
@@ -231,7 +232,7 @@ FVec3& FVec3::operator = (const FVec3& v)
 	 p1.Normalize();
 	 p2.Normalize();
 	 float cos = p1.Dot(p2);
-	 return Float::isZero(cos);
+	 return Float::isWeakZero(cos);
 
 	 //return std::abs(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))<= FLOAT_EPSILON
 		// && (X >= std::min(p1.X, p2.X) +FLOAT_EPSILON&& X <= std::max(p1.X, p2.X)) + FLOAT_EPSILON

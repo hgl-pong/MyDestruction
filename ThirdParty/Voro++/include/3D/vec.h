@@ -4,16 +4,22 @@
 #include <cmath>
 #include <limits>
 #define FLOAT_EPSILON std::numeric_limits<float>::epsilon()
+#define FLOAT_WEAK_EPSILON 1e-4f
 #define FLOAT_MAX std::numeric_limits<float>::max()
 #define FLOAT_MIN std::numeric_limits<float>::lowest()
 
-#define SCALE 1e7
+#define SCALE 1e4
 namespace Float
 {
 
 	inline bool isZero(float number)
 	{
-		return std::abs(number) <= FLOAT_EPSILON;
+		return std::abs(number * number) <= FLOAT_EPSILON;
+	}
+
+	inline bool isWeakZero(float number)
+	{
+		return std::abs(number) <= FLOAT_WEAK_EPSILON;
 	}
 
 	inline bool isEqual(float a, float b)
@@ -21,7 +27,12 @@ namespace Float
 		return isZero(a - b);
 	}
 
-} //namespace Double
+	inline bool isWeakEqual(float a, float b)
+	{
+		return isWeakZero(a - b);
+	}
+
+} //namespace float
 class FVec2
 {
 public:
@@ -29,13 +40,15 @@ public:
 public:
 	FVec2() { X = 0; Y = 0; }
 	FVec2(float x, float y) :X(x), Y(y) {}
-	FVec2& operator = (const FVec2 & v) {
+	FVec2& operator = (const FVec2& v) {
 		X = v.X; Y = v.Y;
 		return *this;
 	}
 
 	bool operator==(const FVec2& v)const {
-		return Float::isEqual( X,v.X) && Float::isEqual(Y ,v.Y);
+		FVec2 d = *this - v;
+		return Float::isWeakZero(d.LengthSqr());
+		//return Float::isWeakEqual(v.X, X) && Float::isWeakEqual(v.Y, Y);
 	}
 
 
@@ -43,24 +56,25 @@ public:
 		if (X < v.X)
 			return true;
 		if (X > v.X)
-			return false;		
+			return false;
 		if (Y < v.Y)
 			return true;
 		if (Y > v.Y)
-			return false;		
+			return false;
 		return false;
 	}
 
-	bool operator==(FVec2& v)const {
-		return X == v.X && Y == v.Y;
-	}
 
 	float Dot(const FVec2& v) {
 		return X * v.X + Y * v.Y;
 	}
 
-	FVec2 operator - (const FVec2& v) {
+	FVec2 operator - (const FVec2& v) const {
 		return FVec2(X - v.X, Y - v.Y);
+	}
+
+	FVec2 operator / (const float& d) {
+		return FVec2(X / d, Y / d);
 	}
 
 	bool IsInPolygon(const std::vector<FVec2>& polygon);
@@ -95,53 +109,53 @@ public:
 	FVec3(float x, float y, float z);
 	FVec3(const FVec3&);
 	~FVec3() = default;
-	
-	FVec3& operator	= (const FVec3& v);	   
+
+	FVec3& operator	= (const FVec3& v);
 	FVec3& operator += (const FVec3& v);
-	 FVec3& operator -= (const FVec3& v);	  
-	 FVec3& operator *= (const float d);	   
-	 FVec3& operator /= (const float d);	
+	FVec3& operator -= (const FVec3& v);
+	FVec3& operator *= (const float d);
+	FVec3& operator /= (const float d);
 
 
-	 float Length() const;				
-	 float LengthSqr() const;			
-	 FVec3& Normalize();			
-	 FVec3 Cross(const FVec3& v) const;			
+	float Length() const;
+	float LengthSqr() const;
+	FVec3& Normalize();
+	FVec3 Cross(const FVec3& v) const;
 
-	 FVec3 operator - (const FVec3& v);					
-	 FVec3 operator + (const FVec3& v);	
-	 FVec3 operator * (const float d);
-	 FVec3 operator * (const float d)const ;
-	  FVec3 operator * (const FVec3& v); 
-	  FVec3 operator / (const float d)const ;	
-	  FVec3 operator / (const FVec3& d);	
-	  FVec3 operator ^ (const FVec3& v);	
-	  int operator == (const FVec3& v)const;
-	 FVec3 Prod(const FVec3& v);		
-	 float Dot(const FVec3& v);		
-	 float Distance(const FVec3& v); 
-	 float DistanceSqr(const FVec3& v);  
+	FVec3 operator - (const FVec3& v)const;
+	FVec3 operator + (const FVec3& v)const;
+	FVec3 operator * (const float d);
+	FVec3 operator * (const float d)const;
+	FVec3 operator * (const FVec3& v);
+	FVec3 operator / (const float d)const;
+	FVec3 operator / (const FVec3& d);
+	FVec3 operator ^ (const FVec3& v);
+	int operator == (const FVec3& v)const;
+	FVec3 Prod(const FVec3& v);
+	float Dot(const FVec3& v);
+	float Distance(const FVec3& v)const;
+	float DistanceSqr(const FVec3& v)const;
 
-	 FVec3 Ceiling(const FVec3& v);
-	 FVec3 Floor(const FVec3& v);
+	FVec3 Ceiling(const FVec3& v);
+	FVec3 Floor(const FVec3& v);
 
-	 bool IsOnSegment(FVec3& a, FVec3& b);
+	bool IsOnSegment(FVec3& a, FVec3& b);
 
-	 bool operator<(const FVec3& v)const {
-		 if (X < v.X)
-			 return true;
-		 if (X > v.X)
-			 return false;
-		 if (Y < v.Y)
-			 return true;
-		 if (Y > v.Y)
-			 return false;
-		 if (Z < v.Z)
-			 return true;
-		 if (Z > v.Z)
-			 return false;
-		 return false;
-	 }
+	bool operator<(const FVec3& v)const {
+		if (X < v.X)
+			return true;
+		if (X > v.X)
+			return false;
+		if (Y < v.Y)
+			return true;
+		if (Y > v.Y)
+			return false;
+		if (Z < v.Z)
+			return true;
+		if (Z > v.Z)
+			return false;
+		return false;
+	}
 
 };
 
@@ -160,13 +174,13 @@ static FVec3 Normal(const FVec3& a, const FVec3& b, const FVec3& c)
 	FVec3 normal = ba.Cross(ca);
 
 	float length = normal.Length();
-	if (Float::isZero(length))
+	if (Float::isWeakZero(length))
 		return FVec3();
 
 	return FVec3(normal.X / length, normal.Y / length, normal.Z / length);
 }
 
-static bool IsInTriangle(FVec3& intersection,FVec3* trianglePositions) {
+static bool IsInTriangle(FVec3& intersection, FVec3* trianglePositions) {
 	//点在三角形内
 	std::vector<FVec3> normals;
 	for (size_t i = 0; i < 3; ++i) {
@@ -180,10 +194,10 @@ static bool IsInTriangle(FVec3& intersection,FVec3* trianglePositions) {
 	float d2 = normals[0].Dot(normals[2]);
 	float d3 = normals[1].Dot(normals[2]);
 	//在三角形内或三角形边上时
-	return (d1 > 0 && d2 > 0 && d3 > 0);
-		/*(d1 < 0 && d2 < 0 && d3 < 0 && std::abs(d1 + 1) <= FLOAT_EPSILON && std::abs(d2 + 1) <= FLOAT_EPSILON && std::abs(d3 + 1) <= FLOAT_EPSILON) || 
-		(d1 >0 && d2 > 0&&d3>0&&std::abs(d1-1)<=FLOAT_EPSILON&& std::abs(d2-1) <= FLOAT_EPSILON&& std::abs(d3 - 1) <= FLOAT_EPSILON) ||
-		(Float::isZero(d1) || Float::isZero(d2)|| Float::isZero(d2));*/
+	return (d1 + FLOAT_EPSILON >= 0 && d2 + FLOAT_EPSILON >= 0 && d3 + FLOAT_EPSILON >= 0);
+	/*(d1 < 0 && d2 < 0 && d3 < 0 && std::abs(d1 + 1) <= FLOAT_EPSILON && std::abs(d2 + 1) <= FLOAT_EPSILON && std::abs(d3 + 1) <= FLOAT_EPSILON) ||
+	(d1 >0 && d2 > 0&&d3>0&&std::abs(d1-1)<=FLOAT_EPSILON&& std::abs(d2-1) <= FLOAT_EPSILON&& std::abs(d3 - 1) <= FLOAT_EPSILON) ||
+	(float::isZero(d1) || float::isZero(d2)|| float::isZero(d2));*/
 }
 namespace std {
 
@@ -193,7 +207,7 @@ namespace std {
 			long vx = x.X * SCALE;
 			long vy = x.Y * SCALE;
 			long vz = x.Z * SCALE;
-			return hash<long>()(vx) ^ hash<long>()(vy) ^ hash<long>()(vz) ;
+			return hash<long>()(vx) << 32 + hash<long>()(vy) << 32 + hash<long>()(vz);
 		}
 	};
 
@@ -202,7 +216,7 @@ namespace std {
 		size_t operator ()(const FVec2& x) const {
 			long vx = x.X * SCALE;
 			long vy = x.Y * SCALE;
-			return hash<long>()(vx) ^ hash<long>()(vy);
+			return hash<long>()(vx) << 32 + hash<long>()(vy);
 		}
 	};
 }

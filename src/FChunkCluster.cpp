@@ -69,10 +69,11 @@ bool FChunkCluster::Seperate(FChunk* chunk)
 {
 	m_pRigidActor->detachShape(*chunk->m_pConvexMeshShape);
 	chunk->m_Transform = m_pRigidActor->getGlobalPose();
+	chunk->isAttaching = false;
 	//chunk->m_Volocity = m_pRigidActor->getLinearVelocity();
 	chunk->InitUniquePhysicsActor();
 	m_pActor->m_pChunkManager->Insert(chunk);
-
+	
 	m_pActor->AddPhysicsActorToScene(chunk->GetPhysicsActor());
 	m_ChunkCount--;
 	PxRigidBodyExt::updateMassAndInertia(*m_pRigidActor, m_pActor->m_Material.identity);

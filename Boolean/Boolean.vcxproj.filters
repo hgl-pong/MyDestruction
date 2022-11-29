@@ -18,9 +18,6 @@
     <ClCompile Include="源.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="vec.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Boolean\FAccelerator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -36,11 +33,11 @@
     <ClCompile Include="..\src\Boolean\tri_tri_intersect.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="vec.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vec.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="IO.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -69,6 +66,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Boolean\tri_tri_intersect.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vec.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

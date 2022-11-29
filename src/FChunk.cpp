@@ -10,7 +10,8 @@ FChunk::FChunk(VoroCellInfo& cellInfo, FActor* actor)
 	:m_IsSleeping(true),
 	m_IsDestructable(false),
 	m_pActor(actor),
-	m_Damage(0, 0)
+	m_Damage(0, 0),
+	isAttaching(false)
 {
 	m_Center = cellInfo.Position;
 	m_Volume = cellInfo.Volume;
@@ -38,7 +39,8 @@ FChunk::FChunk(Geometry::MeshData& meshData, PxTransform transform, FActor* acto
 	m_IsDestructable(false),
 	m_pActor(actor),
 	m_Damage(0, 0),
-	m_Id(0)
+	m_Id(0),
+	isAttaching(false)
 {
 	m_Vertices.resize(meshData.vertices.size());
 	m_Normals.resize(meshData.normals.size());
@@ -92,6 +94,7 @@ bool FChunk::InitUniquePhysicsActor()
 	FASSERT(m_pConvexMeshShape);
 	m_pRigidActor->attachShape(*m_pConvexMeshShape);
 	PxRigidBodyExt::updateMassAndInertia(*m_pRigidActor, m_pActor->m_Material.identity);
+	isAttaching = true;
 	return true;
 Exit0:
 	return false;
@@ -104,6 +107,8 @@ bool FChunk::Attach(PxRigidDynamic* actor)
 	//simulationFilterData.word3 = ChunkType::INCLUSTER;
 	//m_pConvexMeshShape->setSimulationFilterData(simulationFilterData);
 	actor->attachShape(*m_pConvexMeshShape);
+
+	isAttaching = true;
 	return true;
 Exit0:
 	return false;
@@ -112,6 +117,7 @@ Exit0:
 bool FChunk::Update()
 {	
 	FASSERT(m_pRigidActor);
+	if(isAttaching)
 	m_IsSleeping = m_pRigidActor->isSleeping();
 	FASSERT(!m_IsSleeping);
 	m_Transform = m_pRigidActor->getGlobalPose();

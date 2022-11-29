@@ -55,6 +55,8 @@ private:
 	BoundingBox m_BoundingBox;
 	FMeshBoolean* m_pMeshBoolean;
 	float m_Life;
+
+	bool isAttaching;
 	bool m_IsSleeping;
 	bool m_IsDestructable;
 	float m_ChunkHealth;

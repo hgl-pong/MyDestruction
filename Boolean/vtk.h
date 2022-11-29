@@ -305,7 +305,7 @@ void tet2vtk_b(OS &os, const FLOAT *node, size_t node_num, const INT *tet, size_
 
   os << "# vtk DataFile Version 2.0\nTET\nBINARY\n\nDATASET UNSTRUCTURED_GRID\n";
 
-  os << "POINTS " << node_num << " "<< (sizeof(FLOAT) == sizeof(float)?"float":"double") << "\n";
+  os << "POINTS " << node_num << " "<< (sizeof(FLOAT) == sizeof(float)?"float":"float") << "\n";
   //os.write(reinterpret_cast<const char*>(&node[0]),3 * node_num * sizeof(FLOAT));
 
   if(Endianness::is_little_endian()) {
@@ -345,7 +345,7 @@ void tet2vtk_b(OS &os, const FLOAT *node, size_t node_num, const INT *tet, size_
 template <typename OS, typename Iterator, typename INT>
 void vtk_data_b(OS &os, Iterator first, INT size, char *value_name, char *table_name = "my_table")
 {
-  os << "SCALARS " << value_name << (sizeof(*first) == sizeof(float)?" float":" double")<< "\n";
+  os << "SCALARS " << value_name << (sizeof(*first) == sizeof(float)?" float":" float")<< "\n";
   os << "LOOKUP_TABLE " << table_name << "\n";
   os.write(reinterpret_cast<const char*>(first),size * sizeof(*first));
 }

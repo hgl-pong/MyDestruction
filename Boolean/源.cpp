@@ -23,7 +23,7 @@ int main() {
 	}
 	readTri(is, meshA, 3);
 	is.close();
-	is.open("BoxA.obj");
+	is.open("BoxB.obj");
 	if (!is.is_open()) {
 		cout << "fail to open the file" << endl;
 		return -1;
