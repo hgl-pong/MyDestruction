@@ -22,22 +22,21 @@ public:
 	static bool TrianglesIntersect(FTriangle& triangleA, FTriangle& triangleB, std::pair<FVertex, FVertex>*& edge) {
 		int coplanar = 0;
 		edge = nullptr;
-		float pA[3], pB[3];
-		float p1[3] = { triangleA.i().position.X,triangleA.i().position.Y,triangleA.i().position.Z };
-		float p2[3] = { triangleA.j().position.X,triangleA.j().position.Y,triangleA.j().position.Z };
-		float p3[3] = { triangleA.k().position.X,triangleA.k().position.Y,triangleA.k().position.Z };		
-		
-		float q1[3] = { triangleB.i().position.X,triangleB.i().position.Y,triangleB.i().position.Z };
-		float q2[3] = { triangleB.j().position.X,triangleB.j().position.Y,triangleB.j().position.Z };
-		float q3[3] = { triangleB.k().position.X,triangleB.k().position.Y,triangleB.k().position.Z };
-		if (!tri_tri_intersection_test_3d(p1,p2,p3,q1,q2,q3,&coplanar,pA,pB)) {
+		FVec3 posA, posB;
+		if (!tri_tri_intersection_test_3d(
+			(float*)(&triangleA.i().position),
+			(float*)(&triangleA.j().position),
+			(float*)(&triangleA.k().position), 
+			(float*)(&triangleB.i().position),
+			(float*)(&triangleB.j().position),
+			(float*)(&triangleB.k().position),
+			&coplanar,
+			(float*)(&posA),
+			(float*)(&posB))) {
 			return false;
 		}
 		if (coplanar)
 			return false;
-
-		FVec3 posA={ (float)pA[0] ,(float)pA[1] ,(float)pA[2] };
-		FVec3 posB = { (float)pB[0],(float)pB[1],(float)pB[2]};
 		if (posA == posB)
 			return false;
 		edge = new std::pair<FVertex, FVertex>[2];
@@ -79,11 +78,13 @@ public:
 		FVec3 w = pointOnPlane - segmentPoint0;
 		float d = planeNormal.Dot(u);
 		float n = planeNormal.Dot(w);
-		//if (std::abs(d) <= FLOAT_EPSILON)
-		if (Float::isZero(d))
+		//
+		
+		if (std::abs(d) <= FLOAT_EPSILON)
+		if (Float::isWeakZero(d))
 			return false;
 		auto s = n / d;
-		if (s  < 0 || s> 1 || std::isnan(s) || std::isinf(s))
+		if (s < 0 || s> 1 || std::isnan(s) || std::isinf(s))
 			return false;
 		if (intersection!=nullptr)
 			*intersection = segmentPoint0 + u * s;
