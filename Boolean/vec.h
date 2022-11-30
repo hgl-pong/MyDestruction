@@ -4,11 +4,11 @@
 #include <cmath>
 #include <limits>
 #define FLOAT_EPSILON std::numeric_limits<float>::epsilon()
-#define FLOAT_WEAK_EPSILON 1e-4f
+#define FLOAT_WEAK_EPSILON 1e-7f
 #define FLOAT_MAX std::numeric_limits<float>::max()
 #define FLOAT_MIN std::numeric_limits<float>::lowest()
 
-#define SCALE 1e4
+#define SCALE 1e7
 namespace Float
 {
 
@@ -46,9 +46,9 @@ public:
 	}
 
 	bool operator==(const FVec2& v)const {
-		FVec2 d = *this - v;
-		return Float::isWeakZero(d.LengthSqr());
-		//return Float::isWeakEqual(v.X, X) && Float::isWeakEqual(v.Y, Y);
+		//FVec2 d = *this - v;
+		//return Float::isWeakZero(d.LengthSqr());
+		return Float::isWeakEqual(v.X, X) && Float::isWeakEqual(v.Y, Y);
 	}
 
 
@@ -113,7 +113,7 @@ public:
 	FVec3& operator	= (const FVec3& v);	   
 	FVec3& operator += (const FVec3& v);
 	 FVec3& operator -= (const FVec3& v);	  
-	 FVec3& operator *= (const float d);	   
+	 FVec3 operator *= (const float& d)const;	   
 	 FVec3& operator /= (const float d);	
 
 

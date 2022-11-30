@@ -38,6 +38,7 @@ void FMeshBoolean::FetchBooleanResult(VoroCellInfo& cell, VoroCellInfo& result, 
 	FBoundingBox boxB(meshB.m_Vertices);
 	FMeshData mesh = m_SouceMesh->CollecteTriangles(boxB);
 	FGeometryCollection collection(boxB, meshB);
+	collection.SetMeshB(mesh);
 
 	FMeshData 	output = collection.FetchResult(type);
 

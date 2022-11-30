@@ -65,9 +65,9 @@ bool FVec2::IsOnLine( FVec2& a, FVec2& b)
 	//p1 = p1 / l1;
 	//p2 = p2 / l2;
 	//float cos = p1.Dot(p2);
-	//return float::isEqual(cos * cos, 1);
+	//return Float::isWeakEqual(cos*cos, 1)|| Float::isWeakEqual(cos * cos, 0);
 	float d = (Y - a.Y) * (b.X - a.X) - (X - a.X) * (b.Y - a.Y);
-	return Float::isZero(d);
+	return Float::isWeakZero(d*d*d);
 }
 
 // CONSTRUCTORS
@@ -99,9 +99,9 @@ FVec3& FVec3::operator = (const FVec3& v)
 	X -= v.X; Y -= v.Y; Z -= v.Z; return *this;
 }
 
- FVec3& FVec3::operator *= (const float d)
+ FVec3 FVec3::operator *= (const float& d) const
 {
-	X *= d; Y *= d; Z *= d; return *this;
+	 return FVec3(X * d, Y * d, Z * d);
 }
 
  FVec3 FVec3::operator*(const float d) const
@@ -159,7 +159,8 @@ FVec3& FVec3::operator = (const FVec3& v)
 
  FVec3 FVec3:: operator * (const float d)
 {
-	return FVec3(d * X, d * Y, d * Z);
+	 X *= d; Y *= d; Z *= d;
+	return *this;
 }
 
 
@@ -225,17 +226,17 @@ FVec3& FVec3::operator = (const FVec3& v)
 	return FVec3(std::min(X, v.X), std::min(Y, v.Y), std::min(Z, v.Z));
 }
 
- bool FVec3::IsOnSegment(FVec3& a, FVec3& b)
+ bool FVec3::IsOnSegment(FVec3& p1, FVec3& p2)
  {
-	 FVec3 p1 = a - *this;
-	 FVec3 p2 = b - *this;
-	 p1.Normalize();
-	 p2.Normalize();
-	 float cos = p1.Dot(p2);
-	 return Float::isWeakZero(cos);
+	 //FVec3 p1 = a - *this;
+	 //FVec3 p2 = b - *this;
+	 //p1.Normalize();
+	 //p2.Normalize();
+	 //float cos = p1.Dot(p2);
+	 //return Float::isWeakZero(cos);
 
-	 //return std::abs(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))<= FLOAT_EPSILON
-		// && (X >= std::min(p1.X, p2.X) +FLOAT_EPSILON&& X <= std::max(p1.X, p2.X)) + FLOAT_EPSILON
-		// && ((Y >= std::min(p1.Y, p2.Y) + FLOAT_EPSILON) && (Y <= std::max(p1.Y, p2.Y) + FLOAT_EPSILON))
-		// && ((Z >= std::min(p1.Z, p2.Z) + FLOAT_EPSILON) && (Z <= std::max(p1.Z, p2.Z) + FLOAT_EPSILON));
+	 return Float::isWeakZero(((X - p1.X) * (p1.Y - p2.Y))- ((p1.X - p2.X) * (Y - p1.Y)))
+		 && (X >= std::min(p1.X, p2.X) +FLOAT_WEAK_EPSILON&& X <= std::max(p1.X, p2.X)) + FLOAT_WEAK_EPSILON
+		 && ((Y >= std::min(p1.Y, p2.Y) + FLOAT_WEAK_EPSILON) && (Y <= std::max(p1.Y, p2.Y) + FLOAT_WEAK_EPSILON))
+		 && ((Z >= std::min(p1.Z, p2.Z) + FLOAT_WEAK_EPSILON) && (Z <= std::max(p1.Z, p2.Z) + FLOAT_WEAK_EPSILON));
  }

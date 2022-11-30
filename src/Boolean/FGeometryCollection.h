@@ -43,8 +43,7 @@ namespace std {
 	};
 }
 
-static std::unordered_map<TrianglePair, IntersectEdge> m_IntersectMap;
-static std::unordered_map<FTriangle, std::unordered_set<FTriangle>> m_IntersectNeighbors;
+
 
 static const std::vector<FVec3> g_testAxisList = {
 {FLOAT_MAX, 0, 0},
@@ -68,6 +67,7 @@ public:
 	void Triangulate();
 private:
 	void _GetMeshAInMeshB(std::unordered_set<FTriangle>& meshA, std::unordered_set<FTriangle>& meshB);
+	void _Merge();
 private:
 	std::unordered_set<FTriangle> m_MeshASet;
 	std::unordered_set<FTriangle> m_MeshBSet;
@@ -76,6 +76,9 @@ private:
 	FMeshData m_MeshB;
 	FMeshData m_Result;
 	
+	std::unordered_map<TrianglePair, IntersectEdge> m_IntersectMap;
+	std::unordered_map<FTriangle, std::unordered_set<FTriangle>> m_IntersectNeighbors;
+
 	std::unordered_map<FTriangle, std::unordered_set<FVertex>> m_TrianglesIntersction;
 	FBoundingBox m_Box;
 };

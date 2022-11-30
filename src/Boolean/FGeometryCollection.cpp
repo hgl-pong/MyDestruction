@@ -4,38 +4,18 @@
 #include <queue>
 #include <unordered_map>
 
-FGeometryCollection::FGeometryCollection(FBoundingBox& box,FMeshData& meshdata)
-	:m_Box(box),
-	m_MeshA(meshdata)
+FGeometryCollection::FGeometryCollection(FBoundingBox& box, FMeshData& meshdata)
+	:m_Box(box)
+
 {
+	m_MeshA = meshdata;
 }
 
 FGeometryCollection::~FGeometryCollection()
 {
 
 }
-
-FMeshData FGeometryCollection::FetchResult(CollectionType type)
-{
-	bool anyIntersect=CalculateIntersect();
-	if(anyIntersect)
-		Triangulate();
-	else {
-		FVertex& point = m_MeshA.m_Vertices[0];
-		bool isIn = false;
-		for (auto test : g_testAxisList) {
-			if (IntersectUtils::IsInMesh(m_MeshASet, point.position, test)) {
-				isIn = true;
-				break;
-			}
-		}
-		if (isIn)
-			return m_MeshA;
-		else
-			return FMeshData();
-	}
-	Clean(type);
-
+void FGeometryCollection::_Merge() {
 	m_Result.m_Triangles.clear();
 	m_Result.m_Vertices.clear();
 
@@ -55,6 +35,34 @@ FMeshData FGeometryCollection::FetchResult(CollectionType type)
 	for (auto& point : buffer) {
 		m_Result.m_Vertices.push_back(point);
 	}
+}
+
+FMeshData FGeometryCollection::FetchResult(CollectionType type)
+{
+	bool anyIntersect=CalculateIntersect();
+	//_Merge();
+	//if (writeVtk("chunk.vtk", m_Result.m_Vertices, m_Result.m_Triangles))
+	//	printf("write success!-----------------\n");
+	if(anyIntersect)
+		Triangulate();
+	else {
+		FVertex& point = m_MeshA.m_Vertices[0];
+		bool isIn = false;
+		for (auto test : g_testAxisList) {
+			if (IntersectUtils::IsInMesh(m_MeshASet, point.position, test)) {
+				isIn = true;
+				break;
+			}
+		}
+		if (isIn)
+			return m_MeshA;
+		else
+			return FMeshData();
+	}
+	Clean(type);
+	_Merge();
+	//if (writeVtk("chunk2.vtk", m_Result.m_Vertices, m_Result.m_Triangles))
+	//	printf("write success!-----------------\n");
 	return m_Result;
 }
 

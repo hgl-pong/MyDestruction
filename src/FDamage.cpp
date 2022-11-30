@@ -20,10 +20,13 @@ FSphereDamage::~FSphereDamage() {
 }
 
 void FSphereDamage::Damage(FChunk* chunk, bool cmpdis) {
+	if (chunk)
+		return;
 	PxVec3 temp(chunk->GetPosition().X, chunk->GetPosition().Y, chunk->GetPosition().Z);
 	temp= chunk->m_Transform.transform(temp);
 	PxVec3 dir(temp.x- m_Position.X, temp.y - m_Position.Y, temp.z- m_Position.Z);
-	float dis = dir.magnitude();
+	float dis = dir.magnitude();	
+
 	if (dis > m_Radius&&cmpdis)
 		return;
 	if (chunk->m_Neighbors.empty())
@@ -35,6 +38,7 @@ void FSphereDamage::Damage(FChunk* chunk, bool cmpdis) {
 	dir = dir * m_Damage / (dis * dis)*5;
 	//dir = dir * 50;
 	chunk->GetPhysicsActor()->addForce(dir, PxForceMode::eIMPULSE);
+
 }
 
 void FSphereDamage::Damage(FChunkCluster* chunkCluster) 

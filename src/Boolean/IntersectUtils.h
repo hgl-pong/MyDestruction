@@ -92,9 +92,10 @@ public:
 
 	}
 
-	static bool IsInMesh(/*FMeshData&meshdata, */std::unordered_set<FTriangle>& triangles,FVec3& point, const FVec3& testAxis)
+	static bool IsInMesh(/*FMeshData&meshdata, */std::unordered_set<FTriangle>& triangles,FVec3 point, const FVec3& testAxis)
 	{
 		//std::vector<FTriangle>& triangles = meshdata.m_Triangles;
+		//point = point * SCALE;
 		FVec3 testEnd = point + testAxis;
 		bool inside = false;
 		FBoundingBox box;
@@ -102,12 +103,12 @@ public:
 		box.Include(testEnd);
 		std::unordered_set<DetectPair> hits;
 		int time = 0;
-		for (const auto& triangle : triangles) {
-			//FBoundingBox triBox = triangle.box ;
+		for (const auto triangle : triangles) {
+			//triangle.box *= SCALE ;
 			if (!WeakBoundingBoxIntersection(box, triangle.box))
 				continue;
 			std::vector<FVec3> trianglePositions = {
-				triangle.i().position,
+				triangle.i().position ,
 				triangle.j().position,
 				triangle.k().position
 			};

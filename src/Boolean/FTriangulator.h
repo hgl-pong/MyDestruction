@@ -43,7 +43,7 @@ inline std::vector<FVec2> Project(std::vector<FVertex>polygon, FVec3& normal, FV
 	std::vector<FVec2>result;
 
 	FVec3 perpendicularAxis = normal.Cross(axis);
-	for (auto it:polygon) {
+	for (auto& it:polygon) {
 		FVec3 direction = it.position - origin;
 		result.push_back(FVec2(direction.Dot(axis), direction.Dot(perpendicularAxis)));
 	}

@@ -368,6 +368,12 @@
     <ClInclude Include="..\src\Boolean\tri_tri_intersect.h">
       <Filter>头文件\MeshBoolean</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Boolean\IO.h">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boolean\vtk.h">
+      <Filter>头文件\MeshBoolean</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

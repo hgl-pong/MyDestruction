@@ -58,7 +58,7 @@ public:
     void Merge(FBoundingBox& box);
     void Include(FVec3& v);
 
-    FBoundingBox operator* (const float& d){
+    FBoundingBox operator*= (const float& d)const{
         m_Min *= d;
         m_Max *= d;
         m_Size *= d;
@@ -118,11 +118,11 @@ struct FMeshData {
 
 static bool WeakBoundingBoxIntersection(const FBoundingBox& aBox, const FBoundingBox& bBox)
 {
-	if (std::max(aBox.m_Min.X, bBox.m_Min.X) > std::min(aBox.m_Max.X, bBox.m_Max.X) + FLOAT_EPSILON)
+	if (std::max(aBox.m_Min.X, bBox.m_Min.X) > std::min(aBox.m_Max.X, bBox.m_Max.X) + FLOAT_WEAK_EPSILON)
 		return false;
-	if (std::max(aBox.m_Min.Y, bBox.m_Min.Y) > std::min(aBox.m_Max.Y, bBox.m_Max.Y) + FLOAT_EPSILON)
+	if (std::max(aBox.m_Min.Y, bBox.m_Min.Y) > std::min(aBox.m_Max.Y, bBox.m_Max.Y) + FLOAT_WEAK_EPSILON)
 		return false;
-	if (std::max(aBox.m_Min.Z, bBox.m_Min.Z) > std::min(aBox.m_Max.Z, bBox.m_Max.Z) + FLOAT_EPSILON)
+	if (std::max(aBox.m_Min.Z, bBox.m_Min.Z) > std::min(aBox.m_Max.Z, bBox.m_Max.Z) + FLOAT_WEAK_EPSILON)
 		return false;
 	return true;
 }

@@ -109,7 +109,7 @@ void FTriangulator::LookupPolylinesFromNeighborMap(const std::unordered_map<FInd
 
 int FTriangulator::AttachPointToTriangleEdge( FVec2& point)
 {
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; i++) {
         int j = (i + 1) % 3;
         if (point.IsOnLine(m_points[i], m_points[j]))
             return i;

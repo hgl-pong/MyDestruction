@@ -129,6 +129,8 @@ bool FChunkCluster::Update()
 	FASSERT(m_pRigidActor);
 	m_IsSleeping = m_pRigidActor->isSleeping();
 	for (auto chunk : m_ConnectGraph.GetNodes()) {
+		if (chunk == nullptr)
+			continue;
 		for (int i = 0; i < chunk->m_Vertices.size(); i++) {
 			PxVec3 temp(chunk->m_Vertices2[i].X, chunk->m_Vertices2[i].Y, chunk->m_Vertices2[i].Z);
 			temp = m_pRigidActor->getGlobalPose().transform(temp);
@@ -152,6 +154,8 @@ bool FChunkCluster::Init(std::unordered_map<int, FChunk*>& chunks, FActor* actor
 		return false;
 
 	for (auto chunk : chunks) {
+		if (chunk.second == nullptr)
+			continue;
 		m_ConnectGraph.AddNode(chunk.second);
 		for (int i = 0; i < chunk.second->m_Neighbors.size(); i++)
 		{

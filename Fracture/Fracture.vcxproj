@@ -206,7 +206,9 @@
     <ClInclude Include="..\src\Boolean\FGeometryCollection.h" />
     <ClInclude Include="..\src\Boolean\FTriangulator.h" />
     <ClInclude Include="..\src\Boolean\IntersectUtils.h" />
+    <ClInclude Include="..\src\Boolean\IO.h" />
     <ClInclude Include="..\src\Boolean\tri_tri_intersect.h" />
+    <ClInclude Include="..\src\Boolean\vtk.h" />
     <ClInclude Include="..\src\Common\Application.h" />
     <ClInclude Include="..\src\Common\Base.h" />
     <ClInclude Include="..\src\Common\Buffer.h" />

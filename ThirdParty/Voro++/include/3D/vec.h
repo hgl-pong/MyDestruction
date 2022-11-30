@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <limits>
-#define FLOAT_EPSILON std::numeric_limits<float>::epsilon()
+#define FLOAT_EPSILON std::numeric_limits<float>::epsilon()*10
 #define FLOAT_WEAK_EPSILON 1e-4f
 #define FLOAT_MAX std::numeric_limits<float>::max()
 #define FLOAT_MIN std::numeric_limits<float>::lowest()

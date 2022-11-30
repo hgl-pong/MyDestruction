@@ -3,14 +3,13 @@
 #include <fstream>
 #include "FAccelerator.h"
 #include "FGeometryCollection.h"
-#include "vtk.h"
 #include "IO.h"
 #include "IntersectUtils.h"
 using namespace std;
 
 int main() {
 
-	string file = "bunny";
+	string file = "BoxA";
 	string outputDir = file+".vtk";
 	string input = file+".obj";
 	ifstream is;
@@ -21,7 +20,7 @@ int main() {
 		cout << "fail to open the file" << endl;
 		return -1;
 	}
-	readTri(is, meshA, 2.5);
+	readTri(is, meshA, 10);
 	is.close();
 	is.open("BoxB.obj");
 	if (!is.is_open()) {
@@ -29,7 +28,7 @@ int main() {
 		return -1;
 	}
 
-	readTri(is, meshB, 1);
+	readTri(is, meshB, 10);
 	is.close();
 	FBoundingBox boxA(meshA.m_Vertices);
 	FBoundingBox boxB(meshB.m_Vertices);

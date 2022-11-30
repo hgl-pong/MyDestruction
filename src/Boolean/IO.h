@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include"vtk.h"
 using namespace std;
 
 int readTri(ifstream& is, FMeshData& mesh,float scale=1) {
