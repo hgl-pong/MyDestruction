@@ -59,9 +59,9 @@ public:
     void Include(FVec3& v);
 
     FBoundingBox operator*= (const float& d)const{
-        m_Min *= d;
-        m_Max *= d;
-        m_Size *= d;
+        m_Min * d;
+        m_Max * d;
+        m_Size * d;
         return *this;
     }
 public:
