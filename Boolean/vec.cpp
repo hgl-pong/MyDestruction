@@ -67,7 +67,7 @@ bool FVec2::IsOnLine( FVec2& a, FVec2& b)
 	//float cos = p1.Dot(p2);
 	//return Float::isWeakEqual(cos*cos, 1)|| Float::isWeakEqual(cos * cos, 0);
 	float d = (Y - a.Y) * (b.X - a.X) - (X - a.X) * (b.Y - a.Y);
-	return Float::isWeakZero(d*d*d);
+	return Float::isZero(d*d);
 }
 
 // CONSTRUCTORS

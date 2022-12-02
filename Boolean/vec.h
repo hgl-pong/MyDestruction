@@ -4,11 +4,11 @@
 #include <cmath>
 #include <limits>
 #define FLOAT_EPSILON std::numeric_limits<float>::epsilon()
-#define FLOAT_WEAK_EPSILON 1e-7f
+#define FLOAT_WEAK_EPSILON 1e-4f
 #define FLOAT_MAX std::numeric_limits<float>::max()
 #define FLOAT_MIN std::numeric_limits<float>::lowest()
 
-#define SCALE 1e7
+#define SCALE 1e4
 namespace Float
 {
 
@@ -195,9 +195,6 @@ static bool IsInTriangle(FVec3& intersection,FVec3* trianglePositions) {
 	float d3 = normals[1].Dot(normals[2]);
 	//在三角形内或三角形边上时
 	return (d1+FLOAT_EPSILON >= 0 && d2 + FLOAT_EPSILON >= 0 && d3+FLOAT_EPSILON >= 0);
-		/*(d1 < 0 && d2 < 0 && d3 < 0 && std::abs(d1 + 1) <= FLOAT_EPSILON && std::abs(d2 + 1) <= FLOAT_EPSILON && std::abs(d3 + 1) <= FLOAT_EPSILON) || 
-		(d1 >0 && d2 > 0&&d3>0&&std::abs(d1-1)<=FLOAT_EPSILON&& std::abs(d2-1) <= FLOAT_EPSILON&& std::abs(d3 - 1) <= FLOAT_EPSILON) ||
-		(float::isZero(d1) || float::isZero(d2)|| float::isZero(d2));*/
 }
 namespace std {
 

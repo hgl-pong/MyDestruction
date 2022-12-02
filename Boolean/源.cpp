@@ -9,7 +9,7 @@ using namespace std;
 
 int main() {
 
-	string file = "BoxA";
+	string file = "bunny";
 	string outputDir = file+".vtk";
 	string input = file+".obj";
 	ifstream is;
@@ -20,15 +20,15 @@ int main() {
 		cout << "fail to open the file" << endl;
 		return -1;
 	}
-	readTri(is, meshA, 10);
+	readTri(is, meshA, 3);
 	is.close();
-	is.open("BoxB.obj");
+	is.open("BoxA.obj");
 	if (!is.is_open()) {
 		cout << "fail to open the file" << endl;
 		return -1;
 	}
 
-	readTri(is, meshB, 10);
+	readTri(is, meshB, 1);
 	is.close();
 	FBoundingBox boxA(meshA.m_Vertices);
 	FBoundingBox boxB(meshB.m_Vertices);
